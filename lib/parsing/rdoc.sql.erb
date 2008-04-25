@@ -1,0 +1,58 @@
+<% @output[:files].each do |file| %>
+INSERT INTO containers(id, type, parent_id, name, full_name, superklass, comment_id) 
+	VALUES(<%= file.id %>, 'File', 0, '<%= escape_sql(file.file_relative_name) %>', '<%= escape_sql(file.file_absolute_name) %>', '', <%= file.id %>);
+INSERT INTO comments(id, comment)
+	VALUES(<%= file.id %>, '<%= escape_sql(file.comment) %>');
+<% end %>
+
+<% @output[:classes].each do |klass| %>
+INSERT INTO containers(id, type, parent_id, name, full_name, superklass, comment_id) 
+	VALUES(<%= klass.id %>, 'klass', <%= klass.container_id %>, '<%= escape_sql(klass.name) %>', '<%= escape_sql(klass.full_name) %>', '<%= escape_sql(klass.superklass) %>', <%= klass.id %>);
+INSERT INTO comments(id, comment)
+	VALUES(<%= klass.id %>, '<%= escape_sql(klass.comment) %>');
+<% end %>
+
+<% @output[:modules].each do |mod| %>
+INSERT INTO containers(id, type, parent_id, name, full_name, superklass, comment_id) 
+	VALUES(<%= mod.id %>, 'mod', <%= mod.container_id %>, '<%= escape_sql(mod.name) %>', '<%= escape_sql(mod.full_name) %>', '<%= escape_sql(mod.superclass) %>', <%= mod.id %>);
+INSERT INTO comments(id, comment)
+	VALUES(<%= mod.id %>, '<%= escape_sql(mod.comment) %>');
+<% end %>
+
+<% @output[:methods].each do |method| %>
+INSERT INTO methods (id, container_id, name, parent_name, pameters, block_pameters, singleton, visibility, force_documentation, comment_id, source_code_id) 
+	VALUES(<%= method.id %>, <%= method.container_id %>, '<%= escape_sql(method.name) %>', '<%= escape_sql(method.parent.full_name) %>', 	
+	'<%= escape_sql(method.params) %>', '<%= escape_sql(method.block_params) %>', <%= bool_to_int(method.singleton) %>, 
+	<%= VISIBILITY[method.visibility] %>, <%= bool_to_int(method.force_documentation) %>, <%= method.id %>, <%= method.id %>);
+INSERT INTO source_codes (id, source_code)
+	VALUES(<%= method.id %>, '<%= escape_sql(method.source_code) %>');	
+INSERT INTO comments(id, comment)
+	VALUES(<%= method.id %>, '<%= escape_sql(method.comment) %>');
+<% end %>
+
+<% @output[:attributes].each do |attribute| %>
+INSERT INTO code_objects (id, container_id, type, name, parent_name, value, visibility, read_write, comment) 
+	VALUES(<%= attribute.id %>, <%= attribute.container_id %>, 'Attribute', '<%= escape_sql(attribute.name) %>', '', '',
+  <%= VISIBILITY[attribute.visibility] %>, '<%= escape_sql(attribute.rw) %>', '<%= escape_sql(attribute.comment) %>' );
+<% end %>
+
+<% @output[:aliases].each do |_alias| %>	
+INSERT INTO code_objects (id, container_id, type, name, parent_name, value, visibility, read_write, comment) 
+	VALUES(<%= _alias.id %>, <%= _alias.container_id %>, '_alias', '<%= escape_sql(_alias.old_name) %>', '', '<%= escape_sql(_alias.new_name) %>', 0, '', '<%= escape_sql(_alias.comment) %>' );	
+<% end %>
+
+<% @output[:constants].each do |constant| %>
+INSERT INTO code_objects (id, container_id, type, name, parent_name, value, visibility, read_write, comment) 
+	VALUES(<%= constant.id %>, <%= constant.container_id %>, 'Constant', '<%= escape_sql(constant.name) %>', '', '<%= escape_sql(constant.value) %>', 0, '', '<%= escape_sql(constant.comment) %>' );	
+<% end %>
+
+<% @output[:requires].each do |_require| %>
+INSERT INTO code_objects (id, container_id, type, name, parent_name, value, visibility, read_write, comment) 
+	VALUES(<%= _require.id %>, <%= _require.container_id %>, '_require', '<%= escape_sql(_require.name) %>', '', '', 0, '', '<%= escape_sql(_require.comment) %>' );
+<% end %>
+
+<% @output[:includes].each do |_include| %>
+INSERT INTO code_objects (id, container_id, type, name, parent_name, value, visibility, read_write, comment) 
+	VALUES(<%= _include.id %>, <%= _include.id %>, '_include', '<%= escape_sql(_include.name) %>', '', '',
+  0, '', '<%= escape_sql(_include.comment) %>' );
+<% end %>
