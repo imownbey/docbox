@@ -40,7 +40,7 @@ module Generators
         :methods => [], :aliases => [], :constants => [], :requires => [], :includes => []}   
       
       # sequences used to generate unique ids for inserts
-      @seq = 0            
+      @seq = 0     
     end
 
     # Rdoc passes in TopLevel objects from the code_objects.rb tree (all files)
@@ -122,50 +122,44 @@ module Generators
     
     def process_alias(obj, parent, parent_id)
       id = get_next_id(:aliases)    
-      @output[:aliases].push(add_object(obj, id, parent_id))  
+      @output[:aliases].push add_object(obj, id, parent_id) 
     end
     
     def process_constant(obj, parent, parent_id)
       id = get_next_id(:constants)    
-      @output[:constants].push(add_object(obj, id, parent_id))    
+      @output[:constants].push add_object(obj, id, parent_id)  
     end
     
     def process_attribute(obj, parent, parent_id)
       id = get_next_id(:attributes)   
-      @output[:attributes].push(add_object(obj, id, parent_id))     
+      @output[:attributes].push add_object(obj, id, parent_id)  
     end
     
     def process_require(obj, parent, parent_id)
       id = get_next_id(:requires)
-      @output[:requires].push(add_object(obj, id, parent_id)) 
+      @output[:requires].push add_object(obj, id, parent_id)
     end
     
     def process_include(obj, parent, parent_id) 
       id = get_next_id(:includes)   
-      @output[:includes].push(add_object(obj, id, parent_id))     
+      @output[:includes].push add_object(obj, id, parent_id)
     end   
     
     # load the RHTML template
     def load_template   
-      p Dir.getwd
-      return File.read('rdoc.sql.rb')
+      File.read('rdoc.sql.erb')
     end
-    
-    # required so that ERb can access the bindings of this object
-    def get_binding
-    	binding
-    end
-    
- 	def escape_sql(str)  
- 	  if(str == nil) then return '' end
+
+ 	  def escape_sql(str)  
+ 	    return '' if str == nil
  	
- 	  str.gsub(/([\0\n\r\032\'\"\\])/) do
+   	  str.gsub(/([\0\n\r\032\'\"\\])/) do
         case $1
-          when "\0" then "\\0"
-          when "\n" then "\\n"
-          when "\r" then "\\r"
-          when "\032" then "\\Z"
-          else "\\"+$1
+        when "\0";   "\\0"
+        when "\n";   "\\n"
+        when "\r";   "\\r"
+        when "\032"; "\\Z"
+        else "\\#{$1}"
         end
       end
     end    
@@ -174,18 +168,17 @@ module Generators
     def add_object(obj, id, container_id)
       obj.id = id
       obj.container_id = container_id
-      return obj
+      obj
     end
 
-	# get the next unique ID      
+	  # get the next unique ID      
     def get_next_id(name = nil)
       @seq = @seq + 1
-      return @seq
     end                 
     
     # Transform true/false -> 1/0
     def bool_to_int(bool_val)
-      if(bool_val == nil)
+      if bool_val == nil
         return 0
       end
       return bool_val ? 1 : 0
@@ -194,25 +187,24 @@ module Generators
     # get the source code
     def get_source_code(method)
       src = ""
-	  if(ts = method.token_stream)    
-	    ts.each do |t|
-	    next unless t    			
-	      src << t.text
-	    end
+  	  if ts = method.token_stream 
+  	    ts.each do |t|
+  	      next unless t    			
+    	    src << t.text
+    	  end
       end
       return src
-    end
-         
+    end   
+     
+  end # class SqlGenerator
+
+  # dynamically add the id/container_id to the base object of code_objects.rb
+  class RDoc::CodeObject
+    attr_accessor :id, :container_id
+  end 
+
+  # dynamically add a source code attribute to the base oject of code_objects.rb
+  class RDoc::AnyMethod
+    attr_accessor :source_code	  
   end
-
-   # dynamically add the id/container_id to the base object of code_objects.rb
-   class RDoc::CodeObject
-     attr_accessor :id, :container_id
-   end 
-   
-   # dynamically add a source code attribute to the base oject of code_objects.rb
-   class RDoc::AnyMethod
-     attr_accessor :source_code	  
-   end
-
-end
+end # module Generators
