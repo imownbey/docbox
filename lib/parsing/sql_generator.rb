@@ -40,7 +40,7 @@ module Generators
         :methods => [], :aliases => [], :constants => [], :requires => [], :includes => []}   
       
       # sequences used to generate unique ids for inserts
-      @seq = 0     
+      @seq = {:containers => 0, :methods => 0, :code_objects => 0}
     end
 
     # Rdoc passes in TopLevel objects from the code_objects.rb tree (all files)
@@ -147,7 +147,7 @@ module Generators
     
     # load the RHTML template
     def load_template   
-      File.read('rdoc.sql.erb')
+      File.read("#{File.expand_path(File.dirname(__FILE__))}/rdoc.sql.erb")
     end
 
  	  def escape_sql(str)  
@@ -172,8 +172,15 @@ module Generators
     end
 
 	  # get the next unique ID      
-    def get_next_id(name = nil)
-      @seq = @seq + 1
+    def get_next_id name
+      case name
+      when :files, :classes, :modules
+        @seq[:containers] += 1
+      when :methods
+        @seq[:methods] += 1
+      when :attributes, :aliases, :constants, :requires, :includes
+        @seq[:code_objects] += 1
+      end
     end                 
     
     # Transform true/false -> 1/0
