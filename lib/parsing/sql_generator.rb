@@ -46,16 +46,12 @@ module Generators
     # Rdoc passes in TopLevel objects from the code_objects.rb tree (all files)
     def generate(files)                             
       # before doing anything make sure we can output
-      @rhtml = ERB.new(load_template())          
-      f = File.new("inserts.sql", File::CREAT|File::TRUNC|File::RDWR)
-      f.close       
+      @rhtml = ERB.new(load_template())   
     
       # Each object passed in is a file, process it
       files.each { |file| process_file(file) }
-     
-      f = File.new("inserts.sql", File::CREAT|File::TRUNC|File::RDWR)      
-      f << @rhtml.result(binding)
-      f.close      
+      sql = ''
+      sql << @rhtml.result(binding)
     end
 
     private
@@ -185,10 +181,7 @@ module Generators
     
     # Transform true/false -> 1/0
     def bool_to_int(bool_val)
-      if bool_val == nil
-        return 0
-      end
-      return bool_val ? 1 : 0
+      bool_val ? 1 : 0
     end
     
     # get the source code

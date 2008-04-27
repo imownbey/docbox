@@ -1,23 +1,23 @@
 <% @output[:files].each do |file| %>
 INSERT INTO containers(id, type, parent_id, name, full_name, superclass, comment) 
-	VALUES(<%= file.id %>, 'File', 0, '<%= escape_sql(file.file_relative_name) %>', '<%= escape_sql(file.file_absolute_name) %>', '', <%= file.id %>, '<%= escape_sql(file.comment) %>');
+	VALUES(<%= file.id %>, 'file', 0, '<%= escape_sql(file.file_relative_name) %>', '<%= escape_sql(file.file_absolute_name) %>', '', '<%= escape_sql(file.comment) %>');
 <% end %>
 
 <% @output[:classes].each do |klass| %>
 INSERT INTO containers(id, type, parent_id, name, full_name, superclass, comment) 
-	VALUES(<%= klass.id %>, 'klass', <%= klass.container_id %>, '<%= escape_sql(klass.name) %>', '<%= escape_sql(klass.full_name) %>', '<%= escape_sql(klass.superclass) %>', <%= klass.id %>, '<%= escape_sql(klass.comment) %>');
+	VALUES(<%= klass.id %>, 'class', <%= klass.container_id %>, '<%= escape_sql(klass.name) %>', '<%= escape_sql(klass.full_name) %>', '<%= escape_sql(klass.superclass) %>', '<%= escape_sql(klass.comment) %>');
 <% end %>
 
 <% @output[:modules].each do |mod| %>
 INSERT INTO containers(id, type, parent_id, name, full_name, superclass, comment) 
-	VALUES(<%= mod.id %>, 'mod', <%= mod.container_id %>, '<%= escape_sql(mod.name) %>', '<%= escape_sql(mod.full_name) %>', '<%= escape_sql(mod.superclass) %>', <%= mod.id %>, '<%= escape_sql mod.comment %>');
+	VALUES(<%= mod.id %>, 'module', <%= mod.container_id %>, '<%= escape_sql(mod.name) %>', '<%= escape_sql(mod.full_name) %>', '<%= escape_sql(mod.superclass) %>', '<%= escape_sql mod.comment %>');
 <% end %>
 
 <% @output[:methods].each do |method| %>
 INSERT INTO methods (id, container_id, name, parent_name, parameters, block_pameters, singleton, visibility, force_documentation, comment, source_code) 
 	VALUES(<%= method.id %>, <%= method.container_id %>, '<%= escape_sql(method.name) %>', '<%= escape_sql(method.parent.full_name) %>', 	
 	'<%= escape_sql(method.params) %>', '<%= escape_sql(method.block_params) %>', <%= bool_to_int(method.singleton) %>, 
-	<%= VISIBILITY[method.visibility] %>, <%= bool_to_int(method.force_documentation) %>, <%= method.id %>, <%= method.id %>, '<%= escape_sql(method.comment) %>', '<%= escape_sql method.source_code %>');
+	<%= VISIBILITY[method.visibility] %>, <%= bool_to_int(method.force_documentation) %>, '<%= escape_sql(method.comment) %>', '<%= escape_sql method.source_code %>');
 <% end %>
 
 <% @output[:attributes].each do |attribute| %>
