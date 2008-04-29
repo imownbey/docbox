@@ -1,0 +1,23 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  container_id: 1
+  name: MyString
+  parameters: MyString
+  block_parameters: MyString
+  singleton: false
+  visibility: 1
+  force_documentation: false
+  comment: MyText
+  source_code: MyText
+
+two:
+  container_id: 1
+  name: MyString
+  parameters: MyString
+  block_parameters: MyString
+  singleton: false
+  visibility: 1
+  force_documentation: false
+  comment: MyText
+  source_code: MyText

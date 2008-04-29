@@ -142,7 +142,7 @@ module Generators
     
     def process_method(obj, parent, parent_id)      
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Method.create_or_update(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => VISIBILITY[obj.visibility], :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => obj.source_code)
+      Meth.create_or_update(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => VISIBILITY[obj.visibility], :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => obj.source_code)
     end
     
     def process_alias(obj, parent, parent_id)
