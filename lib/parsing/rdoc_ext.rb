@@ -17,10 +17,7 @@ module RDoc
         return false
       else
         $stderr.puts "\nParsing Documentation..."
-
-        require "#{File.expand_path(File.dirname(__FILE__))}/../parsing/sql_generator"
-
-        gen = Generators::SqlGenerator.new(options)
+        gen = Generators::Importer.new(options)
         begin
           gen.generate(file_info)
         ensure
@@ -46,19 +43,23 @@ module Generators
 
   # This generator takes the output of the rdoc parser
   # and turns it into a bunch of INSERT sql statements for a database
-  class SqlGenerator                 
+  class Importer               
 
     TYPE = {:file => 1, :class => 2, :module => 3 }
     VISIBILITY = {:public => 1, :private => 2, :protected => 3 }
         
     # Create a new Sql Generator object (used by RDoc)
-    def SqlGenerator.for(options)
+    def self.for(options)
       new(options)
     end
         
     # Greate a new generator and open up the file that will contain all the INSERT statements
     def initialize(options) #:not-new:
       @options = options
+      
+      # You have to call parent classes for STI to kick in
+      Container
+      CodeObject
       
       # set up a hash to keep track of all the classes/modules we have processed
       @already_processed = {}
@@ -73,20 +74,15 @@ module Generators
 
     # Rdoc passes in TopLevel objects from the code_objects.rb tree (all files)
     def generate(files)                             
-      # before doing anything make sure we can output
-      @rhtml = ERB.new(load_template())   
-    
       # Each object passed in is a file, process it
       files.each { |file| process_file(file) }
-      sql = ''
-      sql << @rhtml.result(binding)
     end
 
     private
 
     # process a file from the code_object.rb tree
     def process_file(file)
-      File.create_or_update :name => file.file_relative_name, :full_name => file.file_absolute_name, :comment => file.comment
+      Doc.create :name => file.file_relative_name, :full_name => file.file_absolute_name, :comment => file.comment
           
       # Process all of the objects that this file contains
       file.method_list.each { |child| process_method(child, file) }
@@ -114,13 +110,13 @@ module Generators
       # twice. So we need to keep track of what classes/modules we have
       # already seen and make sure we don't create two INSERT statements for the same
       # object.
-      if(!@already_processed.has_key?(obj.full_name)) then      
-        parent = Container.find_by_name(parent.name)
+      if(!@already_processed.has_key?(obj.full_name)) then    
+        parent = Container.find_by_name(parent.name) || Container.find_by_name(parent.file_relative_name)
         case type
         when :modules
-          Mod.create_or_update(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.comment)
+          Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.comment)
         when :classes
-          Klass.create_or_update(:parent => parent, :name => obj.name, :full_name => obj.fullname, :superclass => obj.superclass, :comment => obj.superclass)
+          Klass.create(:parent => parent, :name => obj.name, :full_name => obj.fullname, :superclass => obj.superclass, :comment => obj.superclass)
         end
         @already_processed[obj.full_name] = true    
           
@@ -140,34 +136,34 @@ module Generators
       end
     end       
     
-    def process_method(obj, parent, parent_id)      
+    def process_method(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Meth.create_or_update(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => VISIBILITY[obj.visibility], :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => obj.source_code)
+      Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => VISIBILITY[obj.visibility], :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => get_source_code(obj))
     end
     
-    def process_alias(obj, parent, parent_id)
+    def process_alias(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Alias.create_or_update(:container => parent, :name => obj.name, :value => obj.new_name, :comment => obj.comment)
+      Alias.create(:container => parent, :name => obj.name, :old_name => obj.new_name, :comment => obj.comment)
     end
     
-    def process_constant(obj, parent, parent_id)
+    def process_constant(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Alias.create_or_update(:container => parent, :name => obj.name, :value => obj.value, :comment => obj.comment)
+      Alias.create(:container => parent, :name => obj.name, :value => obj.value, :comment => obj.comment)
     end
     
-    def process_attribute(obj, parent, parent_id)
+    def process_attribute(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Attribute.create_or_update(:container => parent, :name => obj.name, :read_write => obj.rw :comment => obj.comment)
+      Attribute.create(:container => parent, :name => obj.name, :read_write => obj.rw, :comment => obj.comment)
     end
     
-    def process_require(obj, parent, parent_id)
+    def process_require(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Require.create_or_update(:container => parent, :name => obj.name, :comment => obj.comment)
+      Require.create(:container => parent, :name => obj.name, :comment => obj.comment)
     end
     
-    def process_include(obj, parent, parent_id) 
+    def process_include(obj, parent) 
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Require.create_or_update(:container => parent, :name => obj.name, :comment => obj.comment)
+      Require.create(:container => parent, :name => obj.name, :comment => obj.comment)
     end
     
     # get the source code
