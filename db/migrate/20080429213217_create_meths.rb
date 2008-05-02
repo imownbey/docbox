@@ -6,7 +6,7 @@ class CreateMeths < ActiveRecord::Migration
       t.string :parameters
       t.string :block_parameters
       t.boolean :singleton
-      t.integer :visibility
+      t.string :visibility, :length => 10
       t.boolean :force_documentation
       t.text :comment
       t.text :source_code
