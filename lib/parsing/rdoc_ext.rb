@@ -18,16 +18,11 @@ module RDoc
       else
         $stderr.puts "\nParsing Documentation..."
         gen = Generators::Importer.new(options)
-        begin
-          gen.generate(file_info)
-        ensure
-          Dir.chdir(pwd)
-        end
+        gen.generate(file_info)
       end
     end
   end
 end
-
 # This class takes RDoc and inputs it into the models using RDocs generator support
 
 # How does it work?
@@ -46,7 +41,6 @@ module Generators
   class Importer               
 
     TYPE = {:file => 1, :class => 2, :module => 3 }
-    VISIBILITY = {:public => 1, :private => 2, :protected => 3 }
         
     # Create a new Sql Generator object (used by RDoc)
     def self.for(options)
@@ -116,7 +110,7 @@ module Generators
         when :modules
           Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.comment)
         when :classes
-          Klass.create(:parent => parent, :name => obj.name, :full_name => obj.fullname, :superclass => obj.superclass, :comment => obj.superclass)
+          Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.superclass)
         end
         @already_processed[obj.full_name] = true    
           
@@ -132,13 +126,13 @@ module Generators
       id = @already_processed[obj.full_name]
       # Recursively process contained subclasses and modules 
       obj.each_classmodule do |child| 
-      	process_class_or_module(child, obj, id) 
+      	process_class_or_module(child, obj) 
       end
     end       
     
     def process_method(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => VISIBILITY[obj.visibility], :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => get_source_code(obj))
+      Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => get_source_code(obj))
     end
     
     def process_alias(obj, parent)
