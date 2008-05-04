@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 require 'rdoc/rdoc'
 require File.dirname(__FILE__) + '/../../lib/parsing/rdoc_ext'
+
 ##
 # This silences the RDoc output so
 # we dont muddy up the console
-
 module RDoc
   class RDoc
     $stderr.reopen(File.new('/tmp/stderr.docbox', 'w'))
