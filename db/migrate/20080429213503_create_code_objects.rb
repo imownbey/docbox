@@ -7,7 +7,6 @@ class CreateCodeObjects < ActiveRecord::Migration
       t.string :value
       t.integer :visibility
       t.string :read_write
-      t.text :comment
 
       t.timestamps
     end

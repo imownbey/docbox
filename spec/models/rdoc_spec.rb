@@ -52,4 +52,8 @@ describe RDoc do
     @import.call
     Meth.find_by_name('no_doc').container.should == Klass.find_by_name('SimpleClass')
   end
+  
+  it "should create 2 comments" do
+    @import.should change(Comment, :count).by(2)
+  end
 end

@@ -8,7 +8,6 @@ class CreateMeths < ActiveRecord::Migration
       t.boolean :singleton
       t.string :visibility, :length => 10
       t.boolean :force_documentation
-      t.text :comment
       t.text :source_code
 
       t.timestamps

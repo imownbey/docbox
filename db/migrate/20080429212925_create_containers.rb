@@ -6,7 +6,6 @@ class CreateContainers < ActiveRecord::Migration
       t.string :name
       t.string :full_name
       t.string :superclass
-      t.string :comment
 
       t.timestamps
     end

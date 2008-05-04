@@ -76,8 +76,8 @@ module Generators
 
     # process a file from the code_object.rb tree
     def process_file(file)
-      Doc.create :name => file.file_relative_name, :full_name => file.file_absolute_name, :comment => file.comment
-          
+      d = Doc.create :name => file.file_relative_name, :full_name => file.file_absolute_name
+      Comment.create :body => file.comment, :owner => d unless file.comment.blank?
       # Process all of the objects that this file contains
       file.method_list.each { |child| process_method(child, file) }
       file.aliases.each { |child| process_alias(child, file) }
@@ -106,12 +106,14 @@ module Generators
       # object.
       if(!@already_processed.has_key?(obj.full_name)) then    
         parent = Container.find_by_name(parent.name) || Container.find_by_name(parent.file_relative_name)
-        case type
-        when :modules
-          Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.comment)
-        when :classes
-          Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :comment => obj.superclass)
-        end
+        p = case type
+            when :modules
+              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass)
+            when :classes
+              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass)
+            end
+        Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
+
         @already_processed[obj.full_name] = true    
           
         # Process all of the objects that this class or module contains
@@ -132,32 +134,38 @@ module Generators
     
     def process_method(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :comment => obj.comment, :source_code => get_source_code(obj))
+      p = Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_alias(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Alias.create(:container => parent, :name => obj.name, :old_name => obj.new_name, :comment => obj.comment)
+      p = Alias.create(:container => parent, :name => obj.name, :old_name => obj.new_name)
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_constant(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Alias.create(:container => parent, :name => obj.name, :value => obj.value, :comment => obj.comment)
+      p = Constant.create(:container => parent, :name => obj.name, :value => obj.value)
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_attribute(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Attribute.create(:container => parent, :name => obj.name, :read_write => obj.rw, :comment => obj.comment)
+      p = Attribute.create(:container => parent, :name => obj.name, :read_write => obj.rw)
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_require(obj, parent)
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Require.create(:container => parent, :name => obj.name, :comment => obj.comment)
+      p = Require.create(:container => parent, :name => obj.name)
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_include(obj, parent) 
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      Require.create(:container => parent, :name => obj.name, :comment => obj.comment)
+      p = Require.create(:container => parent, :name => obj.name)
+      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     # get the source code

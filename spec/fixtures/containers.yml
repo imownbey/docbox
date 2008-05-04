@@ -1,12 +1,10 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  type: MyString
-  parent_id: 1
-  name: MyString
-  full_name: MyString
-  superclass: MyString
-  comment: MyString
+small_class:
+  type: Klass
+  name: SmallClass
+  full_name: Fullname
+  comment: This is a comment
 
 two:
   type: MyString
