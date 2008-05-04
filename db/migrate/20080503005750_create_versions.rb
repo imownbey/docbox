@@ -1,13 +1,13 @@
 class CreateVersions < ActiveRecord::Migration
   def self.up
     create_table :versions do |t|
-      t.text :comment
-      t.integer :version
+      t.text :body
+      t.string :version, :length => 40
       t.integer :user_id
-      t.boolean :exported
-      t.integer :container_id
+      t.boolean :exported, :default => false
+      t.integer :comment_id
 
-      t.timestamps
+      t.datetime :created_at
     end
   end
 
