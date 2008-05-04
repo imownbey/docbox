@@ -5,6 +5,7 @@ class CreateComments < ActiveRecord::Migration
       t.integer :owner_id
       t.string :owner_type
       t.boolean :exported
+      t.integer :user_id
 
       t.datetime :created_at
     end

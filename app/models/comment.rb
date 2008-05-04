@@ -1,5 +1,7 @@
 class Comment < ActiveRecord::Base
   belongs_to :owner, :polymorphic => true
+  belongs_to :user
+  before_save :create_version
   
   # For the sake of STI
   def owner_type=(sType)
