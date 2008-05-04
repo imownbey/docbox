@@ -1,19 +1,1 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  parent_id: 1
-  type: MyString
-  name: MyString
-  value: MyString
-  visibility: 1
-  read_write: MyString
-  comment: MyText
-
-two:
-  parent_id: 1
-  type: MyString
-  name: MyString
-  value: MyString
-  visibility: 1
-  read_write: MyString
-  comment: MyText

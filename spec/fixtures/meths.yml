@@ -1,12 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  container_id: 1
-  name: MyString
-  parameters: MyString
-  block_parameters: MyString
+simple_method:
+  container: some_class
+  name: simple_method
+  parameters: '(foo)'
   singleton: false
-  visibility: 1
+  visibility: public
   force_documentation: false
-  comment: MyText
-  source_code: MyText
+  source_code: |-
+    def simple_method(foo)
+      echo "Hello World!"
+    end

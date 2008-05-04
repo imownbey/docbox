@@ -1,13 +1,16 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  body: MyText
-  owner_id: 1
-  type: MyString
-  current: false
-
-two:
-  body: MyText
-  owner_id: 1
-  type: MyString
-  current: false
+current:
+  body: |-
+    ##
+    # This is a comment
+  owner: simple_method
+  owner_type: Meth
+  exported: true
+not_current:
+  body: |-
+    ##
+    # This comment is not current
+  owner: some_class
+  owner_type: Container
+  exported: false
