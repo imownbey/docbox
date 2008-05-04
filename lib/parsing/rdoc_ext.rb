@@ -51,10 +51,6 @@ module Generators
     def initialize(options) #:not-new:
       @options = options
       
-      # You have to call parent classes for STI to kick in
-      Container
-      CodeObject
-      
       # set up a hash to keep track of all the classes/modules we have processed
       @already_processed = {}
       

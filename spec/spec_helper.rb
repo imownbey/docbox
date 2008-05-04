@@ -5,9 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'spec'
 require 'spec/rails'
 
-# We need to do this to load up STI
-Container
-CodeObject
+include AuthenticatedTestHelper
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
