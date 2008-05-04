@@ -13,3 +13,6 @@
 [submodule "vendor/plugins/acts_as_state_machine"]
 	path = vendor/plugins/acts_as_state_machine
 	url = git://github.com/omghax/acts_as_state_machine.git
+[submodule "vendor/plugins/model_stubbing"]
+	path = vendor/plugins/model_stubbing
+	url = git://github.com/technoweenie/model_stubbing.git
