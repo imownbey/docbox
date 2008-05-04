@@ -1,11 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Comment do
-  before(:each) do
-    @comment = Comment.new
-  end
-
-  it "should be valid" do
-    @comment.should be_valid
+describe Comment, "versioning" do
+  it "should create a new version when saved" do
+    lambda {
+      c = comments(:default)
+      c.update_attributes :body => 'This is a newer comment'
+    }.should change(Version, :count).by(1)
   end
 end

@@ -7,12 +7,6 @@
 [submodule "vendor/plugins/rspec_rails"]
 	path = vendor/plugins/rspec_rails
 	url = git://github.com/dchelimsky/rspec-rails.git
-[submodule "vendor/plugins/restful-authentication"]
-	path = vendor/plugins/restful-authentication
-	url = git://github.com/technoweenie/restful-authentication.git
 [submodule "vendor/plugins/acts_as_state_machine"]
 	path = vendor/plugins/acts_as_state_machine
 	url = git://github.com/omghax/acts_as_state_machine.git
-[submodule "vendor/plugins/model_stubbing"]
-	path = vendor/plugins/model_stubbing
-	url = git://github.com/technoweenie/model_stubbing.git
