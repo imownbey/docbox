@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 require 'rdoc/rdoc'
-require File.dirname(__FILE__) + '/../../lib/parsing/rdoc_ext'
+require File.dirname(__FILE__) + '/../../lib/parsing'
 
 ##
 # This silences the RDoc output so

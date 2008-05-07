@@ -160,7 +160,7 @@ module Generators
     
     def process_include(obj, parent) 
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Require.create(:container => parent, :name => obj.name)
+      p = Include.create(:container => parent, :name => obj.name)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
