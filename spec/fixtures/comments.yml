@@ -8,6 +8,7 @@ current:
   owner_type: Meth
   exported: true
   user: aaron
+  version: 3
 not_current:
   body: |-
     ##
@@ -16,3 +17,4 @@ not_current:
   owner_type: Container
   exported: false
   user: aaron
+  version: 1

@@ -1,2 +1,15 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
+current_v2:
+  body: this is version two
+  user: aaron
+  comment: current
+  version: 2
+  exported: false
+  
+current_v1:
+  body: this is version 1
+  user: aaron
+  comment: current
+  version: 1
+  exported: true
