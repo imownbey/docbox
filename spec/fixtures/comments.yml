@@ -2,8 +2,7 @@
 
 current:
   body: |-
-    ##
-    # This is a comment
+    This is a comment
   owner: simple_method
   owner_type: Meth
   exported: true
@@ -11,8 +10,7 @@ current:
   version: 3
 not_current:
   body: |-
-    ##
-    # This comment is not current
+    This comment is not current
   owner: some_class
   owner_type: Container
   exported: false
