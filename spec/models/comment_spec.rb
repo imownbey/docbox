@@ -134,5 +134,20 @@ EOC
       mock_file(method, replacement)
       comments(:current).export! 2
     end
+    
+    it "should work for class too" do
+      klass = <<-EOC
+# this is not current v1
+class Foobar::SmallClass
+end
+EOC
+      replacement = <<-EOC
+# This comment is not current
+class Foobar::SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      comments(:not_current).export! 2
+    end
   end
 end

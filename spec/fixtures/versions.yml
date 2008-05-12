@@ -13,3 +13,10 @@ current_v1:
   comment: current
   version: 1
   exported: true
+  
+not_current_v1:
+  body: this is not current v1
+  user: quentin
+  comment: not_current
+  exported: true
+  version: 1

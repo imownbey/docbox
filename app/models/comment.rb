@@ -69,7 +69,7 @@ class Comment < ActiveRecord::Base
     regexp = comment.split("\n").collect {|line|
       "(\\s*)#{line}"
     }.join("\n")
-    regexp += "\n(\\s*)(#{next_line_str}[^\\n]+)"
+    regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
     Regexp.new(regexp)
   end
   
