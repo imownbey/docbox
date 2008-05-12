@@ -51,9 +51,10 @@ class Comment < ActiveRecord::Base
   
   def export v1, v2
     pre_regexp = build_regexp(v1.body)
+    p pre_regexp
     replace_string = build_string(v2.body)
     File.open('foobar') do |f|
-      replace = f.read.gsub(pre_regexp, replace_string)
+      replace = f.read.sub!(pre_regexp, replace_string)
       f.rewind
       f.puts(replace)
     end
@@ -68,7 +69,7 @@ class Comment < ActiveRecord::Base
     regexp = comment.split("\n").collect {|line|
       "(\\s*)#{line}"
     }.join("\n")
-    regexp += "\n(\\s*)([^\\n]+)"
+    regexp += "\n(\\s*)(#{next_line_str}[^\\n]+)"
     Regexp.new(regexp)
   end
   
@@ -83,5 +84,22 @@ class Comment < ActiveRecord::Base
   # TODO: Make this support =begin and =end
   def commentify string
     string.split("\n").collect { |line| "\# #{line}"}.join("\n")
+  end
+  
+  def next_line_str
+    case self.owner.class.to_s
+    when 'Meth'
+      "def #{owner.name}"
+    when 'Klass'
+      "class\\s+[^\\s]*#{owner.name}"
+    when 'Mod'
+      "module\\s+[^\\s]*#{owner.name}"
+    when 'Require'
+      "require\\s+['\"]#{owner.name}['\"]"
+    when 'Include'
+      "include\\s+#{owner.name}"
+    when 'Constant'
+      "#{owner.name}\\s+=\\s+#{owner.value}"
+    end
   end
 end

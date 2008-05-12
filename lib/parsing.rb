@@ -91,7 +91,6 @@ module Generators
     # Process classes and modiles   
     def process_class_or_module(obj, parent)
       type = obj.is_module? ? :modules : :classes
-    
       # One important note about the code_objects.rb structure. A class or module
       # definition can be spread a cross many files in Ruby so code_objects.rb handles
       # this by keeping only *one* reference to each class or module that has a definition
@@ -178,6 +177,13 @@ module Generators
      
   end # class SqlGenerator
 
+  class RDoc::ClassModule
+    if @parent && @parent.full_name
+      @parent.name + "::" + @name
+    else
+      @name
+    end
+  end
   # dynamically add the id/container_id to the base object of code_objects.rb
   class RDoc::CodeObject
     attr_accessor :id, :container_id

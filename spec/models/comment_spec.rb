@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 
 describe Comment, "versioning" do
-  fixtures :comments, :users, :versions
+  fixtures :comments, :users, :versions, :code_objects, :containers, :meths
   
   it "should create a new version when saved" do
     lambda {
@@ -46,6 +46,7 @@ describe Comment, "versioning" do
   it "should use current when current versions" do
     comments(:current).v(3).should == comments(:current)
   end
+  
   describe 'exporting' do
     it "should not export if previose version has not been exported" do
       versions(:current_v1).update_attributes :exported => false
@@ -59,6 +60,14 @@ describe Comment, "versioning" do
       c.export!(2)
       v2.reload
       v2.should be_exported
+    end
+    
+    def mock_file(v1, v2)
+      f = mock(File)
+      File.should_receive(:open).and_yield(f)
+      f.should_receive(:read).and_return(v1)
+      f.should_receive(:rewind)
+      f.should_receive(:puts).with(v2)
     end
 
     it "should actually sub out comments" do
@@ -78,14 +87,8 @@ class Foo
   end
 end
 EOC
-      c = comments(:current)
-      # Mock out File
-      f = mock(File)
-      File.should_receive(:open).and_yield(f)
-      f.should_receive(:read).and_return(method)
-      f.should_receive(:rewind)
-      f.should_receive(:puts).with(replacement)
-      c.export! 2
+      mock_file(method, replacement)
+      comments(:current).export! 2
     end
     
     it "should keep weird formatting" do
@@ -105,18 +108,31 @@ class Foo
   end
 end
 EOC
-      c = comments(:current)
-      # Mock out File
-      f = mock(File)
-      File.should_receive(:open).and_yield(f)
-      f.should_receive(:read).and_return(method)
-      f.should_receive(:rewind)
-      f.should_receive(:puts).with(replacement)
-      c.export! 2
+      mock_file(method, replacement)
+      comments(:current).export! 2
     end
-  end
+    
+    it "should replace propper comment when two are the same" do
+      method = <<-EOC
+# this is version 1
+def not_correct_method
 end
 
-describe Comment, "exporting" do
-  fixtures :comments, :versions, :users
+# this is version 1
+def simple_method(foo)
+end
+EOC
+      replacement = <<-EOC
+# this is version 1
+def not_correct_method
+end
+
+# this is version two
+def simple_method(foo)
+end
+EOC
+      mock_file(method, replacement)
+      comments(:current).export! 2
+    end
+  end
 end
