@@ -1,4 +1,41 @@
+# Da file
+
+# Foobar outside
+class Foobar::Tada::Doobie
+  
+end
+
+# LALA
+class Lala < Loo
+end
+
+# Authsystem
 module AuthenticatedSystem
+  
+  # This is some stuff
+  class << self
+    # Ayo
+    def yayo
+    end
+  end
+  # This is a require
+  require 'foobar'
+  
+  # This is a include
+  include SomeMod
+  
+  # This is a constant
+  CONSTANT = 'tada'
+  
+  # Foobar in auth
+  class Foobar
+    
+  end
+  
+  # This is twoinone
+  class TwoIn::One
+    
+  end
   protected
     # Preloads @current_user with the user model if they're logged in.
     def logged_in?

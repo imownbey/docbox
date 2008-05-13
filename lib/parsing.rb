@@ -40,7 +40,7 @@ module RDoc
           read_documentation_modifiers(mod, CLASS_MODIFIERS)
           parse_statements(mod)
           mod.comment = comment
-          MODULES[name] = name_t.line_no
+          MODULES[mod.full_name] = {:line_no => name_t.line_no}
         end
     
     def parse_class(container, single, tk, comment, &block)
@@ -90,7 +90,8 @@ module RDoc
           else
     	warn("Expected class name or '<<'. Got #{name_t.class}: #{name_t.text.inspect}")
           end
-          CLASSES[name] = name_t.line_no
+          CLASSES[@input_file_name] ||= {}
+          CLASSES[@input_file_name][cls.full_name] = { :line_no => name_t.line_no } if cls
     end
   end
 end
@@ -144,6 +145,14 @@ module Generators
     def process_file(file)
       d = Doc.create :name => file.file_relative_name, :full_name => file.file_absolute_name
       Comment.create :body => file.comment, :owner => d unless file.comment.blank?
+      orig_file = File.new(file.file_absolute_name)
+      lines = orig_file.readlines
+      CLASSES[file.file_absolute_name].each do |key, klass|
+        CLASSES[file.file_absolute_name][key][:line] = lines[klass[:line_no] - 1]
+      end if CLASSES[file.file_absolute_name]
+      MODULES[file.file_absolute_name].each do |key, mod|
+        MODULES[file.file_absolute_name][key][:line] = lines[mod[:line_no] - 1]
+      end if MODULES[file.file_absolute_name]
       # Process all of the objects that this file contains
       file.method_list.each { |child| process_method(child, file) }
       file.aliases.each { |child| process_alias(child, file) }
@@ -152,7 +161,8 @@ module Generators
       file.includes.each { |child| process_include(child, file) }
       file.attributes.each { |child| process_attribute(child, file) }   
     
-      # Recursively process contained subclasses and modules 
+      # Recursively process contained subclasses and modules
+      @file = file
       file.each_classmodule do |child| 
         process_class_or_module(child, file)      
       end   
@@ -173,9 +183,11 @@ module Generators
         parent = Container.find_by_name(parent.name) || Container.find_by_name(parent.file_relative_name)
         p = case type
             when :modules
-              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_no => MODULES[obj.name])
+            
+              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => MODULES[@file.file_absolute_name][obj.full_name][:line])
             when :classes
-              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_no => CLASSES[obj.name])
+              
+              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => CLASSES[@file.file_absolute_name][obj.full_name][:line])
             end
         Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
 
