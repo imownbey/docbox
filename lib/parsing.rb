@@ -1,3 +1,8 @@
+# This is a UGLY hack.
+# It lets me keep track of the line that classes are on
+# And makes things generally easier
+CLASSES = {}
+MODULES = {}
 module RDoc
   class RDoc
     def import!(argv)
@@ -22,6 +27,72 @@ module RDoc
       end
     end
   end
+  
+  class RubyParser
+        def parse_module(container, single, tk, comment)
+          progress("m")
+          @stats.num_modules += 1
+          container, name_t  = get_class_or_module(container)
+    #      skip_tkspace
+          name = name_t.name
+          mod = container.add_module(NormalModule, name)
+          mod.record_location(@top_level)
+          read_documentation_modifiers(mod, CLASS_MODIFIERS)
+          parse_statements(mod)
+          mod.comment = comment
+          MODULES[name] = name_t.line_no
+        end
+    
+    def parse_class(container, single, tk, comment, &block)
+          progress("c")
+          @stats.num_classes += 1
+          container, name_t = get_class_or_module(container)
+          case name_t
+          when TkCONSTANT
+    	      name = name_t.name
+            superclass = "Object"
+
+            if peek_tk.kind_of?(TkLT)
+              get_tk
+              skip_tkspace(true)
+              superclass = get_class_specification
+              superclass = "<unknown>" if superclass.empty?
+            end
+
+          	if single == SINGLE
+          	  cls_type = SingleClass
+          	else
+          	  cls_type = NormalClass
+          	end
+
+            cls = container.add_class(cls_type, name, superclass)
+            read_documentation_modifiers(cls, CLASS_MODIFIERS)
+            cls.record_location(@top_level)
+    	parse_statements(cls)
+            cls.comment = comment
+
+          when TkLSHFT
+        	  case name = get_class_specification
+             when "self", container.name
+          	   parse_statements(container, SINGLE, &block)
+          	else
+            other = TopLevel.find_class_named(name)
+            unless other
+      #            other = @top_level.add_class(NormalClass, name, nil)
+      #            other.record_location(@top_level)
+      #            other.comment = comment
+              other = NormalClass.new("Dummy", nil)
+            end
+            read_documentation_modifiers(other, CLASS_MODIFIERS)
+            parse_statements(other, SINGLE, &block)
+    	      end
+
+          else
+    	warn("Expected class name or '<<'. Got #{name_t.class}: #{name_t.text.inspect}")
+          end
+          CLASSES[name] = name_t.line_no
+    end
+  end
 end
 # This class takes RDoc and inputs it into the models using RDocs generator support
 
@@ -35,7 +106,6 @@ end
 # we process these toplevel objects recursivley extracting all of the code 
 # objects they contain: classes, modules, methods, attributes etc..
 module Generators
-
   # This generator takes the output of the rdoc parser
   # and turns it into a bunch of INSERT sql statements for a database
   class Importer               
@@ -103,9 +173,9 @@ module Generators
         parent = Container.find_by_name(parent.name) || Container.find_by_name(parent.file_relative_name)
         p = case type
             when :modules
-              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass)
+              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_no => MODULES[obj.name])
             when :classes
-              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass)
+              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_no => CLASSES[obj.name])
             end
         Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
 

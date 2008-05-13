@@ -149,5 +149,15 @@ EOC
       mock_file(klass, replacement)
       comments(:not_current).export! 2
     end
+    
+    it "should use propper context" do
+      method <<-EOC
+class NotTheRightOne
+  # this is version 1
+  def simple_method(foo)
+  end
+end
+
+class SmallClass
   end
 end
