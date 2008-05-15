@@ -8,7 +8,7 @@ class CreateCodeObjects < ActiveRecord::Migration
       t.integer :visibility
       t.string :read_write
 
-      t.timestamps
+      t.datetime :created_at
     end
   end
 

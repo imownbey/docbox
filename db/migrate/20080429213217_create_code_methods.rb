@@ -1,7 +1,7 @@
-class CreateMeths < ActiveRecord::Migration
+class CreateCodeMethods < ActiveRecord::Migration
   def self.up
-    create_table :meths do |t|
-      t.integer :container_id
+    create_table :code_methods do |t|
+      t.integer :code_container_id
       t.string :name
       t.string :parameters
       t.string :block_parameters
@@ -10,7 +10,7 @@ class CreateMeths < ActiveRecord::Migration
       t.boolean :force_documentation
       t.text :source_code
 
-      t.timestamps
+      t.datetime :created_at
     end
   end
 

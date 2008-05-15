@@ -1,17 +1,18 @@
-class CreateContainers < ActiveRecord::Migration
+class CreateCodeContainers < ActiveRecord::Migration
   def self.up
-    create_table :containers do |t|
+    create_table :code_containers do |t|
       t.string :type
       t.integer :parent_id
       t.string :name
       t.string :full_name
       t.string :superclass
       t.string :line_code
-      t.timestamps
+      
+      t.datetime :created_at
     end
   end
 
   def self.down
-    drop_table :containers
+    drop_table :code_containers
   end
 end

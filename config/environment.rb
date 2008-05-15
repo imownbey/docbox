@@ -59,5 +59,5 @@ Rails::Initializer.run do |config|
 end
 
 # This allows STI stuff
-Container
+CodeContainer
 CodeObject

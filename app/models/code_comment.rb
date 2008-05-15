@@ -1,4 +1,4 @@
-class Comment < ActiveRecord::Base
+class CodeComment < ActiveRecord::Base
   
   class VersionNotExported < ArgumentError; end
   
@@ -50,14 +50,52 @@ class Comment < ActiveRecord::Base
   private
   
   def export v1, v2
+    @file = File.new('foobar', 'r+')
     pre_regexp = build_regexp(v1.body)
-    p pre_regexp
-    replace_string = build_string(v2.body)
-    File.open('foobar') do |f|
-      replace = f.read.sub!(pre_regexp, replace_string)
-      f.rewind
-      f.puts(replace)
+    # If the parent is a class we must make sure its in proper context
+    if owner.parent.is_a? Klass
+      body = get_context
+    else
+      body = @file.read
     end
+    replace_string = build_string(v2.body)
+    replace = f.read.sub!(pre_regexp, replace_string)
+    @file.rewind
+    @file.puts(replace)
+    @file.close
+  end
+  
+  def get_context
+    raise unless @file
+    buffer = ''
+    context = ''
+    future = ''
+    in_context = false
+    in_future = false
+    @file.each_line do line
+      if in_future
+        future += line
+        next
+      end
+
+      case line
+      when Regexp.new(next_line_str)
+        in_context = false
+        in_future = true
+        context += line # We add it any way just so we have an ending point (if there is no comment)
+        next
+      when owner.parent.line_code # This defines the class
+        in_context = true
+      end
+      
+      if in_context
+        context += line
+      else
+        # we arent in future or context, must just be in buffer
+        buffer += line
+      end
+    end # file.each_line
+    [buffer, context, future]
   end
   
   # Builds regex with the following:
@@ -66,7 +104,7 @@ class Comment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1
     comment = commentify(v1)
-    regexp = comment.split("\n").collect {|line|
+    regexp += comment.split("\n").collect {|line|
       "(\\s*)#{line}"
     }.join("\n")
     regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
@@ -91,7 +129,7 @@ class Comment < ActiveRecord::Base
     when 'Meth'
       "def #{owner.name}"
     when 'Klass'
-      "class\\s+[^\\s]*#{owner.name}"
+      "#{owner.line_code}"
     when 'Mod'
       "module\\s+[^\\s]*#{owner.name}"
     when 'Require'

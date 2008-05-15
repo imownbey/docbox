@@ -130,7 +130,7 @@ module Generators
         :methods => [], :aliases => [], :constants => [], :requires => [], :includes => []}   
       
       # sequences used to generate unique ids for inserts
-      @seq = {:containers => 0, :methods => 0, :code_objects => 0}
+      @seq = {:code_containers => 0, :methods => 0, :code_objects => 0}
     end
 
     # Rdoc passes in TopLevel objects from the code_objects.rb tree (all files)
@@ -143,8 +143,8 @@ module Generators
 
     # process a file from the code_object.rb tree
     def process_file(file)
-      d = Doc.create :name => file.file_relative_name, :full_name => file.file_absolute_name
-      Comment.create :body => file.comment, :owner => d unless file.comment.blank?
+      d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
+      CodeComment.create :body => file.comment, :owner => d unless file.comment.blank?
       orig_file = File.new(file.file_absolute_name)
       lines = orig_file.readlines
       CLASSES[file.file_absolute_name].each do |key, klass|
@@ -180,16 +180,16 @@ module Generators
       # already seen and make sure we don't create two INSERT statements for the same
       # object.
       if(!@already_processed.has_key?(obj.full_name)) then    
-        parent = Container.find_by_name(parent.name) || Container.find_by_name(parent.file_relative_name)
+        parent = CodeContainer.find_by_name(parent.name) || CodeContainer.find_by_name(parent.file_relative_name)
         p = case type
             when :modules
             
-              Mod.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => MODULES[@file.file_absolute_name][obj.full_name][:line])
+              CodeModule.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[@file.file_absolute_name][obj.full_name][:line] if MODULES[@file.file_absolute_name]))
             when :classes
               
-              Klass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => CLASSES[@file.file_absolute_name][obj.full_name][:line])
+              CodeClass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[@file.file_absolute_name][obj.full_name][:line] if CLASSES[@file.file_absolute_name]))
             end
-        Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
+        CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
 
         @already_processed[obj.full_name] = true    
           
@@ -210,38 +210,38 @@ module Generators
     end       
     
     def process_method(obj, parent)
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Meth.create(:container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
-      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeMethod.create(:code_container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
+      CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_alias(obj, parent)
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Alias.create(:container => parent, :name => obj.name, :old_name => obj.new_name)
-      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeAlias.create(:code_container => parent, :name => obj.name, :old_name => obj.new_name)
+      CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_constant(obj, parent)
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Constant.create(:container => parent, :name => obj.name, :value => obj.value)
-      Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeConstant.create(:code_container => parent, :name => obj.name, :value => obj.value)
+      CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_attribute(obj, parent)
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Attribute.create(:container => parent, :name => obj.name, :read_write => obj.rw)
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeAttribute.create(:code_container => parent, :name => obj.name, :read_write => obj.rw)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_require(obj, parent)
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Require.create(:container => parent, :name => obj.name)
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeRequire.create(:code_container => parent, :name => obj.name)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_include(obj, parent) 
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = Container.find_by_name(parent.name)
-      p = Include.create(:container => parent, :name => obj.name)
+      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      p = CodeInclude.create(:code_container => parent, :name => obj.name)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
@@ -268,7 +268,7 @@ module Generators
   end
   # dynamically add the id/container_id to the base object of code_objects.rb
   class RDoc::CodeObject
-    attr_accessor :id, :container_id
+    attr_accessor :id, :code_container_id
   end 
 
   # dynamically add a source code attribute to the base oject of code_objects.rb

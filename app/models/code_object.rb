@@ -1,9 +1,9 @@
 class CodeObject < ActiveRecord::Base
-  belongs_to :container
-  has_one :comment, :as => :owner, :dependent => :destroy
+  belongs_to :code_container
+  has_one :code_comment, :as => :owner, :dependent => :destroy
 end
 
-class Alias < CodeObject
+class CodeAlias < CodeObject
   def old_name
     value
   end
@@ -13,14 +13,14 @@ class Alias < CodeObject
   end
 end
 
-class Constant < CodeObject
+class CodeConstant < CodeObject
 end
 
-class Attribute < CodeObject
+class CodeAttribute < CodeObject
 end
 
-class Require < CodeObject
+class CodeRequire < CodeObject
 end
 
-class Include < CodeObject
+class CodeInclude < CodeObject
 end

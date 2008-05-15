@@ -1,12 +1,12 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 some_class:
-  type: Klass
+  type: CodeClass
   name: SmallClass
   full_name: Fullname
   parent: file
   
 file:
-  type: Doc
+  type: CodeFile
   name: somefile.rb
   full_name: '/var/foo/somefile.rb'

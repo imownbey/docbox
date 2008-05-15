@@ -20,40 +20,40 @@ describe RDoc do
   end
 
   it "should create three containers" do
-    @import.should change(Container, :count).by(3)
+    @import.should change(CodeContainer, :count).by(3)
   end
   
   it "should create 1 new doc" do
-    @import.should change(Doc, :count).by(1)
+    @import.should change(CodeFile, :count).by(1)
   end
   
   it "should create 1 new mod" do
-    @import.should change(Mod, :count).by(1)
+    @import.should change(CodeModule, :count).by(1)
   end
   
   it "should create 1 new klass" do
-    @import.should change(Klass, :count).by(1)
+    @import.should change(CodeClass, :count).by(1)
   end
   
   it "should create 4 new methods" do
-    @import.should change(Meth, :count).by(4)
+    @import.should change(CodeMethod, :count).by(4)
   end
   
   it "should create 1 private method" do
     @import.call
-    [Meth.find_by_visibility('private')].length.should == 1
+    [CodeMethod.find_by_visibility('private')].length.should == 1
   end
 
   it "should require duckies" do
-    @import.should change(Require, :count).by(1)
+    @import.should change(CodeRequire, :count).by(1)
   end
   
   it "should give proper parent" do
     @import.call
-    Meth.find_by_name('no_doc').container.should == Klass.find_by_name('SimpleClass')
+    CodeMethod.find_by_name('no_doc').code_container.should == CodeClass.find_by_name('SimpleClass')
   end
   
   it "should create 2 comments" do
-    @import.should change(Comment, :count).by(2)
+    @import.should change(CodeComment, :count).by(2)
   end
 end

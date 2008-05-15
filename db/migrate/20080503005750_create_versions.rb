@@ -3,7 +3,7 @@ class CreateVersions < ActiveRecord::Migration
     create_table :versions do |t|
       t.text :body
       t.string :commit, :length => 40
-      t.integer :user_id, :comment_id, :version
+      t.integer :user_id, :code_comment_id, :version
       t.boolean :exported, :default => false
 
       t.datetime :created_at

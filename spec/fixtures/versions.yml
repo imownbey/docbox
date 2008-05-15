@@ -3,20 +3,20 @@
 current_v2:
   body: this is version two
   user: aaron
-  comment: current
+  code_comment: current
   version: 2
   exported: false
   
 current_v1:
   body: this is version 1
   user: aaron
-  comment: current
+  code_comment: current
   version: 1
   exported: true
   
 not_current_v1:
   body: this is not current v1
   user: quentin
-  comment: not_current
+  code_comment: not_current
   exported: true
   version: 1

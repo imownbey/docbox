@@ -1,8 +1,8 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Container do
+describe CodeContainer do
   before(:each) do
-    @container = Container.new
+    @container = CodeContainer.new
   end
 
   it "should be valid" do
