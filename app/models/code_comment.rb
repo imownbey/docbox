@@ -19,7 +19,7 @@ class CodeComment < ActiveRecord::Base
         :user_id => (self.user_id_changed? ? self.user_id_was : self.user_id), 
         :body => self.body_was, 
         :exported => self.exported?, 
-        :comment => self,
+        :code_comment => self,
         :version => self.version
       )
       self.exported = false
@@ -53,15 +53,17 @@ class CodeComment < ActiveRecord::Base
     @file = File.new('foobar', 'r+')
     pre_regexp = build_regexp(v1.body)
     # If the parent is a class we must make sure its in proper context
-    if owner.parent.is_a? Klass
-      body = get_context
+    if owner.code_container.is_a? CodeClass
+      start, context, ending = get_context
     else
-      body = @file.read
+      start = ''
+      ending = ''
+      context = @file.read
     end
     replace_string = build_string(v2.body)
-    replace = f.read.sub!(pre_regexp, replace_string)
+    context = context.sub(pre_regexp, replace_string)
     @file.rewind
-    @file.puts(replace)
+    @file.puts(start + context + ending)
     @file.close
   end
   
@@ -72,7 +74,7 @@ class CodeComment < ActiveRecord::Base
     future = ''
     in_context = false
     in_future = false
-    @file.each_line do line
+    @file.each_line do |line|
       if in_future
         future += line
         next
@@ -84,7 +86,7 @@ class CodeComment < ActiveRecord::Base
         in_future = true
         context += line # We add it any way just so we have an ending point (if there is no comment)
         next
-      when owner.parent.line_code # This defines the class
+      when owner.code_container.line_code # This defines the class
         in_context = true
       end
       
@@ -104,7 +106,7 @@ class CodeComment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1
     comment = commentify(v1)
-    regexp += comment.split("\n").collect {|line|
+    regexp = comment.split("\n").collect {|line|
       "(\\s*)#{line}"
     }.join("\n")
     regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
@@ -126,17 +128,17 @@ class CodeComment < ActiveRecord::Base
   
   def next_line_str
     case self.owner.class.to_s
-    when 'Meth'
+    when 'CodeMethod'
       "def #{owner.name}"
-    when 'Klass'
+    when 'CodeClass'
       "#{owner.line_code}"
-    when 'Mod'
+    when 'CodeModule'
       "module\\s+[^\\s]*#{owner.name}"
-    when 'Require'
+    when 'CodeRequire'
       "require\\s+['\"]#{owner.name}['\"]"
-    when 'Include'
+    when 'CodeInclude'
       "include\\s+#{owner.name}"
-    when 'Constant'
+    when 'CodeConstant'
       "#{owner.name}\\s+=\\s+#{owner.value}"
     end
   end

@@ -63,16 +63,16 @@ describe CodeComment, "versioning" do
     end
     
     def mock_file(v1, v2)
-      f = mock(File)
-      File.should_receive(:open).and_return(f)
-      f.should_receive(:read).and_return(v1)
-      f.should_receive(:rewind)
-      f.should_receive(:puts).with(v2)
+      File.should_receive(:new).and_return(v1)
+      v1.should_receive(:read).any_number_of_times.and_return(v1)
+      v1.should_receive(:rewind)
+      v1.should_receive(:puts).with(v2)
+      v1.should_receive(:close)
     end
 
     it "should actually sub out comments" do
       method = <<-EOC
-class Foo
+class SmallClass
   # this is version 1
   def simple_method(foo)
     puts "win"
@@ -80,7 +80,7 @@ class Foo
 end
 EOC
       replacement = <<-EOC
-class Foo
+class SmallClass
   # this is version two
   def simple_method(foo)
     puts "win"
@@ -93,7 +93,7 @@ EOC
     
     it "should keep weird formatting" do
       method = <<-EOC
-class Foo
+class SmallClass
             # this is version 1
         def simple_method(foo)
     puts "win"
@@ -101,7 +101,7 @@ class Foo
 end
 EOC
       replacement = <<-EOC
-class Foo
+class SmallClass
             # this is version two
         def simple_method(foo)
     puts "win"
@@ -113,6 +113,7 @@ EOC
     end
     
     it "should replace propper comment when two are the same" do
+      code_comments(:current).owner.code_container = nil
       method = <<-EOC
 # this is version 1
 def not_correct_method
@@ -138,12 +139,12 @@ EOC
     it "should work for class too" do
       klass = <<-EOC
 # this is not current v1
-class Foobar::SmallClass
+class SmallClass
 end
 EOC
       replacement = <<-EOC
 # This comment is not current
-class Foobar::SmallClass
+class SmallClass
 end
 EOC
       mock_file(klass, replacement)

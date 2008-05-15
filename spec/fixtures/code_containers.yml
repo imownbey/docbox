@@ -4,7 +4,8 @@ some_class:
   type: CodeClass
   name: SmallClass
   full_name: Fullname
-  parent: file
+  code_container: file
+  line_code: "class SmallClass\n"
   
 file:
   type: CodeFile
