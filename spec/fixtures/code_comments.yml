@@ -8,10 +8,20 @@ current:
   exported: true
   user: aaron
   version: 3
+  
 not_current:
   body: |-
     This comment is not current
   owner: some_class
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 2
+  
+nested_class:
+  body: |-
+    This is the comment of a nested class
+  owner: nested_class
   owner_type: CodeContainer
   exported: false
   user: aaron

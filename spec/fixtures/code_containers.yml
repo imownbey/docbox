@@ -7,6 +7,13 @@ some_class:
   code_container: file
   line_code: "class SmallClass\n"
   
+nested_class:
+  type: CodeClass
+  name: NestedClass
+  full_name: SmallClass::NestedClass
+  code_container: some_class
+  line_code: "class NestedClass\n"
+  
 file:
   type: CodeFile
   name: somefile.rb

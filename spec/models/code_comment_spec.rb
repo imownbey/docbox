@@ -182,5 +182,36 @@ EOC
       mock_file(method, replacement)
       code_comments(:current).export! 2
     end
+    
+    it "should use context for classes" do
+      klass = <<-EOC
+class OtherClass
+  # this is a old comment of a nested class
+  class NestedClass
+  end
+end
+
+class SmallClass
+  # this is a old comment of a nested class
+  class NestedClass
+  end
+end
+EOC
+      replacement = <<-EOC
+class OtherClass
+  # this is a old comment of a nested class
+  class NestedClass
+  end
+end
+
+class SmallClass
+  # This is the comment of a nested class
+  class NestedClass
+  end
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:nested_class).export! 2
+    end
   end
 end

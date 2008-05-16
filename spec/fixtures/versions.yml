@@ -20,3 +20,10 @@ not_current_v1:
   code_comment: not_current
   exported: true
   version: 1
+  
+nested_v1:
+  body: this is a old comment of a nested class
+  user: aaron
+  code_comment: nested_class
+  exported: true
+  version: 1
