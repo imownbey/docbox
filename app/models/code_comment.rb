@@ -75,23 +75,22 @@ class CodeComment < ActiveRecord::Base
     in_context = false
     in_future = false
     @file.each_line do |line|
-      if in_future
-        future += line
-        next
-      end
-
       case line
       when Regexp.new(next_line_str)
-        in_context = false
-        in_future = true
-        context += line # We add it any way just so we have an ending point (if there is no comment)
-        next
+        if in_context
+          in_context = false
+          in_future = true
+          context += line # Add the last line (def ...) for sanitys sake
+          next
+        end
       when owner.code_container.line_code # This defines the class
         in_context = true
       end
       
       if in_context
         context += line
+      elsif in_future
+        future += line
       else
         # we arent in future or context, must just be in buffer
         buffer += line
