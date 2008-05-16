@@ -213,5 +213,37 @@ EOC
       mock_file(klass, replacement)
       code_comments(:nested_class).export! 2
     end
+    
+    it "should use context for :: classes" do
+      klass = <<-EOC
+class OtherClass
+  # this class has an old colon
+  class NestedClass::ColonClass
+  end
+end
+
+class SmallClass
+  # this class has an old colon
+  class NestedClass::ColonClass
+  end
+end
+EOC
+
+      replacement = <<-EOC
+class OtherClass
+  # this class has an old colon
+  class NestedClass::ColonClass
+  end
+end
+
+class SmallClass
+  # this class has a colon
+  class NestedClass::ColonClass
+  end
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:colon_class).export! 2
+    end
   end
 end

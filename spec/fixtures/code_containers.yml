@@ -3,7 +3,7 @@
 some_class:
   type: CodeClass
   name: SmallClass
-  full_name: Fullname
+  full_name: SmallClass
   code_container: file
   line_code: "class SmallClass\n"
   
@@ -13,6 +13,13 @@ nested_class:
   full_name: SmallClass::NestedClass
   code_container: some_class
   line_code: "class NestedClass\n"
+  
+colon_class:
+  type: CodeClass
+  name: ColonClass
+  full_name: NestedClass::ColonClass
+  code_container: nested_class
+  line_code: "class NestedClass::ColonClass\n"
   
 file:
   type: CodeFile

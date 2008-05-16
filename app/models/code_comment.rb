@@ -53,7 +53,7 @@ class CodeComment < ActiveRecord::Base
     @file = File.new('foobar', 'r+')
     pre_regexp = build_regexp(v1.body)
     # If the parent is a class we must make sure its in proper context
-    if owner.code_container.is_a? CodeClass
+    if owner.true_container.is_a? CodeClass
       start, context, ending = get_context
     else
       start = ''
@@ -83,7 +83,7 @@ class CodeComment < ActiveRecord::Base
           context += line # Add the last line (def ...) for sanitys sake
           next
         end
-      when owner.code_container.line_code # This defines the class
+      when owner.true_container.line_code # This defines the class
         in_context = true
       end
       

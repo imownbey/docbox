@@ -26,3 +26,12 @@ nested_class:
   exported: false
   user: aaron
   version: 2
+  
+colon_class:
+  body: |-
+    this class has a colon
+  owner: colon_class
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 2

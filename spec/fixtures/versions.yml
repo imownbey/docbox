@@ -27,3 +27,10 @@ nested_v1:
   code_comment: nested_class
   exported: true
   version: 1
+  
+colon_v1:
+  body: this class has an old colon
+  user: aaron
+  code_comment: colon_class
+  exported: true
+  version: 1

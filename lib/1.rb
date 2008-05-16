@@ -1,3 +1,7 @@
+# This is a comment on two?
+class One::Two
+end
+
 class Foobar
   #This is foobar tad
   class Tad

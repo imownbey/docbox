@@ -184,10 +184,10 @@ module Generators
         p = case type
             when :modules
             
-              CodeModule.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[@file.file_absolute_name][obj.full_name][:line] if MODULES[@file.file_absolute_name]))
+              CodeModule.create(:code_container => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[@file.file_absolute_name][obj.full_name][:line] if MODULES[@file.file_absolute_name]))
             when :classes
               
-              CodeClass.create(:parent => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[@file.file_absolute_name][obj.full_name][:line] if CLASSES[@file.file_absolute_name]))
+              CodeClass.create(:code_container => parent, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[@file.file_absolute_name][obj.full_name][:line] if CLASSES[@file.file_absolute_name]))
             end
         CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
 
