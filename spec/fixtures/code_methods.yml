@@ -11,3 +11,7 @@ simple_method:
     def simple_method(foo)
       echo "Hello World!"
     end
+    
+no_comment:
+  code_container: some_class
+  name: no_comment

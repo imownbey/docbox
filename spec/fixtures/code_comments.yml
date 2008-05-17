@@ -35,3 +35,11 @@ colon_class:
   exported: false
   user: aaron
   version: 2
+
+no_comment:
+  body: this is the first comment
+  owner: no_comment
+  owner_type: CodeMethod
+  exported: false
+  user: aaron
+  version: 1

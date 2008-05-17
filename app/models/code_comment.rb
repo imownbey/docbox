@@ -37,8 +37,8 @@ class CodeComment < ActiveRecord::Base
   
   def export! version_number
     version = self.v version_number
-    pre_version = self.v version_number - 1
-    raise VersionNotExported.new("Previous version not exported.") unless pre_version.exported?
+    pre_version = self.v version_number - 1 unless version == 1
+    raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
     if f = export(pre_version, version)
       version.exported = true
       version.save
@@ -51,7 +51,8 @@ class CodeComment < ActiveRecord::Base
   
   def export v1, v2
     @file = File.new('foobar', 'r+')
-    pre_regexp = build_regexp(v1.body)
+    body = v1.body rescue nil
+    pre_regexp = build_regexp(body)
     # If the parent is a class we must make sure its in proper context
     if owner.true_container.is_a? CodeClass
       start, context, ending = get_context
@@ -60,7 +61,7 @@ class CodeComment < ActiveRecord::Base
       ending = ''
       context = @file.read
     end
-    replace_string = build_string(v2.body)
+    replace_string = build_string(v2.body, (true if v1.nil?))
     context = context.sub(pre_regexp, replace_string)
     @file.rewind
     @file.puts(start + context + ending)
@@ -103,21 +104,30 @@ class CodeComment < ActiveRecord::Base
   #   \1 = Tabbing before comment
   #   \2 = Tabbing/newlining before def
   #   \3 = Def syntax
-  def build_regexp v1
-    comment = commentify(v1)
-    regexp = comment.split("\n").collect {|line|
-      "(\\s*)#{line}"
-    }.join("\n")
-    regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
+  def build_regexp v1 = nil
+    if v1.nil?
+      regexp = "(\\s*)(#{next_line_str}[^\\n]*)"
+    else
+      comment = commentify(v1)
+      regexp = comment.split("\n").collect {|line|
+        "(\\s*)#{line}"
+      }.join("\n")
+      regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
+    end
     Regexp.new(regexp)
   end
   
-  def build_string string
+  def build_string string, no_v1 = false
     comment = commentify(string)
     string = comment.split("\n").collect {|line|
       "\\1#{line}"
     }.join("\n")
-    string + "\n\\2\\3"
+    string += if no_v1
+                "\\1\\2"
+              else
+                "\n\\2\\3"
+              end
+    string
   end
   
   # TODO: Make this support =begin and =end

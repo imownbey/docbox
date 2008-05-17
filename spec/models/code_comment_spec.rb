@@ -245,5 +245,23 @@ EOC
       mock_file(klass, replacement)
       code_comments(:colon_class).export! 2
     end
+    
+    it "should work when no previous comment is there" do
+      method = <<-EOC
+class SmallClass
+  def no_comment
+  end
+end
+EOC
+      replacement = <<-EOC
+class SmallClass
+  # this is the first comment
+  def no_comment
+  end
+end
+EOC
+      mock_file(method, replacement)
+      code_comments(:no_comment).export! 1
+    end
   end
 end
