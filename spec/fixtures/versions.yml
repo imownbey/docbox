@@ -34,3 +34,10 @@ colon_v1:
   code_comment: colon_class
   exported: true
   version: 1
+  
+file_v1:
+  body: This is a file comment
+  user: aaron
+  code_comment: file
+  exported: true
+  version: 1

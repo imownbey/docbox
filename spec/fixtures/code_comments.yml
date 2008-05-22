@@ -43,3 +43,11 @@ no_comment:
   exported: false
   user: aaron
   version: 1
+  
+file_comment:
+  body: This is a new file comment
+  owner: file
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 2

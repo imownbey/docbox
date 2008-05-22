@@ -1,3 +1,7 @@
+#! /usr/local/ruby
+
+# This file does stuff
+
 # This is a comment on two?
 class One::Two
 end

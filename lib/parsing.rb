@@ -1,3 +1,5 @@
+require 'digest/md5' # This is to find comments which are the same
+
 # This is a UGLY hack.
 # It lets me keep track of the line that classes are on
 # And makes things generally easier
@@ -125,6 +127,8 @@ module Generators
       # set up a hash to keep track of all the classes/modules we have processed
       @already_processed = {}
       
+      # Set up to look for first comment md5
+      
       # set up a hash to keep track of all of the objects to be output
       @output = {:files => [], :classes => [], :modules => [], :attributes => [], 
         :methods => [], :aliases => [], :constants => [], :requires => [], :includes => []}   
@@ -144,7 +148,7 @@ module Generators
     # process a file from the code_object.rb tree
     def process_file(file)
       d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
-      CodeComment.create :body => file.comment, :owner => d unless file.comment.blank?
+      @first_comment = nil
       orig_file = File.new(file.file_absolute_name)
       lines = orig_file.readlines
       CLASSES[file.file_absolute_name].each do |key, klass|
@@ -165,11 +169,15 @@ module Generators
       @file = file
       file.each_classmodule do |child| 
         process_class_or_module(child, file)      
-      end   
+      end
+      CodeComment.create :body => file.comment, :owner => d unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
     end
     
     # Process classes and modiles   
     def process_class_or_module(obj, parent)
+      if parent == @file && @first_comment.nil?
+        @first_comment = Digest::MD5.hexdigest(obj.comment)
+      end
       type = obj.is_module? ? :modules : :classes
       # One important note about the code_objects.rb structure. A class or module
       # definition can be spread a cross many files in Ruby so code_objects.rb handles

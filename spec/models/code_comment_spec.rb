@@ -263,5 +263,24 @@ EOC
       mock_file(method, replacement)
       code_comments(:no_comment).export! 1
     end
+    
+    it "should replace file comment" do
+      file = <<-EOC
+# This is a file comment
+
+# This is a class comment
+class Something
+end
+EOC
+      replacement = <<-EOC
+# This is a new file comment
+
+# This is a class comment
+class Something
+end
+EOC
+      mock_file(file, replacement)
+      code_comments(:file_comment).export! 2
+    end
   end
 end
