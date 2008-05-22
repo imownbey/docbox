@@ -148,7 +148,7 @@ module Generators
     # process a file from the code_object.rb tree
     def process_file(file)
       d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
-      @first_comment = nil
+      @first_comment = false
       orig_file = File.new(file.file_absolute_name)
       lines = orig_file.readlines
       CLASSES[file.file_absolute_name].each do |key, klass|
@@ -157,6 +157,7 @@ module Generators
       MODULES[file.file_absolute_name].each do |key, mod|
         MODULES[file.file_absolute_name][key][:line] = lines[mod[:line_no] - 1]
       end if MODULES[file.file_absolute_name]
+
       # Process all of the objects that this file contains
       file.method_list.each { |child| process_method(child, file) }
       file.aliases.each { |child| process_alias(child, file) }
@@ -164,7 +165,7 @@ module Generators
       file.requires.each { |child| process_require(child, file) }
       file.includes.each { |child| process_include(child, file) }
       file.attributes.each { |child| process_attribute(child, file) }   
-    
+
       # Recursively process contained subclasses and modules
       @file = file
       file.each_classmodule do |child| 
@@ -175,9 +176,7 @@ module Generators
     
     # Process classes and modiles   
     def process_class_or_module(obj, parent)
-      if parent == @file && @first_comment.nil?
-        @first_comment = Digest::MD5.hexdigest(obj.comment)
-      end
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       type = obj.is_module? ? :modules : :classes
       # One important note about the code_objects.rb structure. A class or module
       # definition can be spread a cross many files in Ruby so code_objects.rb handles
@@ -218,36 +217,42 @@ module Generators
     end       
     
     def process_method(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeMethod.create(:code_container => parent, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
       CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_alias(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeAlias.create(:code_container => parent, :name => obj.name, :old_name => obj.new_name)
       CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_constant(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeConstant.create(:code_container => parent, :name => obj.name, :value => obj.value)
       CodeComment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_attribute(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeAttribute.create(:code_container => parent, :name => obj.name, :read_write => obj.rw)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
     def process_require(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeRequire.create(:code_container => parent, :name => obj.name)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
     end
     
-    def process_include(obj, parent) 
+    def process_include(obj, parent)
+      @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeInclude.create(:code_container => parent, :name => obj.name)
       Comment.create :body => obj.comment, :owner => p unless obj.comment.blank?
