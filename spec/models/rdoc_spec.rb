@@ -58,15 +58,18 @@ describe RDoc do
   end
 end
 
-describe RDoc, "file comments" do
-  before(:each) do
-    @import = lambda {
+describe RDoc, "file comments" do  
+  it "should only update comments by 1" do
+    lambda {
       @rdoc = RDoc::RDoc.new
       @rdoc.import! %W{#{File.dirname(__FILE__)}/../fixtures/file_comments.rb}
-    }
+    }.should change(CodeComment, :count).by(1)
   end
   
-  it "should only update comments by 1" do
-    @import.should change(CodeComment, :count).by(1)
+  it "should update 2 comments when there are 2 comments" do
+    lambda {
+      @rdoc = RDoc::RDoc.new
+      @rdoc.import! %W{#{File.dirname(__FILE__)}/../fixtures/file_comments2.rb}
+    }.should change(CodeComment, :count).by(2)
   end
 end
