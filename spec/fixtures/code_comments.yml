@@ -51,3 +51,11 @@ file_comment:
   exported: false
   user: aaron
   version: 2
+  
+long_comment:
+  body: This is a very long comment which has a lot of words and is very very nice
+  owner: file
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 1

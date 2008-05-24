@@ -13,6 +13,16 @@ class CodeComment < ActiveRecord::Base
     super(sType.to_s.classify.constantize.base_class.to_s)
   end
   
+  def exported_body=(comment)
+    self.raw_body = comment
+    self.body = strip(comment)
+    self.exported = true # Only rdoc import uses exported_body, so this means its been exported
+  end
+  
+  def uses_begin?
+    (raw_body =~ /^\s*#/).nil? # =begin doesnt have any #
+  end
+  
   def create_version
     if self.body_changed?
       Version.create(
@@ -49,6 +59,17 @@ class CodeComment < ActiveRecord::Base
   
   private
   
+  def strip(comment)
+    comment.split("\n").inject([]) do |new_comment, line|
+      if line =~ /(=begin.*|=end)/ || line =~ /^\s*#+\s*$/
+        # This is fluff
+        new_comment
+      else
+        new_comment << line.gsub(/\s*#\s*/, '')
+      end
+    end.join("\n")
+  end
+  
   def export v1, v2
     @file = File.new('foobar', 'r+')
     body = v1.body rescue nil
@@ -57,15 +78,73 @@ class CodeComment < ActiveRecord::Base
     if owner.true_container.is_a? CodeClass
       start, context, ending = get_context
     else
-      start = ''
-      ending = ''
-      context = @file.read
+      if owner.is_a? CodeFile
+        start = ''
+        context, ending = get_file_start
+      else
+        start = ''
+        ending = ''
+        context = @file.read
+      end
     end
     replace_string = build_string(v2.body, (true if v1.nil?))
+    p pre_regexp
     context = context.sub(pre_regexp, replace_string)
     @file.rewind
     @file.puts(start + context + ending)
     @file.close
+  end
+  
+  def get_file_start
+    raise unless @file
+    context = ''
+    future = ''
+    in_context = true
+    seen_comment = false
+    uses_begin = false
+    @file.each_line do |line|
+      if in_context # We are still adding to context
+        unless seen_comment # We have not seen the comment, so add to context and look for it
+          if line =~ /^\s*#!/
+            # Bashfun
+            context << line
+          elsif line =~ /^\s+$/
+            # Blank line
+            context << line
+          elsif line =~ /^\s*#/
+            # This is most likely the first comment
+            seen_comment = true
+            context << line
+          elsif line =~ /^=begin\s+rdoc/
+            #this is the begin of a comment
+            context << line
+            seen_comment = true
+            uses_begin = true
+          end
+        else # We have seen the comment, so continue until the end of it
+          # Seen teh comment, look to keep seeing it
+          if uses_begin
+            unless line =~ /^=end\s*$/
+              context << line
+              in_context = false
+            else
+              context << line
+            end
+          else
+            if line =~ /\s*#/
+              context << line
+            else
+              context << line
+              in_context = false
+            end
+          end
+        end
+      else # We are not in context, just add to future
+        future << line
+      end
+    end
+    p context
+    [context, future]
   end
   
   def get_context
@@ -136,18 +215,18 @@ class CodeComment < ActiveRecord::Base
   end
   
   def next_line_str
-    case self.owner.class.to_s
-    when 'CodeMethod'
+    case self.owner
+    when CodeMethod
       "def #{owner.name}"
-    when 'CodeClass'
+    when CodeClass
       "#{owner.line_code}"
-    when 'CodeModule'
+    when CodeModule
       "module\\s+[^\\s]*#{owner.name}"
-    when 'CodeRequire'
+    when CodeRequire
       "require\\s+['\"]#{owner.name}['\"]"
-    when 'CodeInclude'
+    when CodeInclude
       "include\\s+#{owner.name}"
-    when 'CodeConstant'
+    when CodeConstant
       "#{owner.name}\\s+=\\s+#{owner.value}"
     end
   end

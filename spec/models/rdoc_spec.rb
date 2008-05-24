@@ -20,7 +20,7 @@ describe RDoc do
   end
 
   it "should create three containers" do
-    @import.should change(CodeContainer, :count).by(3)
+    @import.should change(CodeContainer, :count).by(4)
   end
   
   it "should create 1 new doc" do
@@ -31,8 +31,8 @@ describe RDoc do
     @import.should change(CodeModule, :count).by(1)
   end
   
-  it "should create 1 new klass" do
-    @import.should change(CodeClass, :count).by(1)
+  it "should create 2 new klass" do
+    @import.should change(CodeClass, :count).by(2)
   end
   
   it "should create 4 new methods" do
@@ -53,8 +53,19 @@ describe RDoc do
     CodeMethod.find_by_name('no_doc').code_container.should == CodeClass.find_by_name('SimpleClass')
   end
   
-  it "should create 2 comments" do
-    @import.should change(CodeComment, :count).by(2)
+  it "should create 3 comments" do
+    @import.should change(CodeComment, :count).by(3)
+  end
+  
+  it "should create a heredoc comment" do
+    @import.call
+    CodeClass.find_by_name('SomeOtherClass').code_comment.should be_uses_begin
+    CodeClass.find_by_name('SimpleClass').code_comment.should_not be_uses_begin
+  end
+  
+  it "should strip comments properly" do
+    @import.call
+    CodeClass.find_by_name('SimpleClass').code_comment.body.should == "This is a class comment"
   end
 end
 

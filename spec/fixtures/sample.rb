@@ -26,3 +26,11 @@ class SimpleClass
     # This method is private
   end
 end
+
+=begin rdoc
+This bad boys
+Has a begin
+And a:
+=end
+class SomeOtherClass
+end

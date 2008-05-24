@@ -282,5 +282,24 @@ EOC
       mock_file(file, replacement)
       code_comments(:file_comment).export! 2
     end
+
+    it "should allow for first file comment" do
+      pending
+      file = <<-EOC
+# This is a class comment
+class Something
+end
+EOC
+      replacement = <<-EOC
+# This is the first of many
+
+# This is a class comment
+class Something
+end
+EOC
+      mock_file(file, replacement)
+      code_comments(:first_file_comment).export! 1
+    end
+
   end
 end

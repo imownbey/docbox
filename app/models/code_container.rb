@@ -9,7 +9,7 @@ class CodeContainer < ActiveRecord::Base
       return code_container
     end
     
-    if match = line_code.match(/\s*class\s+([^#:]*)(::)/) # This finds if there are :: in the line_code and gets the first one
+    if line_code && match = line_code.match(/\s*class\s+([^#:]*)(::)/) # This finds if there are :: in the line_code and gets the first one
       initial_class = match[1]
       if container = CodeContainer.find_by_name(initial_class)
         return container.code_container
