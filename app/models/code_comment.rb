@@ -1,5 +1,15 @@
 class CodeComment < ActiveRecord::Base
   
+  # Regexp for stuff
+  REGEXP = {}
+  # =begin and =end stuff
+  REGEXP[:begin] = {}
+  REGEXP[:begin][:start] = /^=begin\s+rdoc/
+  REGEXP[:begin][:finish] = /^=end/
+  
+  # Pound (#) stuff
+  REGEXP[:pound] = /^\s*#/
+  
   class VersionNotExported < ArgumentError; end
   
   belongs_to :owner, :polymorphic => true
@@ -88,7 +98,6 @@ class CodeComment < ActiveRecord::Base
       end
     end
     replace_string = build_string(v2.body, (true if v1.nil?))
-    p pre_regexp
     context = context.sub(pre_regexp, replace_string)
     @file.rewind
     @file.puts(start + context + ending)
@@ -97,25 +106,23 @@ class CodeComment < ActiveRecord::Base
   
   def get_file_start
     raise unless @file
-    context = ''
-    future = ''
-    in_context = true
-    seen_comment = false
-    uses_begin = false
+    context, future = '', ''
+    in_context, seen_comment, uses_begin = true, false, false
     @file.each_line do |line|
       if in_context # We are still adding to context
         unless seen_comment # We have not seen the comment, so add to context and look for it
-          if line =~ /^\s*#!/
+          case line
+          when /^\s*#!/
             # Bashfun
             context << line
-          elsif line =~ /^\s+$/
+          when /^\s+$/
             # Blank line
             context << line
-          elsif line =~ /^\s*#/
+          when REGEXP[:pound]
             # This is most likely the first comment
             seen_comment = true
             context << line
-          elsif line =~ /^=begin\s+rdoc/
+          when REGEXP[:begin][:start]
             #this is the begin of a comment
             context << line
             seen_comment = true
@@ -124,16 +131,16 @@ class CodeComment < ActiveRecord::Base
         else # We have seen the comment, so continue until the end of it
           # Seen teh comment, look to keep seeing it
           if uses_begin
-            unless line =~ /^=end\s*$/
+            unless line =~ REGEXP[:begin][:finish] # End of begin
               context << line
               in_context = false
             else
               context << line
             end
-          else
-            if line =~ /\s*#/
+          else # Uses # comments
+            if line =~ REGEXP[:pound]
               context << line
-            else
+            else # Line does not start with #, out of context
               context << line
               in_context = false
             end
@@ -143,7 +150,6 @@ class CodeComment < ActiveRecord::Base
         future << line
       end
     end
-    p context
     [context, future]
   end
   
@@ -164,7 +170,9 @@ class CodeComment < ActiveRecord::Base
           next
         end
       when owner.true_container.line_code # This defines the class
+        buffer += line
         in_context = true
+        next
       end
       
       if in_context
@@ -185,7 +193,7 @@ class CodeComment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1 = nil
     if v1.nil?
-      regexp = "(\\s*)(#{next_line_str}[^\\n]*)"
+      regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
     else
       comment = commentify(v1)
       regexp = comment.split("\n").collect {|line|
@@ -201,11 +209,8 @@ class CodeComment < ActiveRecord::Base
     string = comment.split("\n").collect {|line|
       "\\1#{line}"
     }.join("\n")
-    string += if no_v1
-                "\\1\\2"
-              else
-                "\n\\2\\3"
-              end
+    string += "\n\\2\\3"
+    p string
     string
   end
   
