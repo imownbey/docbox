@@ -30,10 +30,7 @@ class CodeComment < ActiveRecord::Base
     self.raw_body = comment
     self.body = strip(comment)
     self.exported = true # Only rdoc import uses exported_body, so this means its been exported
-  end
-  
-  def uses_begin?
-    (raw_body =~ /^\s*#/).nil? # =begin doesnt have any #
+    self.uses_begin = (comment =~ REGEXP[:pound]).nil?
   end
   
   def create_version

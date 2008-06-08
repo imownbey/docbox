@@ -54,6 +54,12 @@ describe CodeComment, "versioning" do
     code_comments(:current).v(3).should == code_comments(:current)
   end
   
+  it "should set uses_begin automatically when exported_body is set" do
+    c = CodeComment.new
+    c.exported_body = "foobar" # no # means begin
+    c.uses_begin?.should == true
+  end
+  
   describe 'exporting' do
     it "should not export if previose version has not been exported" do
       versions(:current_v1).update_attributes :exported => false

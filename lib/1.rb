@@ -1,6 +1,8 @@
 #! /usr/local/ruby
 
-# This file does stuff
+=begin rdoc
+  This is a begin statment
+=end
 
 # This is a comment on two?
 class One::Two
