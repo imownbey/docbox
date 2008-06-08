@@ -43,7 +43,8 @@ class CodeComment < ActiveRecord::Base
         :body => self.body_was, 
         :exported => self.exported?, 
         :code_comment => self,
-        :version => self.version
+        :version => self.version,
+        :uses_begin => self.uses_begin
       )
       self.exported = false
       self.version += 1

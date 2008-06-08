@@ -25,6 +25,13 @@ describe CodeComment, "versioning" do
     c.versions.last.body.should == old_body
   end
   
+  it "should move uses_begin" do
+    c = code_comments(:current)
+    c.uses_begin = true
+    c.update_attributes :body => 'This is changed'
+    c.versions.last.uses_begin?.should == true
+  end
+  
   it "should move user" do
     c = code_comments(:current)
     c.update_attributes :body => 'New Body!', :user => users(:quentin)
