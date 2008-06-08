@@ -10,6 +10,9 @@ class CodeComment < ActiveRecord::Base
   # Pound (#) stuff
   REGEXP[:pound] = /^\s*#/
   
+  # Bash stuff (#! envruby)
+  REGEXP[:bash] = /^\s*#!/
+  
   class VersionNotExported < ArgumentError; end
   
   belongs_to :owner, :polymorphic => true
@@ -57,7 +60,7 @@ class CodeComment < ActiveRecord::Base
   
   def export! version_number
     version = self.v version_number
-    pre_version = self.v version_number - 1 unless version == 1
+    pre_version = self.v(version_number - 1) unless version == 1
     raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
     if f = export(pre_version, version)
       version.exported = true
@@ -82,26 +85,58 @@ class CodeComment < ActiveRecord::Base
   
   def export v1, v2
     @file = File.new('foobar', 'r+')
-    body = v1.body rescue nil
-    pre_regexp = build_regexp(body)
-    # If the parent is a class we must make sure its in proper context
-    if owner.true_container.is_a? CodeClass
-      start, context, ending = get_context
+    if v1.nil? && owner.is_a?(CodeFile)
+      # v1 is nil and owner is a file, just throw it at start at file
+      file_body = inject_at_file_start v2.body
     else
-      if owner.is_a? CodeFile
-        start = ''
-        context, ending = get_file_start
+      body = v1.body rescue nil
+      pre_regexp = build_regexp(body)
+      # If the parent is a class we must make sure its in proper context
+      if owner.true_container.is_a? CodeClass
+        start, context, ending = get_context
       else
-        start = ''
-        ending = ''
-        context = @file.read
+        if owner.is_a? CodeFile
+          start = ''
+          context, ending = get_file_start
+        else
+          start = ''
+          ending = ''
+          context = @file.read
+        end
+      end
+      replace_string = build_string(v2.body, (true if v1.nil?))
+      context = context.sub(pre_regexp, replace_string)
+      file_body = start + context + ending
+    end
+    @file.rewind
+    @file.puts(file_body)
+    @file.close
+  end
+  
+  def inject_at_file_start body
+    raise unless @file
+    body = commentify(body)
+    pre, future, comment_added = '', '', false
+    @file.each_line do |line|
+      unless comment_added
+        if line =~ REGEXP[:bash]
+          # Bash, add to pre
+          pre << line
+        else
+          if line =~ /^\s*$/
+            # Just space, add to pre
+            pre << line
+          else
+            comment_added = true
+            future << line
+          end
+        end
+      else
+        # Comment has been added, just add to future
+        future << line
       end
     end
-    replace_string = build_string(v2.body, (true if v1.nil?))
-    context = context.sub(pre_regexp, replace_string)
-    @file.rewind
-    @file.puts(start + context + ending)
-    @file.close
+    pre + body + "\n\n" + future
   end
   
   def get_file_start
@@ -112,7 +147,7 @@ class CodeComment < ActiveRecord::Base
       if in_context # We are still adding to context
         unless seen_comment # We have not seen the comment, so add to context and look for it
           case line
-          when /^\s*#!/
+          when REGEXP[:bash]
             # Bashfun
             context << line
           when /^\s+$/
@@ -141,8 +176,9 @@ class CodeComment < ActiveRecord::Base
             if line =~ REGEXP[:pound]
               context << line
             else # Line does not start with #, out of context
-              context << line
+              future << line
               in_context = false
+              next
             end
           end
         end
@@ -199,7 +235,7 @@ class CodeComment < ActiveRecord::Base
       regexp = comment.split("\n").collect {|line|
         "(\\s*)#{line}"
       }.join("\n")
-      regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)"
+      regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
     Regexp.new(regexp)
   end
@@ -209,8 +245,7 @@ class CodeComment < ActiveRecord::Base
     string = comment.split("\n").collect {|line|
       "\\1#{line}"
     }.join("\n")
-    string += "\n\\2\\3"
-    p string
+    string += "\n\\2\\3" unless self.owner.is_a? CodeFile
     string
   end
   

@@ -38,6 +38,6 @@ colon_v1:
 file_v1:
   body: This is a file comment
   user: aaron
-  code_comment: file
+  code_comment: file_comment
   exported: true
   version: 1

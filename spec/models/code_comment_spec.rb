@@ -284,13 +284,33 @@ EOC
     end
 
     it "should allow for first file comment" do
-      pending
       file = <<-EOC
 # This is a class comment
 class Something
 end
 EOC
       replacement = <<-EOC
+# This is the first of many
+
+# This is a class comment
+class Something
+end
+EOC
+      mock_file(file, replacement)
+      code_comments(:first_file_comment).export! 1
+    end
+    
+    it "should ignore bash stuff" do
+      file = <<-EOC
+#! ruby /usr/env/ruby
+
+# This is a class comment
+class Something
+end
+EOC
+      replacement = <<-EOC
+#! ruby /usr/env/ruby
+
 # This is the first of many
 
 # This is a class comment
