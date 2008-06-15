@@ -1,4 +1,5 @@
 class CodeComment < ActiveRecord::Base
+  include ActionView::Helpers::TextHelper
   
   # Regexp for stuff
   REGEXP = {}
@@ -140,7 +141,7 @@ class CodeComment < ActiveRecord::Base
   def get_file_start
     raise unless @file
     context, future = '', ''
-    in_context, seen_comment, uses_begin = true, false, false
+    in_context, seen_comment = true, false
     @file.each_line do |line|
       if in_context # We are still adding to context
         unless seen_comment # We have not seen the comment, so add to context and look for it
@@ -155,29 +156,15 @@ class CodeComment < ActiveRecord::Base
             # This is most likely the first comment
             seen_comment = true
             context << line
-          when REGEXP[:begin][:start]
-            #this is the begin of a comment
-            context << line
-            seen_comment = true
-            uses_begin = true
           end
         else # We have seen the comment, so continue until the end of it
           # Seen teh comment, look to keep seeing it
-          if uses_begin
-            unless line =~ REGEXP[:begin][:finish] # End of begin
-              context << line
-              in_context = false
-            else
-              context << line
-            end
-          else # Uses # comments
-            if line =~ REGEXP[:pound]
-              context << line
-            else # Line does not start with #, out of context
-              future << line
-              in_context = false
-              next
-            end
+          if line =~ REGEXP[:pound]
+            context << line
+          else # Line does not start with #, out of context
+            future << line
+            in_context = false
+            next
           end
         end
       else # We are not in context, just add to future
@@ -226,15 +213,26 @@ class CodeComment < ActiveRecord::Base
   #   \2 = Tabbing/newlining before def
   #   \3 = Def syntax
   def build_regexp v1 = nil
+    p v1
     if v1.nil?
       regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
     else
+      p v1
       comment = commentify(v1)
       regexp = comment.split("\n").collect {|line|
-        "(\\s*)#{line}"
+        n ||= true # Counter to see if this is the first, in which case we capture
+        if n
+          start = "(\\s*)"
+        else
+          start = "\\s*"
+        end
+        n = false
+        start + line
       }.join("\n")
+      p regexp
       regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
+    p regexp
     Regexp.new(regexp)
   end
   
@@ -249,6 +247,7 @@ class CodeComment < ActiveRecord::Base
   
   # TODO: Make this support =begin and =end
   def commentify string
+    p string = word_wrap(string, 60)
     string.split("\n").collect { |line| "\# #{line}"}.join("\n")
   end
   

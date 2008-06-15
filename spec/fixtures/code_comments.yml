@@ -67,3 +67,20 @@ long_comment:
   exported: false
   user: aaron
   version: 1
+  
+begin_comment:
+  body: This is the second version
+  owner: some_class
+  uses_begin: true
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 2
+  
+long_comment:
+  body: This is a very long comment that is longer then 15 words la la la la la
+  owner: some_class
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 1

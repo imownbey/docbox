@@ -41,3 +41,11 @@ file_v1:
   code_comment: file_comment
   exported: true
   version: 1
+  
+begin_v1:
+  body: This is the first
+  user: aaron
+  uses_begin: true
+  code_comment: begin_comment
+  exported: true
+  version: 1

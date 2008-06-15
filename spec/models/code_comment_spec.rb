@@ -333,6 +333,40 @@ EOC
       mock_file(file, replacement)
       code_comments(:first_file_comment).export! 1
     end
-
+    
+    it "should keep begin if starts with it" do
+      pending
+      klass = <<-EOC
+=begin rdoc
+  This is the first
+=end
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+=begin rdoc
+  This is the second version
+=end
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:begin_comment).export! 2
+    end
+    
+    it "should wrap words at 60 chars niceley" do
+      klass = <<-EOC
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+# This is a very long comment that is longer then 15 words la
+# la la la la
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:long_comment).export! 1
+    end
   end
 end
