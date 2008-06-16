@@ -213,11 +213,9 @@ class CodeComment < ActiveRecord::Base
   #   \2 = Tabbing/newlining before def
   #   \3 = Def syntax
   def build_regexp v1 = nil
-    p v1
     if v1.nil?
       regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
     else
-      p v1
       comment = commentify(v1)
       regexp = comment.split("\n").collect {|line|
         n ||= true # Counter to see if this is the first, in which case we capture
@@ -229,10 +227,8 @@ class CodeComment < ActiveRecord::Base
         n = false
         start + line
       }.join("\n")
-      p regexp
       regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
-    p regexp
     Regexp.new(regexp)
   end
   
@@ -247,7 +243,7 @@ class CodeComment < ActiveRecord::Base
   
   # TODO: Make this support =begin and =end
   def commentify string
-    p string = word_wrap(string, 60)
+    string = word_wrap(string, 60)
     string.split("\n").collect { |line| "\# #{line}"}.join("\n")
   end
   

@@ -66,7 +66,7 @@ describe RDoc do
   it "should strip comments properly" do
     @import.call
     CodeClass.find_by_name('SimpleClass').code_comment.body.should == "This is a class comment"
-  end
+  end 
 end
 
 describe RDoc, "file comments" do  
