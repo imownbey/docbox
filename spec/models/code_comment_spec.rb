@@ -76,11 +76,7 @@ describe CodeComment, "versioning" do
     end
     
     def mock_file(v1, v2)
-      File.should_receive(:new).and_return(v1)
-      v1.should_receive(:read).any_number_of_times.and_return(v1)
-      v1.should_receive(:rewind)
-      v1.should_receive(:puts).with(v2)
-      v1.should_receive(:close)
+      File.should_receive(:new).and_return(StringIO.new(v1))
     end
 
     it "should actually sub out comments" do
