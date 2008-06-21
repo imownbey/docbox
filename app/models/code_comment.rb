@@ -110,6 +110,9 @@ class CodeComment < ActiveRecord::Base
     @file.rewind
     @file.puts(file_body)
     @file.close
+    git = Git.open(RAILS_ROOT + '/code')
+    git.config('user.name', v2.user.name)
+    git.config('user.email', v2.user.email)
   end
   
   def inject_at_file_start body

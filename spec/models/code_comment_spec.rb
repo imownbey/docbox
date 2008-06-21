@@ -76,8 +76,10 @@ describe CodeComment, "versioning" do
     end
     
     it "should set git username and password" do
-      v1, v2 = versions(:current_v1).body, versions(:current_v2).body
-      mock_file(v1, v2)
+      file_mock = StringIO.new
+      File.should_receive(:new).and_return(file_mock)
+      file_mock.should_receive(:puts).and_return(true)
+      
       g = mock(Git)
       Git.should_receive(:open).and_return(g)
       g.should_receive(:config).with('user.name', users(:aaron).name).and_return(true)
