@@ -10,3 +10,6 @@
 [submodule "vendor/plugins/acts_as_state_machine"]
 	path = vendor/plugins/acts_as_state_machine
 	url = git://github.com/omghax/acts_as_state_machine.git
+[submodule "lib/git"]
+	path = lib/git
+	url = git://github.com/schacon/ruby-git.git
