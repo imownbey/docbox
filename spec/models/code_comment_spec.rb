@@ -75,8 +75,21 @@ describe CodeComment, "versioning" do
       v2.should be_exported
     end
     
+    it "should set git username and password" do
+      v1, v2 = versions(:current_v1).body, versions(:current_v2).body
+      mock_file(v1, v2)
+      g = mock(Git)
+      Git.should_receive(:open).and_return(g)
+      g.should_receive(:config).with('user.name', users(:aaron).name).and_return(true)
+      g.should_receive(:config).with('user.email', users(:aaron).email).and_return(true)
+      code_comments(:current).export!(2)
+    end
+    
     def mock_file(v1, v2)
-      File.should_receive(:new).and_return(StringIO.new(v1))
+      mock = StringIO.new(v1)
+      File.should_receive(:new).and_return(mock)
+      mock.should_receive(:puts).with(v2).and_return(true)
+      Git.should_receive(:open).and_return(mock(Git, :null_object => true))
     end
 
     it "should actually sub out comments" do
