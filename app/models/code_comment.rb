@@ -110,6 +110,7 @@ class CodeComment < ActiveRecord::Base
     @file.rewind
     @file.puts(file_body)
     @file.close
+    
     git = Git.open(RAILS_ROOT + '/code')
     git.config('user.name', v2.user.name)
     git.config('user.email', v2.user.email)
@@ -222,14 +223,20 @@ class CodeComment < ActiveRecord::Base
     else
       comment = commentify(v1)
       regexp = comment.split("\n").collect {|line|
-        n ||= true # Counter to see if this is the first, in which case we capture
-        if n
-          start = "(\\s*)"
+        if line =~ REGEXP[:begin][:start] || line =~ REGEXP[:begin][:finish]
+          # This is a begin or end, just add the line
+          line
         else
-          start = "\\s*"
+          n ||= true # Counter to see if this is the first, in which case we capture whitespace
+          # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
+          if n
+            start = "(\\s*)"
+          else
+            start = "\\s*"
+          end
+          n = false
+          start + line
         end
-        n = false
-        start + line
       }.join("\n")
       regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
@@ -237,10 +244,19 @@ class CodeComment < ActiveRecord::Base
   end
   
   def build_string string, no_v1 = false
-    comment = commentify(string)
-    string = comment.split("\n").collect {|line|
-      "\\1#{line}"
-    }.join("\n")
+    if uses_begin?
+      comment = "=begin rdoc\n"
+      string.each_line do |line|
+        comment += "  #{line}" # Throw a tab first, for sake of looking nice
+      end
+      comment += "\n=end"
+      string = comment
+    else
+      comment = commentify(string)
+      string = comment.split("\n").collect {|line|
+        "\\1#{line}"
+      }.join("\n")
+    end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
     string
   end
@@ -248,7 +264,12 @@ class CodeComment < ActiveRecord::Base
   # TODO: Make this support =begin and =end
   def commentify string
     string = word_wrap(string, 60)
-    string.split("\n").collect { |line| "\# #{line}"}.join("\n")
+    if uses_begin?
+      string = "=begin rdoc\n#{string}\n=end"
+    else
+      string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
+    end
+    string
   end
   
   def next_line_str

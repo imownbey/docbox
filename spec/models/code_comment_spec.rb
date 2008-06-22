@@ -356,7 +356,6 @@ EOC
     end
     
     it "should keep begin if starts with it" do
-      pending
       klass = <<-EOC
 =begin rdoc
   This is the first
