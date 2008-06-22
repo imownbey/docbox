@@ -411,5 +411,23 @@ EOC
       mock_file(klass, replacement)
       code_comments(:long_comment).export! 1
     end
+    
+    it "should wrap words even in begin" do
+      code_comments(:long_comment).uses_begin = true
+      klass = <<-EOC
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+=begin rdoc
+  This is a very long comment that is longer then 15 words la
+  la la la la
+=end
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:long_comment).export! 1
+    end
   end
 end

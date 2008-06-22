@@ -245,12 +245,7 @@ class CodeComment < ActiveRecord::Base
   
   def build_string string, no_v1 = false
     if uses_begin?
-      comment = "=begin rdoc\n"
-      string.each_line do |line|
-        comment += "  #{line}" # Throw a tab first, for sake of looking nice
-      end
-      comment += "\n=end"
-      string = comment
+      string = commentify(string)
     else
       comment = commentify(string)
       string = comment.split("\n").collect {|line|
@@ -265,6 +260,7 @@ class CodeComment < ActiveRecord::Base
   def commentify string
     string = word_wrap(string, 60)
     if uses_begin?
+      string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
     else
       string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
