@@ -258,7 +258,7 @@ class CodeComment < ActiveRecord::Base
   
   # TODO: Make this support =begin and =end
   def commentify string
-    string = word_wrap(string, 60)
+    string = string.wrap(60, 0, true, true)
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
