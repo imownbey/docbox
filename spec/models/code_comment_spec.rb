@@ -429,5 +429,20 @@ EOC
       mock_file(klass, replacement)
       code_comments(:long_comment).export! 1
     end
+    
+    it "should not wrap lines with a tab" do
+      klass = <<-EOC
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+# tada
+#   This is a very long comment that is longer then 15 words la la la la la
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:long_tabbed_comment).export! 1
+    end
   end
 end

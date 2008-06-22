@@ -96,3 +96,13 @@ long_comment:
   exported: false
   user: aaron
   version: 1
+  
+long_tabbed_comment:
+  body: |-
+    tada
+      This is a very long comment that is longer then 15 words la la la la la
+  owner: some_class
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 1
