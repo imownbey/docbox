@@ -27,6 +27,7 @@ class CodeComment < ActiveRecord::Base
     super(sType.to_s.classify.constantize.base_class.to_s)
   end
   
+  # This is called by the RDoc importer. It is only used when imported.
   def exported_body=(comment)
     self.raw_body = comment
     self.body = strip(comment)
@@ -34,6 +35,7 @@ class CodeComment < ActiveRecord::Base
     self.uses_begin = (comment =~ REGEXP[:pound]).nil?
   end
   
+  # Before update, creating the previous version
   def create_version
     if self.body_changed?
       Version.create(
@@ -49,6 +51,7 @@ class CodeComment < ActiveRecord::Base
     end
   end
   
+  # Grabs the version of a comment based on number
   def v number
     if self.version == number
       self
@@ -57,6 +60,7 @@ class CodeComment < ActiveRecord::Base
     end
   end
   
+  # Export the version number and set exported to true
   def export! version_number
     version = self.v version_number
     pre_version = self.v(version_number - 1) unless version == 1
@@ -71,6 +75,7 @@ class CodeComment < ActiveRecord::Base
   
   private
   
+  # Strip a comment of anything except the meat
   def strip(comment)
     comment.split("\n").inject([]) do |new_comment, line|
       if line =~ /(=begin.*|=end)/ || line =~ /^\s*#+\s*$/
@@ -82,6 +87,7 @@ class CodeComment < ActiveRecord::Base
     end.join("\n")
   end
   
+  # Takes two versions, and exports the second one.
   def export v1, v2
     @file = File.new('foobar', 'r+')
     if v1.nil? && owner.is_a?(CodeFile)
@@ -117,6 +123,8 @@ class CodeComment < ActiveRecord::Base
     git.commit_all("Documentation update for #{owner.name}")
   end
   
+  # Called when there is no previous version and creating a new file comment
+  # Skips inital bash stuff
   def inject_at_file_start body
     raise unless @file
     body = commentify(body)
@@ -143,6 +151,8 @@ class CodeComment < ActiveRecord::Base
     pre + body + "\n\n" + future
   end
   
+  # Used to get context if comments parent is a file. Thus context is the start of a file (before 
+  # class or method declarations)
   def get_file_start
     raise unless @file
     context, future = '', ''
@@ -179,6 +189,7 @@ class CodeComment < ActiveRecord::Base
     [context, future]
   end
   
+  # Gets context of a comment. This means from start of class declartion => definition of method or require
   def get_context
     raise unless @file
     buffer = ''
@@ -243,6 +254,7 @@ class CodeComment < ActiveRecord::Base
     Regexp.new(regexp)
   end
   
+  # Builds the replacement string based on a comment. Adds #'s and formats for regexp
   def build_string string, no_v1 = false
     if uses_begin?
       string = commentify(string)
@@ -256,7 +268,7 @@ class CodeComment < ActiveRecord::Base
     string
   end
   
-  # TODO: Make this support =begin and =end
+  # Makes a comment a comment. Addes # or =begin=end
   def commentify string
     string = string.wrap(60, 0, true, true)
     if uses_begin?
@@ -268,6 +280,7 @@ class CodeComment < ActiveRecord::Base
     string
   end
   
+  # Get the definition string, based on the owner
   def next_line_str
     case self.owner
     when CodeMethod
