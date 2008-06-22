@@ -49,3 +49,14 @@ begin_v1:
   code_comment: begin_comment
   exported: true
   version: 1
+  
+begin_tabbed_v1:
+  body: |-
+    This is the first
+      version
+    yup!
+  user: aaron
+  uses_begin: true
+  code_comment: begin_tabbed_comment
+  exported: true
+  version: 1

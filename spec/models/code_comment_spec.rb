@@ -374,6 +374,29 @@ EOC
       code_comments(:begin_comment).export! 2
     end
     
+    it "should keep tabbing proper in begin" do
+      klass = <<-EOC
+=begin rdoc
+  This is the first
+    version
+  yup!
+=end
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+=begin rdoc
+  This is the second
+    version
+  yup!
+=end
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:begin_tabbed_comment).export! 2
+    end
+    
     it "should wrap words at 60 chars niceley" do
       klass = <<-EOC
 class SmallClass

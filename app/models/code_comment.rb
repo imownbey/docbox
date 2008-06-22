@@ -229,7 +229,7 @@ class CodeComment < ActiveRecord::Base
         else
           n ||= true # Counter to see if this is the first, in which case we capture whitespace
           # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
-          if n
+          if n && !uses_begin?
             start = "(\\s*)"
           else
             start = "\\s*"
