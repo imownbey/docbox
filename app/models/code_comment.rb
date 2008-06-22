@@ -218,10 +218,10 @@ class CodeComment < ActiveRecord::Base
   #   \2 = Tabbing/newlining before def
   #   \3 = Def syntax
   def build_regexp v1 = nil
-    if v1.nil?
+    if v1.nil? && raw_body.nil?
       regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
     else
-      comment = commentify(v1)
+      comment = commentify(raw_body || v1)
       regexp = comment.split("\n").collect {|line|
         if line =~ REGEXP[:begin][:start] || line =~ REGEXP[:begin][:finish]
           # This is a begin or end, just add the line

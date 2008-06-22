@@ -444,5 +444,21 @@ EOC
       mock_file(klass, replacement)
       code_comments(:long_tabbed_comment).export! 1
     end
+    
+    it "should use raw body for regexp if needed" do
+      code_comments(:not_current).raw_body = "tada"
+      klass = <<-EOC
+# tada
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+# This comment is not current
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:not_current).export! 2
+    end
   end
 end
