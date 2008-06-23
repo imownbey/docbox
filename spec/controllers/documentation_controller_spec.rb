@@ -10,4 +10,15 @@ describe DocumentationController do
     
     assigns[:objects].should == [code_containers(:some_class), code_containers(:nested_class)]  
   end
+
+  it "should get file for /files/" do
+    file = code_containers(:file)
+    comment = code_comments(:file_comment)
+    CodeFile.should_receive(:find_by_full_name).with("path/to/somefile.rb").and_return(file)
+    file.should_receive(:comment).and_return(comment)
+    
+    get :show_file, :path => %W{path to somefile.rb}
+    assigns[:file].should == file
+    assigns[:comment].should == comment
+  end
 end

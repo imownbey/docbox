@@ -7,4 +7,8 @@ class ApplicationController < ActionController::Base
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => '50b31e962fd5a59413682eeff21dda01'
+  
+  def render_404
+    render :file => RAILS_ROOT + "/public/404.html", :status => 404
+  end
 end

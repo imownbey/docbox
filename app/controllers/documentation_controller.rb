@@ -9,6 +9,17 @@ class DocumentationController < ApplicationController
     end
   end
   
+  def show_file
+    path = params[:path].join('/')
+    @file = CodeFile.find_by_full_name(path)
+    @comment = @file.comment
+    if @file
+      # Render
+    else
+      render_404
+    end
+  end
+  
   private
   
   def get_object(params)

@@ -23,5 +23,5 @@ colon_class:
   
 file:
   type: CodeFile
-  name: somefile.rb
-  full_name: '/var/foo/somefile.rb'
+  name: path/to/somefile.rb
+  full_name: path/to/somefile.rb
