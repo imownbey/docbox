@@ -1,6 +1,7 @@
 class CodeContainer < ActiveRecord::Base
   has_many :code_objects
   has_many :code_methods
+  has_many :code_containers
   belongs_to :code_container
   has_one :code_comment, :as => :owner, :dependent => :destroy
   
