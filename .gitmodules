@@ -10,3 +10,6 @@
 [submodule "vendor/plugins/acts_as_state_machine"]
 	path = vendor/plugins/acts_as_state_machine
 	url = git://github.com/omghax/acts_as_state_machine.git
+[submodule "vendor/plugins/rspec_on_rails_on_crack"]
+	path = vendor/plugins/rspec_on_rails_on_crack
+	url = git://github.com/courtenay/altered_beast.git
