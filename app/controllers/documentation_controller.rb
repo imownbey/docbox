@@ -1,8 +1,8 @@
 class DocumentationController < ApplicationController
   
   def show
-    @object = get_object(params[:tokens])
-    if @object
+    @objects = get_object(params[:tokens])
+    if @objects
       # render stuff here
     else
       # 404

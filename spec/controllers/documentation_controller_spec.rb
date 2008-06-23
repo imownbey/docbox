@@ -8,7 +8,6 @@ describe DocumentationController do
     
     get :show, :tokens => ["SmallClass", "NestedClass"]
     
-    assigns[:objects] = [code_containers(:some_class), code_containers(:nested_class)]
+    assigns[:objects].should == [code_containers(:some_class), code_containers(:nested_class)]  
   end
-
 end
