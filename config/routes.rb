@@ -4,6 +4,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resource :session
   map.connect 'docs/file/*path', :controller => 'documentation', :action => 'show_file'
   map.connect 'docs/*tokens', :controller => 'documentation', :action => 'show'
+  
+  map.resources :comments
 
   # The priority is based upon order of creation: first created -> highest priority.
 
