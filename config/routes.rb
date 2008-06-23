@@ -3,6 +3,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :session
 
+  map.connect 'docs/*tokens', :controller => 'documentation', :action => 'show'
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
