@@ -1,11 +1,37 @@
 ActionController::Routing::Routes.draw do |map|
+  get = {:method => :get}
+  put = {:method => :put}
+  post = {:method => :post}
+
   map.resources :users
 
   map.resource :session
-  map.connect 'docs/file/*path', :controller => 'documentation', :action => 'show_file'
-  map.connect 'docs/*tokens', :controller => 'documentation', :action => 'show'
   
-  map.resources :comments
+  map.with_options :controller => 'documentation', :path_prefix => 'docs', :conditions => get do |docs|
+    docs.file_doc 'file/*path', :action => 'show_file'
+    docs.doc '*tokens', :action => 'show'
+  end
+  
+  map.with_options :controller => 'comments', :path_prefix => 'comments' do |comments|
+    comments.comments '', :conditions => get
+    map.formatted_comments 'comments.:format', :conditions => get, :controller => 'comments'
+    
+    comments.edit_comment ':id/edit',  :conditions => get, :action => 'edit'
+    comments.connect ':id',            :conditions => put, :action => 'update'
+    comments.connect ':id.:format',    :conditions => put, :action => 'update'
+    
+    comments.comment ':id', :conditions => get, :action => 'show'
+  end
+  
+  map.with_options :path_prefix => 'commentables/:id/comment', :controller => 'comments' do |comment|
+    comment.commentable_new_comment 'new', :conditions => get,  :action => 'new'
+    comment.connect                 '',    :conditions => post, :action => 'create'
+  end
+  
+  
+  map.with_options :controller => 'commentables', :path_prefix => 'commentables' do |commentables|
+    commentables.commentable ':id', :conditions => get, :action => 'show'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
 
