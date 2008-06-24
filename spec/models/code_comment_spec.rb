@@ -60,6 +60,11 @@ describe CodeComment, "versioning" do
     c.uses_begin?.should == true
   end
   
+  it "should have proper to_param with id" do
+    c = code_comments(:nested_class)
+    c.to_param.should == "SmallClass/NestedClass##{c.id}"
+  end
+  
   describe 'exporting' do
     it "should not export if previose version has not been exported" do
       versions(:current_v1).update_attributes :exported => false

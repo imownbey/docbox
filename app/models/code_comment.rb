@@ -1,6 +1,4 @@
 class CodeComment < ActiveRecord::Base
-  include ActionView::Helpers::TextHelper
-  
   # Regexp for stuff
   REGEXP = {}
   # =begin and =end stuff
@@ -25,6 +23,17 @@ class CodeComment < ActiveRecord::Base
   # For the sake of STI
   def owner_type=(sType)
     super(sType.to_s.classify.constantize.base_class.to_s)
+  end
+  
+  def to_param
+    path = []
+    object = self.owner
+    while object
+      path << "#{object.name}"
+      object = object.code_container
+      object = nil if object.is_a? CodeFile
+    end
+    path.reverse.join('/') + "##{self.id}"
   end
   
   # This is called by the RDoc importer. It is only used when imported.
