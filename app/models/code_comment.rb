@@ -33,7 +33,7 @@ class CodeComment < ActiveRecord::Base
       object = object.code_container
       object = nil if object.is_a? CodeFile
     end
-    path.reverse.join('/') + "##{self.id}"
+    path.reverse.join('/')
   end
   
   # This is called by the RDoc importer. It is only used when imported.

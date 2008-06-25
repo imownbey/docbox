@@ -1,57 +1,59 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 
-describe CodeComment, "versioning" do
+describe CodeComment do
   fixtures :code_comments, :users, :versions, :code_objects, :code_containers, :code_methods
   
-  it "should create a new version when saved" do
-    lambda {
-      c = code_comments(:not_current)
-      c.update_attributes :body => 'This is a newer comment'
-    }.should change(Version, :count).by(1)
-  end
+  describe "versioning" do
+    it "should create a new version when saved" do
+      lambda {
+        c = code_comments(:not_current)
+        c.update_attributes :body => 'This is a newer comment'
+      }.should change(Version, :count).by(1)
+    end
   
-  it "should move current" do
-    c = code_comments(:current)
-    c.update_attributes :body => 'New comment'
-    c.should_not be_exported
-    c.versions.last.should be_exported
-  end
+    it "should move current" do
+      c = code_comments(:current)
+      c.update_attributes :body => 'New comment'
+      c.should_not be_exported
+      c.versions.last.should be_exported
+    end
   
-  it "should move body" do
-    c = code_comments(:current)
-    old_body = c.body
-    c.update_attributes :body => 'New Comment!'
-    c.versions.last.body.should == old_body
-  end
+    it "should move body" do
+      c = code_comments(:current)
+      old_body = c.body
+      c.update_attributes :body => 'New Comment!'
+      c.versions.last.body.should == old_body
+    end
   
-  it "should move uses_begin" do
-    c = code_comments(:current)
-    c.uses_begin = true
-    c.update_attributes :body => 'This is changed'
-    c.versions.last.uses_begin?.should == true
-  end
+    it "should move uses_begin" do
+      c = code_comments(:current)
+      c.uses_begin = true
+      c.update_attributes :body => 'This is changed'
+      c.versions.last.uses_begin?.should == true
+    end
   
-  it "should move user" do
-    c = code_comments(:current)
-    c.update_attributes :body => 'New Body!', :user => users(:quentin)
-    c.versions.last.user.should == users(:aaron)
-    c.user.should == users(:quentin)
-  end
+    it "should move user" do
+      c = code_comments(:current)
+      c.update_attributes :body => 'New Body!', :user => users(:quentin)
+      c.versions.last.user.should == users(:aaron)
+      c.user.should == users(:quentin)
+    end
   
-  it "should up version number when edited" do
-    c = code_comments(:current)
-    old_v = c.version
-    c.update_attributes :body => 'New Body!', :user => users(:quentin)
-    c.version.should == old_v + 1
-  end
+    it "should up version number when edited" do
+      c = code_comments(:current)
+      old_v = c.version
+      c.update_attributes :body => 'New Body!', :user => users(:quentin)
+      c.version.should == old_v + 1
+    end
   
-  it "should get the right version" do
-    code_comments(:current).v(2).should == versions(:current_v2)
-  end
+    it "should get the right version" do
+      code_comments(:current).v(2).should == versions(:current_v2)
+    end
   
-  it "should use current when current versions" do
-    code_comments(:current).v(3).should == code_comments(:current)
+    it "should use current when current versions" do
+      code_comments(:current).v(3).should == code_comments(:current)
+    end
   end
   
   it "should set uses_begin automatically when exported_body is set" do
@@ -62,7 +64,7 @@ describe CodeComment, "versioning" do
   
   it "should have proper to_param with id" do
     c = code_comments(:nested_class)
-    c.to_param.should == "SmallClass/NestedClass##{c.id}"
+    c.to_param.should == "SmallClass/NestedClass"
   end
   
   describe 'exporting' do
