@@ -15,15 +15,40 @@ end
 
 describe CommentsController, "PUT #update" do
   fixtures :all
+  describe "with a class" do 
+    before(:each) do
+      @comment = code_comments(:nested_class)
+      CodeComment.stub!(:find).and_return(@comment)
+      @comment.stub!(:id).and_return(1)
+      @comment.stub!(:update_attributes).and_return(true)
+    end
   
-  before(:each) do
-    @comment = code_comments(:nested_class)
-    CodeComment.stub!(:find).and_return(@comment)
-    @comment.stub!(:id).and_return(1)
-    @comment.stub!(:update_attributes).and_return(true)
+  
+    act! { put :update, :id => 1, :comment => {}}
+    it_assigns :comment, :flash => {:notice => :not_nil, :comment => 1}
+    it_redirects_to { doc_path(@comment) }
   end
   
-  act! { put :update, :id => 1, :comment => {}}
-  it_assigns :comment, :flash => {:notice => :not_nil, :comment => 1}
-  it_redirects_to { doc_path(@comment) }
+  describe "with a method" do
+    before(:each) do
+      @comment = code_comments(:current)
+      CodeComment.stub!(:find).and_return(@comment)
+      @comment.stub!(:update_attributes).and_return(true)
+    end
+    
+    act!{ put :update, :id => 1, :comment => {} }
+    it_redirects_to {doc_path(@comment, :anchor => @comment.owner.name)}
+  end
+  
+  describe "failed" do
+    before(:each) do
+      @comment = code_comments(:current)
+      CodeComment.stub!(:find).and_return(@comment)
+      @comment.stub!(:update_attributes).and_return(false)
+    end
+    
+    act!{ put :update, :id => 1, :comment => {} }
+    it_assigns :comment
+    it_renders :template, :edit
+  end 
 end
