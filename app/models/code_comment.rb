@@ -1,6 +1,5 @@
 require 'mixins'
 class CodeComment < ActiveRecord::Base
-  include TokenParams
   # Regexp for stuff
   REGEXP = {}
   # =begin and =end stuff

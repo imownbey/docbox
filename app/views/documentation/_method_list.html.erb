@@ -7,7 +7,7 @@
     <% if method.code_comment -%>
       <div class="comment">
         <%= method.code_comment.body %>
-        <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %> <%= link_to "edit", edit_comment_path(method.code_comment)%>
+        <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %> <%= link_to "edit", edit_comment_path(method.code_comment.id)%>
         </div>
       </div>
     <% else -%>
