@@ -2,9 +2,12 @@
 <h3><%= name %></h3>
 <ul class="methods">
 <% collection.each do |method| %>
-  <li>
-    <h4><%= method.name %></h4>
-    <%= method.code_comment.body %>
+  <li class="method">
+    <h4><%= method.name %> <span class="params"><%= method.parameters%></span> <%= link_to "edit", edit_comment_path(method.code_comment)%></h4>
+    <div class="comment">
+      <%= method.code_comment.body %>
+      <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %></div>
+    </div>
   </li>
 <% end %>
 </ul>

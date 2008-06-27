@@ -5,6 +5,7 @@ class CodeMethod < ActiveRecord::Base
   has_one :code_comment, :as => :owner, :dependent => :destroy
   
   named_scope :ordered, :order => :name
+  named_scope :with_comments, :include => [:code_comment]
   
   def true_container
     code_container

@@ -6,7 +6,7 @@ class DocumentationController < ApplicationController
       owner = @objects.last.try(:owner)
       @containing_class = (owner || @objects.last)
       @methods = {}
-      @methods[:all] = @containing_class.code_methods.ordered
+      @methods[:all] = @containing_class.code_methods.with_comments.ordered
       @methods[:instance] = {}
       @methods[:instance][:all] = @methods[:all].select{ |m| m.singleton? }
       @methods[:instance] = seperate_methods(@methods[:instance][:all].dup)
