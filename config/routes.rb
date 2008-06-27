@@ -9,6 +9,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.with_options :controller => 'documentation', :path_prefix => 'docs', :conditions => get do |docs|
     docs.file_doc 'file/*path', :action => 'show_file'
+    docs.docs '', :action => 'index'
     docs.doc '*tokens', :action => 'show'
   end
   

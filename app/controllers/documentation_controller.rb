@@ -1,4 +1,7 @@
 class DocumentationController < ApplicationController
+  def index
+    @classes = CodeContainer.not_file.find(:all)
+  end
   
   def show
     @objects = get_object(params[:tokens])
