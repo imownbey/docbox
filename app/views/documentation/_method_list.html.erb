@@ -3,11 +3,18 @@
 <ul class="methods">
 <% collection.each do |method| %>
   <li class="method">
-    <h4><%= method.name %> <span class="params"><%= method.parameters%></span> <%= link_to "edit", edit_comment_path(method.code_comment)%></h4>
-    <div class="comment">
-      <%= method.code_comment.body %>
-      <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %></div>
-    </div>
+    <h4><%= method.name %> <span class="params"><%= method.parameters%></span></h4>
+    <% if method.code_comment -%>
+      <div class="comment">
+        <%= method.code_comment.body %>
+        <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %> <%= link_to "edit", edit_comment_path(method.code_comment)%>
+        </div>
+      </div>
+    <% else -%>
+      <div class="comment">
+        No comment yet. <%= link_to "Add One!", commentable_new_comment_path(method)%>
+      </div>
+    <% end -%>
   </li>
 <% end %>
 </ul>

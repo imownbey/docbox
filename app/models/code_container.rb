@@ -7,6 +7,8 @@ class CodeContainer < ActiveRecord::Base
   belongs_to :code_container
   has_one :code_comment, :as => :owner, :dependent => :destroy
   
+  named_scope :not_file, :conditions => ["type != 'CodeFile'"]
+  
   def true_container
     if code_container.is_a? CodeFile
       return code_container
