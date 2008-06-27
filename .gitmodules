@@ -10,3 +10,6 @@
 [submodule "vendor/plugins/rspec_on_rails_on_crack"]
 	path = vendor/plugins/rspec_on_rails_on_crack
 	url = git://github.com/technoweenie/rspec_on_rails_on_crack.git
+[submodule "vendor/plugins/bj"]
+	path = vendor/plugins/bj
+	url = git://github.com/gabriel/backgroundjob.git
