@@ -15,6 +15,7 @@ class CodeComment < ActiveRecord::Base
   REGEXP[:bash] = /^\s*#!/
   
   class VersionNotExported < ArgumentError; end
+  class AlreadyExported < ArgumentError; end
   
   belongs_to :owner, :polymorphic => true
   belongs_to :user
@@ -64,9 +65,9 @@ class CodeComment < ActiveRecord::Base
   # Export the version number and set exported to true
   def export! version_number
     version = self.v version_number
+    raise AlreadyExported.new("Version already exported") if version.exported?
     unless version.skip?
       pre_version = good_version_before(version_number) unless version == 1
-      p pre_version unless pre_version.nil?
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
       if f = export(pre_version, version)
         version.exported = true

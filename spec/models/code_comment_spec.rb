@@ -96,6 +96,10 @@ describe CodeComment do
       v2.should be_exported
     end
     
+    it "should not export when current v is exported" do
+      lambda {code_comments(:current).export!(3)}.should raise_error
+    end
+    
     describe "git" do
       before(:each) do
         file_mock = StringIO.new
