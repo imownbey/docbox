@@ -1,1 +1,7 @@
-<%= debug(@object.last)%>
+<% @methods[:class].each do |methods_hash| %>
+<%= render :partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Class Methods"}%>
+<% end %>
+
+<% @methods[:instance].each do |methods_hash| %>
+<%= render :partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Instance Methods"}%>
+<% end %>
