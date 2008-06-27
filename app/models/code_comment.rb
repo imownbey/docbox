@@ -1,5 +1,6 @@
 require 'mixins'
 class CodeComment < ActiveRecord::Base
+  include TokenParams
   # Regexp for stuff
   REGEXP = {}
   # =begin and =end stuff
@@ -43,6 +44,7 @@ class CodeComment < ActiveRecord::Base
         :exported => self.exported?, 
         :code_comment => self,
         :version => self.version,
+        :skip => self.skip,
         :uses_begin => self.uses_begin
       )
       self.exported = false
@@ -62,13 +64,16 @@ class CodeComment < ActiveRecord::Base
   # Export the version number and set exported to true
   def export! version_number
     version = self.v version_number
-    pre_version = self.v(version_number - 1) unless version == 1
-    raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
-    if f = export(pre_version, version)
-      version.exported = true
-      version.save
-    else
-      false
+    unless version.skip?
+      pre_version = good_version_before(version_number) unless version == 1
+      p pre_version unless pre_version.nil?
+      raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
+      if f = export(pre_version, version)
+        version.exported = true
+        version.save
+      else
+        false
+      end
     end
   end
   
@@ -84,6 +89,10 @@ class CodeComment < ActiveRecord::Base
         new_comment << line.gsub(/\s*#\s*/, '')
       end
     end.join("\n")
+  end
+  
+  def good_version_before(n)
+    self.versions.recent.acceptable.before(n).first
   end
   
   # Takes two versions, and exports the second one.

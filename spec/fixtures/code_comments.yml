@@ -5,7 +5,15 @@ current:
     This is a comment
   owner: simple_method
   owner_type: CodeMethod
-  exported: true
+  exported: false
+  user: aaron
+  version: 3
+  
+skip:
+  body: lala
+  owner: simple_method
+  owner_type: CodeMethod
+  exported: false
   user: aaron
   version: 3
   

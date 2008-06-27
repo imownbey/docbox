@@ -4,7 +4,7 @@ class CreateCodeComments < ActiveRecord::Migration
       t.text :body, :raw_body
       t.integer :owner_id, :user_id
       t.string :owner_type
-      t.boolean :exported, :uses_begin, :default => false
+      t.boolean :exported, :uses_begin, :skip, :default => false
       t.integer :version, :default => 1
       t.string :commit, :length => 40
 

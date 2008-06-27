@@ -4,7 +4,7 @@ class CreateVersions < ActiveRecord::Migration
       t.text :body
       t.string :commit, :length => 40
       t.integer :user_id, :code_comment_id, :version
-      t.boolean :exported, :uses_begin, :default => false
+      t.boolean :exported, :uses_begin, :skip, :default => false
 
       t.datetime :created_at
     end

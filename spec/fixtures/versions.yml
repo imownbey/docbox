@@ -14,6 +14,21 @@ current_v1:
   version: 1
   exported: true
   
+skip_v1:
+  body: tada
+  user: aaron
+  code_comment: skip
+  version: 1
+  exported: true
+  
+skip_v2:
+  body: tooodoo
+  user: aaron
+  code_comment: skip
+  version: 2
+  skip: true
+  exported: false
+  
 not_current_v1:
   body: this is not current v1
   user: quentin

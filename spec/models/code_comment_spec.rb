@@ -14,6 +14,7 @@ describe CodeComment do
   
     it "should move current" do
       c = code_comments(:current)
+      c.exported = true
       c.update_attributes :body => 'New comment'
       c.should_not be_exported
       c.versions.last.should be_exported
@@ -39,6 +40,13 @@ describe CodeComment do
       c.versions.last.user.should == users(:aaron)
       c.user.should == users(:quentin)
     end
+    
+    it "should move skip" do
+      c = code_comments(:current)
+      c.skip = true
+      c.update_attributes :body => "TADA"
+      c.versions.last.skip?.should == true
+    end
   
     it "should up version number when edited" do
       c = code_comments(:current)
@@ -46,7 +54,7 @@ describe CodeComment do
       c.update_attributes :body => 'New Body!', :user => users(:quentin)
       c.version.should == old_v + 1
     end
-  
+    
     it "should get the right version" do
       code_comments(:current).v(2).should == versions(:current_v2)
     end
@@ -69,8 +77,14 @@ describe CodeComment do
   
   describe 'exporting' do
     it "should not export if previose version has not been exported" do
-      versions(:current_v1).update_attributes :exported => false
+      versions(:current_v1).exported = false
       lambda {code_comments(:current).export!(2)}.should raise_error
+    end
+    
+    it "should skip version marked as skip" do
+      current = code_comments(:skip)
+      current.should_receive(:export).with(versions(:skip_v1), code_comments(:skip)).and_return(true)
+      current.export! 3
     end
 
     it "should change the exported to true" do
