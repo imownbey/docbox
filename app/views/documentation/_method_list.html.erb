@@ -1,0 +1,11 @@
+<% unless collection.empty? -%>
+<h3><%= name %></h3>
+<ul class="methods">
+<% collection.each do |method| %>
+  <li>
+    <h4><%= method.name %></h4>
+    <%= method.code_comment.body %>
+  </li>
+<% end %>
+</ul>
+<% end %>
