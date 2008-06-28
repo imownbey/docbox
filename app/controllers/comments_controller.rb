@@ -1,11 +1,13 @@
 class CommentsController < ApplicationController
+  before_filter :find_comment
   def show
-    @comment = CodeComment.find(params[:id])
+  end
+  
+  def edit
   end
   
   def update
-    @comment = CodeComment.find(params[:id])
-    if @comment.update_attributes(params[:comment])
+    if @comment.update_attributes(params[:code_comment].merge({:user => current_user}))
       flash[:notice] = "Comment properly updated"
       flash[:comment] = @comment.id
       options = ((@comment.owner.is_a? CodeMethod) ? { :anchor => @comment.owner.name } : {})
@@ -13,5 +15,11 @@ class CommentsController < ApplicationController
     else
       render :action => "edit", :controller => "comments", :id => @comment.id
     end
+  end
+  
+  private
+  
+  def find_comment
+    @comment = CodeComment.find(params[:id])
   end
 end

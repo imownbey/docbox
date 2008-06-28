@@ -24,7 +24,7 @@ describe CommentsController, "PUT #update" do
     end
   
   
-    act! { put :update, :id => 1, :comment => {}}
+    act! { put :update, :id => 1, :code_comment => {}}
     it_assigns :comment, :flash => {:notice => :not_nil, :comment => 1}
     it_redirects_to { doc_path(@comment) }
   end
@@ -36,7 +36,7 @@ describe CommentsController, "PUT #update" do
       @comment.stub!(:update_attributes).and_return(true)
     end
     
-    act!{ put :update, :id => 1, :comment => {} }
+    act!{ put :update, :id => 1, :code_comment => {} }
     it_redirects_to {doc_path(@comment, :anchor => @comment.owner.name)}
   end
   
@@ -47,7 +47,7 @@ describe CommentsController, "PUT #update" do
       @comment.stub!(:update_attributes).and_return(false)
     end
     
-    act!{ put :update, :id => 1, :comment => {} }
+    act!{ put :update, :id => 1, :code_comment => {} }
     it_assigns :comment
     it_renders :template, :edit
   end 

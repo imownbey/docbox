@@ -167,7 +167,7 @@ EOC
     end
     
     it "should replace propper comment when two are the same" do
-      code_comments(:current).owner.code_container = nil
+      code_comments(:current).owner.code_container = code_containers(:file)
       method = <<-EOC
 # this is version 1
 def not_correct_method
@@ -466,7 +466,7 @@ EOC
     end
     
     it "should use raw body for regexp if needed" do
-      code_comments(:not_current).raw_body = "tada"
+      code_comments(:not_current).raw_body = "# tada"
       klass = <<-EOC
 # tada
 class SmallClass

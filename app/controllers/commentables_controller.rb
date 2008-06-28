@@ -8,7 +8,7 @@ class CommentablesController < ApplicationController
   end
   
   def create
-    @comment = CodeComment.create(params[:comment])
+    @comment = CodeComment.create(params[:code_comment])
     unless @comment.new_record?
       flash[:notice] = "Your comment has been added."
       redirect_to doc_path(@commentable)
