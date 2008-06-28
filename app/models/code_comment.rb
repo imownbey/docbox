@@ -147,7 +147,13 @@ class CodeComment < ActiveRecord::Base
     git.config('user.name', v2.user.try(:name) || 'Ian Ownbey')
     git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
     git.commit_all("Documentation update for #{owner.name}")
-    git.push
+    unless other_commits_pending?
+      git.push
+    end
+  end
+  
+  def other_commits_pending?
+    Bj.table.jobs.count('bj_job_id', :conditions => ['state != \'finished\'']) > 0
   end
   
   # Called when there is no previous version and creating a new file comment
