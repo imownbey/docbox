@@ -56,7 +56,9 @@ class CodeComment < ActiveRecord::Base
   
   # TODO: Make this not always export and use a setting
   def add_export_to_queue
-  #  Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
+    unless self.exported?
+      Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
+    end
   end
   
   # Grabs the version of a comment based on number
@@ -257,7 +259,8 @@ class CodeComment < ActiveRecord::Base
     if v1.nil? && raw_body.nil?
       regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
     else
-      comment = raw_body.nil? ? commentify(v1) : raw_body
+      comment = raw_body || commentify(v1)
+      comment.gsub!(/([\[\]\(\)\?\.\*\+\|\\])/, '\\\\\1') # Escapes regex special chars
       n = true
       regexp = comment.split("\n").collect {|line|
         if line =~ REGEXP[:begin][:start] || line =~ REGEXP[:begin][:finish]
