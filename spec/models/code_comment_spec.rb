@@ -145,6 +145,31 @@ EOC
       code_comments(:current).export! 2
     end
     
+    it "should not get tripped up on regexp special charecters" do
+      c = code_comments(:current)
+      v1 = versions(:current_v1)
+      v1.body = "This ? * Is Special( I think []!)?"
+      v1.save
+      method = <<-EOC
+class SmallClass
+  # This ? * Is Special( I think []!)?
+  def simple_method(foo)
+    puts "win"
+  end
+end
+EOC
+      replacement = <<-EOC
+class SmallClass
+  # this is version two
+  def simple_method(foo)
+    puts "win"
+  end
+end
+EOC
+      mock_file(method, replacement)
+      c.export! 2
+    end
+    
     it "should keep weird formatting" do
       method = <<-EOC
 class SmallClass
