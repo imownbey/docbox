@@ -36,7 +36,7 @@ describe CommentablesController do
       end
       
       it_assigns :commentable, :comment, :flash => { :notice => :not_nil }
-      it_redirects_to {doc_path ( @commentable )}
+      it_redirects_to { doc_path @commentable }
     end
     
     describe "failing" do

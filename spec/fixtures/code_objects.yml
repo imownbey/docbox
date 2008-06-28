@@ -1,1 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+require:
+  code_container: some_class
+  type: CodeRequire
+  name: foobar
