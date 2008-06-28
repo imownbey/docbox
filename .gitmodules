@@ -13,3 +13,6 @@
 [submodule "vendor/plugins/bj"]
 	path = vendor/plugins/bj
 	url = git://github.com/gabriel/backgroundjob.git
+[submodule "vendor/plugins/ultrasphinx"]
+	path = vendor/plugins/ultrasphinx
+	url = git://github.com/fauna/ultrasphinx.git
