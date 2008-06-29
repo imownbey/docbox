@@ -313,7 +313,6 @@ class CodeComment < ActiveRecord::Base
     else
       string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
     end
-    p string
     string
   end
   
