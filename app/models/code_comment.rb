@@ -144,16 +144,17 @@ class CodeComment < ActiveRecord::Base
     @file.close
     
     git = Git.open(RAILS_ROOT + '/code')
+    git.branch('docs').checkout
     git.config('user.name', v2.user.try(:name) || 'Ian Ownbey')
     git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
     git.commit_all("Documentation update for #{owner.name}")
     unless other_commits_pending?
-      git.push
+      git.push('origin', 'docs')
     end
   end
   
   def other_commits_pending?
-    Bj.table.jobs.count('bj_job_id', :conditions => ['state != \'finished\'']) > 0
+    Bj::Table::Job.count('bj_job_id', :conditions => ['state != \'finished\'']) > 1
   end
   
   # Called when there is no previous version and creating a new file comment
@@ -304,7 +305,7 @@ class CodeComment < ActiveRecord::Base
   
   # Makes a comment a comment. Addes # or =begin=end
   def commentify string
-    string.gsub!("\r", "\n")
+    string.gsub!("\r\n", "\n")
     string = string.wrap(60, 0, true, true)
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
