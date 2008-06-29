@@ -17,16 +17,14 @@ ActionController::Routing::Routes.draw do |map|
     comments.comments '', :conditions => get
     map.formatted_comments 'comments.:format', :conditions => get, :controller => 'comments'
     
+    comments.new_comment 'new/*tokens', :conditions => get,  :action => 'new'
+    comments.connect 'new/*tokens',     :conditions => post, :action => 'create'
+    
     comments.edit_comment ':id/edit',  :conditions => get, :action => 'edit'
     comments.connect ':id',            :conditions => put, :action => 'update'
     comments.connect ':id.:format',    :conditions => put, :action => 'update'
     
     comments.comment ':id', :conditions => get, :action => 'show'
-  end
-  
-  map.with_options :path_prefix => 'commentables/:id/comment', :controller => 'comments' do |comment|
-    comment.commentable_new_comment 'new', :conditions => get,  :action => 'new'
-    comment.connect                 '',    :conditions => post, :action => 'create'
   end
   
   
