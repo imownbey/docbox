@@ -56,7 +56,7 @@ class CodeComment < ActiveRecord::Base
   # TODO: Make this not always export and use a setting
   def add_export_to_queue
     unless self.exported?
-    #  Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
+      Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
     end
   end
   
@@ -286,7 +286,6 @@ class CodeComment < ActiveRecord::Base
       }.join("\n")
       regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
-    p regexp
     Regexp.new(regexp)
   end
   
