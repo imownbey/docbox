@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Multi line error
+desc: "When adding a comment via web with a blank line, Docbox injects multiple blank lines without any # in between."
+type: :bugfix
+component: docbox
+release: Look ma, No hands
+reporter: Ian Ownbey <imownbey@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-06-29 22:32:12.562986 Z
+references: []
+
+id: 3db3b36c7bf17a64d4d8720c80eb74989bbee834
+log_events: 
+- - 2008-06-29 22:32:21.003255 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - created
+  - ""
