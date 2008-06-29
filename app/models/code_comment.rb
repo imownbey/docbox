@@ -49,7 +49,6 @@ class CodeComment < ActiveRecord::Base
         :uses_begin => self.uses_begin
       )
       self.exported = false
-      self.raw_body = nil
       self.version += 1
     end
   end
@@ -57,7 +56,7 @@ class CodeComment < ActiveRecord::Base
   # TODO: Make this not always export and use a setting
   def add_export_to_queue
     unless self.exported?
-      Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
+    #  Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
     end
   end
   
@@ -79,6 +78,7 @@ class CodeComment < ActiveRecord::Base
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
       if f = export(pre_version, version)
         version.exported = true
+        self.raw_body = nil
         version.save
       else
         false
@@ -154,7 +154,7 @@ class CodeComment < ActiveRecord::Base
   end
   
   def other_commits_pending?
-    Bj::Table::Job.count('bj_job_id', :conditions => ['state != \'finished\'']) > 1
+    Bj.table.job.count('bj_job_id', :conditions => ['state != \'finished\'']) > 1
   end
   
   # Called when there is no previous version and creating a new file comment
@@ -286,6 +286,7 @@ class CodeComment < ActiveRecord::Base
       }.join("\n")
       regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
     end
+    p regexp
     Regexp.new(regexp)
   end
   
@@ -313,6 +314,7 @@ class CodeComment < ActiveRecord::Base
     else
       string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
     end
+    p string
     string
   end
   
