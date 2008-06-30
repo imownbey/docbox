@@ -13,10 +13,10 @@ class ApplicationController < ActionController::Base
     render :file => RAILS_ROOT + "/public/404.html", :status => 404
   end
   
-  def get_object(params)
+  def get_object(params, preload = true)
     objects = []
     params.each_with_index do |token, index|
-      objects[index] = find_token token, (objects[index - 1] || nil), (params.length == index + 1)
+      objects[index] = find_token token, (objects[index - 1] || nil), (preload && (params.length == index + 1))
     end
     objects
   end
