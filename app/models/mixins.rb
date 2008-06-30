@@ -1,5 +1,5 @@
 module TokenParams
-  def to_param
+  def to_path
     path = []
     object = (CodeComment === self ? owner : self)
     while object
