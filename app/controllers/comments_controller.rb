@@ -4,6 +4,7 @@ class CommentsController < ApplicationController
   end
   
   def edit
+    @source = @comment.owner.try(:source_code)
   end
   
   def update
