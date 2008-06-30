@@ -114,3 +114,14 @@ long_tabbed_comment:
   exported: false
   user: aaron
   version: 1
+
+multi_line:
+  body: |-
+    This is a cool comment
+    
+    Aint it?
+  owner: some_class
+  owner_type: CodeContainer
+  exported: false
+  user: aaron
+  version: 1
