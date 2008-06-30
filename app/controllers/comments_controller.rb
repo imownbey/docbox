@@ -25,7 +25,11 @@ class CommentsController < ApplicationController
   
   def create
     @commentable = get_object(params[:tokens], false).last
-    @commentable.code_comment = CodeComment.create(params[:code_comment].merge({:user => current_user}))
+    if @commentable.code_comment.nil?
+      @commentable.code_comment = CodeComment.create(params[:code_comment].merge({:user => current_user}))
+    else
+      @commentable.code_comment.update_attributes params[:code_comment].merge({:user => current_user})
+    end
   end
   
   private

@@ -264,7 +264,7 @@ class CodeComment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1 = nil
     if v1.nil? && raw_body.nil?
-      regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
+      regexp = "(([ \\t]*))(#{next_line_str}[^\\n]*)"
     else
       comment = raw_body || commentify(v1)
       comment.gsub!(/([\[\]\(\)\?\.\*\+\|\\])/, '\\\\\1') # Escapes regex special chars
@@ -276,9 +276,9 @@ class CodeComment < ActiveRecord::Base
         else
           # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
           if n && !uses_begin?
-            start = "(\\s*)"
+            start = "([ \\t]*)"
           else
-            start = "\\s*"
+            start = "[ \\t]*"
           end
           n = false
           start + line
@@ -300,6 +300,7 @@ class CodeComment < ActiveRecord::Base
       }.join("\n")
     end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
+    p string
     string
   end
   

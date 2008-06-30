@@ -5,8 +5,8 @@ type: :bugfix
 component: docbox
 release: Look ma, No hands
 reporter: Ian Ownbey <imownbey@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2008-06-30 04:49:12.330483 Z
 references: []
 
@@ -15,4 +15,8 @@ log_events:
 - - 2008-06-30 04:49:14.579127 Z
   - Ian Ownbey <imownbey@gmail.com>
   - created
+  - ""
+- - 2008-06-30 06:28:00.684225 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - closed issue with disposition fixed
   - ""
