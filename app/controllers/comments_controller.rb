@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_filter :find_comment
+  before_filter :find_comment, :except => [:new, :create]
   def show
   end
   
@@ -15,6 +15,17 @@ class CommentsController < ApplicationController
     else
       render :action => "edit", :controller => "comments", :id => @comment.id
     end
+  end
+  
+  def new
+    @commentable = get_object(params[:tokens], false).last
+    p @commentable.to_path
+    @comment = CodeComment.new
+  end
+  
+  def create
+    @commentable = get_object(params[:tokens], false).last
+    @commentable.code_comment = CodeComment.create(params[:code_comment].merge({:user => current_user}))
   end
   
   private

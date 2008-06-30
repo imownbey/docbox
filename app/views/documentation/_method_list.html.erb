@@ -12,7 +12,7 @@
       </div>
     <% else -%>
       <div class="comment">
-        No comment yet. <%= link_to "Add One!", commentable_new_comment_path(method)%>
+        No comment yet. <%= link_to "Add One!", new_comment_path(method.to_path)%>
       </div>
     <% end -%>
   </li>
