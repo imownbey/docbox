@@ -21,6 +21,7 @@ class CodeComment < ActiveRecord::Base
   has_many :versions
   
   before_update :create_version
+  after_update :add_export_to_queue
   
   is_indexed :fields => [:body]
   
@@ -54,6 +55,13 @@ class CodeComment < ActiveRecord::Base
     end
   end
   
+  # TODO: Make this not always export and use a setting
+  def add_export_to_queue
+    unless self.exported?
+      Bj.submit "rake docbox:export ID=#{self.id} V=#{self.version}"
+    end
+  end
+  
   # Grabs the version of a comment based on number
   def v number
     if self.version == number
@@ -72,11 +80,20 @@ class CodeComment < ActiveRecord::Base
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
       if f = export(pre_version, version)
         version.exported = true
+        self.raw_body = nil
         version.save
       else
         false
       end
     end
+  end
+  
+  def file
+    container = self.owner
+    while !container.is_a? CodeFile
+      container = container.code_container
+    end
+    container
   end
   
   private
@@ -99,12 +116,13 @@ class CodeComment < ActiveRecord::Base
   
   # Takes two versions, and exports the second one.
   def export v1, v2
-    @file = File.new('foobar', 'r+')
+    Dir.chdir(RAILS_ROOT + "/code")
+    @file = File.new(self.file.name, 'r+')
     if v1.nil? && owner.is_a?(CodeFile)
       # v1 is nil and owner is a file, just throw it at start at file
       file_body = inject_at_file_start v2.body
     else
-      body = v1.body rescue nil
+      body = v1.try(:body)
       pre_regexp = build_regexp(body)
       # If the parent is a class we must make sure its in proper context
       if owner.true_container.is_a? CodeClass
@@ -128,9 +146,17 @@ class CodeComment < ActiveRecord::Base
     @file.close
     
     git = Git.open(RAILS_ROOT + '/code')
-    git.config('user.name', v2.user.name)
-    git.config('user.email', v2.user.email)
+    git.branch('docs').checkout
+    git.config('user.name', v2.user.try(:name) || 'Ian Ownbey')
+    git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
     git.commit_all("Documentation update for #{owner.name}")
+    unless other_commits_pending?
+      git.push('origin', 'docs')
+    end
+  end
+  
+  def other_commits_pending?
+    Bj.table.job.count('bj_job_id', :conditions => ['state != \'finished\'']) > 1
   end
   
   # Called when there is no previous version and creating a new file comment
@@ -240,20 +266,21 @@ class CodeComment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1 = nil
     if v1.nil? && raw_body.nil?
-      regexp = "((\\s*))(#{next_line_str}[^\\n]*)"
+      regexp = "(([ \\t]*))(#{next_line_str}[^\\n]*)"
     else
-      comment = commentify(raw_body || v1)
+      comment = raw_body || commentify(v1)
+      comment.gsub!(/([\[\]\(\)\?\.\*\+\|\\])/, '\\\\\1') # Escapes regex special chars
+      n = true
       regexp = comment.split("\n").collect {|line|
         if line =~ REGEXP[:begin][:start] || line =~ REGEXP[:begin][:finish]
           # This is a begin or end, just add the line
           line
         else
-          n ||= true # Counter to see if this is the first, in which case we capture whitespace
           # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
           if n && !uses_begin?
-            start = "(\\s*)"
+            start = "([ \\t]*)"
           else
-            start = "\\s*"
+            start = "[ \\t]*"
           end
           n = false
           start + line
@@ -275,11 +302,13 @@ class CodeComment < ActiveRecord::Base
       }.join("\n")
     end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
+    p string
     string
   end
   
   # Makes a comment a comment. Addes # or =begin=end
   def commentify string
+    string.gsub!("\r\n", "\n")
     string = string.wrap(60, 0, true, true)
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")

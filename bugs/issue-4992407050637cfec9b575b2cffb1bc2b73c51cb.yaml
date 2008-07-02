@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make Users Browsable
+desc: Build up the view for users so you can see commits etc.
+type: :task
+component: docbox
+release: Look ma, No hands
+reporter: Ian Ownbey <imownbey@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-06-30 04:31:15.345738 Z
+references: []
+
+id: 4992407050637cfec9b575b2cffb1bc2b73c51cb
+log_events: 
+- - 2008-06-30 04:31:20.410002 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - created
+  - ""

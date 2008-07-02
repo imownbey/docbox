@@ -1,0 +1,9 @@
+<% form_for @comment, :url => {:action => 'update'} do |f| -%>
+  <%= f.text_area :body %>
+  <%= f.submit %>
+<% end %>
+<% if @source %>
+<div class="source">
+  <%= @source %>
+</div>
+<% end %>

@@ -1,0 +1,4 @@
+<% form_for @comment, :url => new_comment_path(@commentable.to_path) do |f| %>
+  <%= f.text_area :body %>
+  <%= f.submit %>
+<% end %>

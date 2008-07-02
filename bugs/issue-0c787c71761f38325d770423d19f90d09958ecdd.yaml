@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make import work twice
+desc: Import just creates new methods and classes instead of updating old ones.
+type: :bugfix
+component: docbox
+release: Look ma, No hands
+reporter: Ian Ownbey <imownbey@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-06-30 07:02:49.949998 Z
+references: []
+
+id: 0c787c71761f38325d770423d19f90d09958ecdd
+log_events: 
+- - 2008-06-30 07:02:51.189600 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - created
+  - ""

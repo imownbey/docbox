@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: WhiteSpace on new comment
+desc: New comment adds odd whitespace around comment.
+type: :bugfix
+component: docbox
+release: Look ma, No hands
+reporter: Ian Ownbey <imownbey@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2008-06-30 04:49:12.330483 Z
+references: 
+- This is test
+id: 2312b5c1573f72a226a2a19558f0a561564601e8
+log_events: 
+- - 2008-06-30 04:49:14.579127 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - created
+  - ""
+- - 2008-06-30 06:28:00.684225 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - closed issue with disposition fixed
+  - ""
+- - 2008-06-30 16:30:19.578486 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - added reference 1
+  - Testing

@@ -15,6 +15,11 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  
+  config.before(:all) do
+    # Disable backgroundjob
+    Bj = mock(Bj, :null_object => true) unless Bj.is_a? Spec::Mocks::Mock
+  end
 
   # == Fixtures
   #

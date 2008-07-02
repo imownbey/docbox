@@ -1,0 +1,91 @@
+body {
+	background: white;
+	color: #202020;
+	margin-bottom: 2em;
+	margin-left: auto;
+	margin-right: auto;
+	width: 90%;
+}
+
+a, a:visited {
+	border-bottom: 1px dotted #03c;
+	background: inherit;
+	color: #03c;
+	text-decoration: none;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+p {
+  width: 40em;
+}
+
+table {
+  border-style: none;
+  border-spacing: 0;
+}
+
+td {
+  border-width: 0;
+  border-style: none;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+}
+
+tr {
+  padding-bottom: 5em;
+}
+
+h1 {
+  padding: 0.2em;
+  margin-left: -1em;
+  margin-right: 1em;
+  background: #abc;
+}
+
+.attrname {
+  text-align: right;
+}
+
+.issuestatus_closed {
+  background-color: #afa;
+  text-align: center;
+}
+
+.issuestatus_in_progress {
+  background-color: #ffa;
+  text-align: center;
+}
+
+.issuestatus_paused {
+  background-color: #ffa;
+  text-align: center;
+}
+
+.issuestatus_unstarted {
+  background-color: #faa;
+  text-align: center;
+}
+
+.logwhat {
+  font-style: italic;
+}
+
+.logentryeven {
+  background: #eee;
+}
+
+.logentryodd {
+  background: #eee;
+}
+
+.logcomment {
+  padding-left: 3em;
+}
+
+.footer {
+  font-size: small;
+}

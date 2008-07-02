@@ -1,0 +1,16 @@
+--- !ditz.rubyforge.org,2008-03-06/project 
+name: docbox
+version: "0.3"
+components: 
+- !ditz.rubyforge.org,2008-03-06/component 
+  name: docbox
+releases: 
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: Look ma, No hands
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2008-06-29 22:29:06.531242 Z
+    - Ian Ownbey <imownbey@gmail.com>
+    - created
+    - Initial release. Proof of concept

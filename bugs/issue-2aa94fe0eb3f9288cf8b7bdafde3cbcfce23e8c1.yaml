@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Gui fix list
+desc: Add new comment, as well as source code and general options to comment list
+type: :feature
+component: docbox
+release: Look ma, No hands
+reporter: Ian Ownbey <imownbey@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-06-30 04:38:24.106672 Z
+references: []
+
+id: 2aa94fe0eb3f9288cf8b7bdafde3cbcfce23e8c1
+log_events: 
+- - 2008-06-30 04:38:25.170615 Z
+  - Ian Ownbey <imownbey@gmail.com>
+  - created
+  - ""

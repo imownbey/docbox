@@ -36,28 +36,6 @@ class DocumentationController < ApplicationController
   
   private
   
-  def get_object(params)
-    objects = []
-    params.each_with_index do |token, index|
-      objects[index] = find_token token, (objects[index - 1] || nil), (params.length == index + 1)
-    end
-    objects
-  end
-
-  def find_token(token, parent, last = false)
-    if last
-      conditions = {:include => [:code_methods]}
-    else
-      conditions = {}
-    end
-    
-    if parent
-      parent.code_methods.find_by_name(token, conditions) || parent.code_objects.find_by_name(token, conditions) || parent.code_containers.find_by_name(token, conditions)
-    else
-      CodeContainer.find_by_name(token, conditions)
-    end
-  end
-  
   def seperate_methods(methods)
     if methods.nil? || methods.empty?
       {

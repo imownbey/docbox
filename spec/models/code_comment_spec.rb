@@ -145,6 +145,31 @@ EOC
       code_comments(:current).export! 2
     end
     
+    it "should not get tripped up on regexp special charecters" do
+      c = code_comments(:current)
+      v1 = versions(:current_v1)
+      v1.body = "This ? * Is Special( I think []!)?"
+      v1.save
+      method = <<-EOC
+class SmallClass
+  # This ? * Is Special( I think []!)?
+  def simple_method(foo)
+    puts "win"
+  end
+end
+EOC
+      replacement = <<-EOC
+class SmallClass
+  # this is version two
+  def simple_method(foo)
+    puts "win"
+  end
+end
+EOC
+      mock_file(method, replacement)
+      c.export! 2
+    end
+    
     it "should keep weird formatting" do
       method = <<-EOC
 class SmallClass
@@ -167,7 +192,7 @@ EOC
     end
     
     it "should replace propper comment when two are the same" do
-      code_comments(:current).owner.code_container = nil
+      code_comments(:current).owner.code_container = code_containers(:file)
       method = <<-EOC
 # this is version 1
 def not_correct_method
@@ -465,8 +490,24 @@ EOC
       code_comments(:long_tabbed_comment).export! 1
     end
     
+    it "should newline accordingly" do
+      klass = <<-EOC
+class SmallClass
+end
+EOC
+      replacement = <<-EOC
+# This is a cool comment
+# 
+# Aint it?
+class SmallClass
+end
+EOC
+      mock_file(klass, replacement)
+      code_comments(:multi_line).export! 1
+    end
+    
     it "should use raw body for regexp if needed" do
-      code_comments(:not_current).raw_body = "tada"
+      code_comments(:not_current).raw_body = "# tada"
       klass = <<-EOC
 # tada
 class SmallClass
