@@ -12,8 +12,8 @@ module RDoc
 
       @stats = Stats.new
 
-      options = Options.instance
-      options.parse(argv, GENERATORS)
+      options = Options.new GENERATORS
+      options.parse(argv)
 
       @last_created = nil
       start_time = Time.now
@@ -213,6 +213,11 @@ module Generators
       # Recursively process contained subclasses and modules 
       obj.each_classmodule do |child| 
       	process_class_or_module(child, obj) 
+      end
+      
+      # Delete things that arent updated
+      CodeComment.find(:all, :conditions => ["exported = 0"]).each do |comment|
+        comment.owner.destroy
       end
     end       
     
