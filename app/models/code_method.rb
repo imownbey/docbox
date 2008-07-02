@@ -7,6 +7,8 @@ class CodeMethod < ActiveRecord::Base
   named_scope :ordered, :order => :name
   named_scope :with_comments, :include => [:code_comment]
   
+  is_indexed :fields => [:name, :parameters]
+  
   def true_container
     code_container
   end
