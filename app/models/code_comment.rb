@@ -22,6 +22,8 @@ class CodeComment < ActiveRecord::Base
   
   before_update :create_version
   
+  is_indexed :fields => [:body]
+  
   # For the sake of STI
   def owner_type=(sType)
     super(sType.to_s.classify.constantize.base_class.to_s)
