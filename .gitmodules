@@ -16,3 +16,6 @@
 [submodule "vendor/plugins/ultrasphinx"]
 	path = vendor/plugins/ultrasphinx
 	url = git://github.com/fauna/ultrasphinx.git
+[submodule "vendor/plugins/will_paginate"]
+	path = vendor/plugins/will_paginate
+	url = git://github.com/mislav/will_paginate.git
