@@ -27,7 +27,7 @@ class CodeComment < ActiveRecord::Base
   
   # For the sake of STI
   def owner_type=(sType)
-    super(sType.to_s.classify.constantize.base_class.to_s)
+    super(sType.to_s.constantize.base_class.to_s)
   end
   
   # This is called by the RDoc importer. It is only used when imported.
@@ -311,7 +311,6 @@ class CodeComment < ActiveRecord::Base
       }.join("\n")
     end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
-    p string
     string
   end
   

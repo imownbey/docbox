@@ -15,7 +15,7 @@ describe RDoc do
   before(:each) do
     @import = lambda {
       @rdoc = RDoc::RDoc.new
-      @rdoc.import! %W{#{File.dirname(__FILE__)}/../fixtures/sample.rb}
+      @rdoc.import! %W{#{RAILS_ROOT}/spec/fixtures/sample.rb}
     }
   end
 
@@ -66,21 +66,26 @@ describe RDoc do
   it "should strip comments properly" do
     @import.call
     CodeClass.find_by_name('SimpleClass').code_comment.body.should == "This is a class comment"
-  end 
+  end
+  
+  it "should not recreate comments" do
+    @import.should change(CodeComment, :count).by(3)
+    @import.should_not change(CodeComment, :count)
+  end
 end
 
 describe RDoc, "file comments" do  
   it "should only update comments by 1" do
     lambda {
       @rdoc = RDoc::RDoc.new
-      @rdoc.import! %W{#{File.dirname(__FILE__)}/../fixtures/file_comments.rb}
+      @rdoc.import! %W{#{RAILS_ROOT}/spec/fixtures/file_comments.rb}
     }.should change(CodeComment, :count).by(1)
   end
   
   it "should update 2 comments when there are 2 comments" do
     lambda {
       @rdoc = RDoc::RDoc.new
-      @rdoc.import! %W{#{File.dirname(__FILE__)}/../fixtures/file_comments2.rb}
+      @rdoc.import! %W{#{RAILS_ROOT}/spec/fixtures/file_comments2.rb}
     }.should change(CodeComment, :count).by(2)
   end
 end
