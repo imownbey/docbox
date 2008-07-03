@@ -62,6 +62,15 @@ describe CodeComment do
     it "should use current when current versions" do
       code_comments(:current).v(3).should == code_comments(:current)
     end
+    
+    it "should be able to not version" do
+      lambda {
+        c = code_comments(:current)
+        c.without_versioning do
+          c.update_attributes :body => 'New Body!'
+        end
+      }.should_not change(Version, :count)
+    end
   end
   
   it "should set uses_begin automatically when exported_body is set" do
