@@ -38,7 +38,7 @@ class CodeComment < ActiveRecord::Base
   
   # Before update, creating the previous version
   def create_version
-    if self.body_changed?
+    if self.body_changed? && !@dont_version
       Version.create(
         :user_id => (self.user_id_changed? ? self.user_id_was : self.user_id), 
         :body => self.body_was, 
@@ -51,6 +51,13 @@ class CodeComment < ActiveRecord::Base
       self.exported = false
       self.version += 1
     end
+  end
+  
+  def without_versioning(&block)
+    @dont_version = true
+    block.call
+  ensure
+    @dont_version = false
   end
   
   # TODO: Make this not always export and use a setting
@@ -77,9 +84,11 @@ class CodeComment < ActiveRecord::Base
       pre_version = good_version_before(version_number) unless version == 1
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
       if f = export(pre_version, version)
-        version.exported = true
-        self.raw_body = nil
-        version.save
+        self.without_versioning do
+          version.exported = true
+          self.raw_body = nil
+          version.save
+        end
       else
         false
       end
