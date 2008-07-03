@@ -71,20 +71,17 @@ class << ActiveRecord::Base
   end
 
   def create_or_update_by(field, options = {})
-    find_value = options.delete(field)
+    find_value = options[field]
     record = find(:first, :conditions => {field => find_value}) || self.new
-    record.send field.to_s + "=", find_value
     record.attributes = options
     record.save!
     record
   end
   
   def create_or_update_by_and(field1, field2, options = {})
-    find_value1 = options.delete(field1)
-    find_value2 = options.delete(field2)
-    record = find(:first, :conditions => {field1 => find_value1, field2 => find_value2}) || self.new
-    record.send "#{field1.to_s}=", find_value1
-    record.send "#{field2.to_s}=", find_value2
+    find_value1 = options[field1]
+    find_value2 = options[field2]
+    record = find(:first, :conditions => {field1 => find_value1.to_s, field2 => find_value2.to_s}) || self.new
     record.attributes = options
     record.save!
     record
@@ -92,8 +89,9 @@ class << ActiveRecord::Base
 
   def method_missing_with_create_or_update(method_name, *args)
     if match = method_name.to_s.match(/create_or_update_by_([a-z0-9_]+)/)
-      if match[1] =~ /([a-z0-9_]+)_and_([a-z0-9_]+)/
-        create_or_update_by_and($1.to_sym, $2.to_sym, *args)
+      if match[1] =~ /_and_/
+        first, second = match[1].split('_and_')
+        create_or_update_by_and(first.to_sym, second.to_sym, *args)
       else
         field = match[1].to_sym
         create_or_update_by(field,*args)

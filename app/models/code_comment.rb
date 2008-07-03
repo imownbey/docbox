@@ -18,7 +18,7 @@ class CodeComment < ActiveRecord::Base
   
   belongs_to :owner, :polymorphic => true
   belongs_to :user
-  has_many :versions
+  has_many :versions, :dependent => :delete_all
   
   before_update :create_version
   after_update :add_export_to_queue
