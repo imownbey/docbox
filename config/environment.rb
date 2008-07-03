@@ -11,7 +11,6 @@ RAILS_GEM_VERSION = '2.0.2' unless defined? RAILS_GEM_VERSION
 require File.join(File.dirname(__FILE__), 'boot')
 
 require 'git'
-require 'lib/core_ext'
 require 'rdoc/markup/to_html'
 
 Rails::Initializer.run do |config|
@@ -61,6 +60,8 @@ Rails::Initializer.run do |config|
   # Make Active Record use UTC-base instead of local time
   # config.active_record.default_timezone = :utc
 end
+
+require 'lib/core_ext'
 
 # This allows STI stuff
 CodeContainer
