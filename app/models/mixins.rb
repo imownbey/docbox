@@ -1,6 +1,5 @@
 module TokenParams
   def path
- method:app/models/mixins.rb
     path = []
     object = (CodeComment === self ? owner : self)
     while object
@@ -13,7 +12,7 @@ module TokenParams
   end
   
   def fully_qualified_name
-    path = to_path
+    path = self.path
     
     if self.class == CodeMethod
       method_name = path.pop
