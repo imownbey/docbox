@@ -23,6 +23,8 @@ class CodeComment < ActiveRecord::Base
   before_update :create_version
   after_update :add_export_to_queue
   
+  is_indexed :fields => [:body]
+  
   # For the sake of STI
   def owner_type=(sType)
     super(sType.to_s.constantize.base_class.to_s)

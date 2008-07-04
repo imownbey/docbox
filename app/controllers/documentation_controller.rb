@@ -5,6 +5,7 @@ class DocumentationController < ApplicationController
   
   def show
     @objects = get_object(params[:tokens])
+    
     if @objects
       owner = @objects.last.try(:owner)
       @containing_class = (owner || @objects.last)

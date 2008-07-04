@@ -5,13 +5,20 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.0.2' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.1.0' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
 require 'git'
-require 'rdoc/markup/to_html'
+require 'lib/core_ext'
+
+begin
+  require 'rdoc/markup/to_html'
+rescue LoadError
+  # RDoc not really up to date?  No problem!
+  require 'rdoc/markup/simple_markup/to_html'
+end
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
