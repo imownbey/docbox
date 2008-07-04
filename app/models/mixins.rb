@@ -1,5 +1,6 @@
 module TokenParams
-  def to_path
+  def path
+ method:app/models/mixins.rb
     path = []
     object = (CodeComment === self ? owner : self)
     while object
@@ -7,6 +8,7 @@ module TokenParams
       object = object.code_container
       object = nil if object.is_a? CodeFile
     end
-    path.reverse.join('/')
+    
+    path.reverse
   end
 end
