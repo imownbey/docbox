@@ -12,7 +12,13 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 require 'git'
 require 'lib/core_ext'
-require 'rdoc/markup/to_html'
+
+begin
+  require 'rdoc/markup/to_html'
+rescue LoadError
+  # RDoc not really up to date?  No problem!
+  require 'rdoc/markup/simple_markup/to_html'
+end
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
