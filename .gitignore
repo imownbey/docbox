@@ -7,3 +7,4 @@ doc/app
 db/schema.rb
 config/database.yml
 code/
+config/ultrasphinx/development.conf
