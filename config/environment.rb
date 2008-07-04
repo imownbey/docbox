@@ -11,9 +11,6 @@ RAILS_GEM_VERSION = '2.1.0' unless defined? RAILS_GEM_VERSION
 require File.join(File.dirname(__FILE__), 'boot')
 
 require 'git'
-<<<<<<< HEAD:config/environment.rb
-require 'rdoc/markup/to_html'
-=======
 require 'lib/core_ext'
 
 begin
@@ -22,7 +19,6 @@ rescue LoadError
   # RDoc not really up to date?  No problem!
   require 'rdoc/markup/simple_markup/to_html'
 end
->>>>>>> 4595a52... Env fixes for older Rdoc and migration fixes:config/environment.rb
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
@@ -71,8 +67,6 @@ Rails::Initializer.run do |config|
   # Make Active Record use UTC-base instead of local time
   # config.active_record.default_timezone = :utc
 end
-
-require 'lib/core_ext'
 
 # This allows STI stuff
 CodeContainer
