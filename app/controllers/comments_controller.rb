@@ -20,7 +20,6 @@ class CommentsController < ApplicationController
   
   def new
     @commentable = get_object(params[:tokens], false).last
-    p @commentable.to_path
     @comment = CodeComment.new
   end
   
