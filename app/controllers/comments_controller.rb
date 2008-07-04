@@ -12,7 +12,7 @@ class CommentsController < ApplicationController
       flash[:notice] = "Comment properly updated"
       flash[:comment] = @comment.id
       options = ((@comment.owner.is_a? CodeMethod) ? { :anchor => @comment.owner.name } : {})
-      redirect_to doc_path(@comment, options)
+      redirect_to doc_path(@comment.owner.to_path, options)
     else
       render :action => "edit", :controller => "comments", :id => @comment.id
     end

@@ -10,4 +10,15 @@ module TokenParams
     
     path.reverse
   end
+  
+  def fully_qualified_name
+    path = to_path
+    
+    if self.class == CodeMethod
+      method_name = path.pop
+      (path.join("::")) + "##{method_name}"
+    else
+      path.join("::")
+    end
+  end
 end

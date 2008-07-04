@@ -1,0 +1,15 @@
+<%= render :partial => 'search_form' %>
+
+<p class="search_results">
+  <strong><%= pluralize(@search.results.length, "result") %></strong> for <strong><%= params[:q] %></strong>.
+<p>
+  
+<% @search.results.each do |result| %>
+  <p class="search_result">
+    <%= result.body %>
+    <br />
+    <span class="where">in <%= link_to result.owner.fully_qualified_name, doc_path(result.owner.to_path) %></span>
+  </p>
+<% end %>
+
+<%= will_paginate(@search) %>
