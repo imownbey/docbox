@@ -1,0 +1,5 @@
+<% form_tag url_for(:controller => 'search', :action => 'results'), :method => :post do %>
+  <p>
+    <%= text_field_tag :q %> <%= submit_tag "Search" %>
+  </p>
+<% end %>
