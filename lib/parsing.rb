@@ -9,17 +9,17 @@ module RDoc
   class RDoc
     def import!(argv)
       TopLevel::reset
-
+ 
       @stats = Stats.new
-
-      options = Options.new GENERATORS
-      options.parse(argv)
-
+ 
+      options = Options.instance
+      options.parse(argv, GENERATORS)
+ 
       @last_created = nil
       start_time = Time.now
-
+ 
       file_info = parse_files(options)
-
+ 
       if file_info.empty?
         return false
       else
@@ -29,76 +29,74 @@ module RDoc
       end
     end
   end
-end
-class RDoc::RubyParser
+  
+  class RubyParser
         def parse_module(container, single, tk, comment)
           progress("m")
           @stats.num_modules += 1
-          container, name_t  = get_class_or_module(container)
-      #      skip_tkspace
+          container, name_t = get_class_or_module(container)
+    # skip_tkspace
           name = name_t.name
-          mod = container.add_module RDoc::NormalModule, name
-          mod.record_location @top_level
-          read_documentation_modifiers mod, RDoc::CLASS_MODIFIERS
+          mod = container.add_module(NormalModule, name)
+          mod.record_location(@top_level)
+          read_documentation_modifiers(mod, CLASS_MODIFIERS)
           parse_statements(mod)
           mod.comment = comment
           MODULES[mod.full_name] = {:line_no => name_t.line_no}
         end
     
-        def parse_class(container, single, tk, comment, &block)
+    def parse_class(container, single, tk, comment, &block)
           progress("c")
-
           @stats.num_classes += 1
-
           container, name_t = get_class_or_module(container)
-
           case name_t
           when TkCONSTANT
-            name = name_t.name
+       name = name_t.name
             superclass = "Object"
-
+ 
             if peek_tk.kind_of?(TkLT)
               get_tk
               skip_tkspace(true)
               superclass = get_class_specification
               superclass = "<unknown>" if superclass.empty?
             end
-
+ 
             if single == SINGLE
-              cls_type = RDoc::SingleClass
+             cls_type = SingleClass
             else
-              cls_type = RDoc::NormalClass
+             cls_type = NormalClass
             end
-
-            cls = container.add_class cls_type, name, superclass
-            read_documentation_modifiers cls, RDoc::CLASS_MODIFIERS
+ 
+            cls = container.add_class(cls_type, name, superclass)
+            read_documentation_modifiers(cls, CLASS_MODIFIERS)
             cls.record_location(@top_level)
-            parse_statements(cls)
+      parse_statements(cls)
             cls.comment = comment
-
+ 
           when TkLSHFT
-            case name = get_class_specification
-            when "self", container.name
-              parse_statements(container, SINGLE, &block)
+           case name = get_class_specification
+             when "self", container.name
+             parse_statements(container, SINGLE, &block)
             else
-              other = RDoc::TopLevel.find_class_named(name)
-              unless other
-                #            other = @top_level.add_class(NormalClass, name, nil)
-                #            other.record_location(@top_level)
-                #            other.comment = comment
-                other = RDoc::NormalClass.new "Dummy", nil
-              end
-              read_documentation_modifiers other, RDoc::CLASS_MODIFIERS
-              parse_statements(other, SINGLE, &block)
+            other = TopLevel.find_class_named(name)
+            unless other
+      # other = @top_level.add_class(NormalClass, name, nil)
+      # other.record_location(@top_level)
+      # other.comment = comment
+              other = NormalClass.new("Dummy", nil)
             end
-
+            read_documentation_modifiers(other, CLASS_MODIFIERS)
+            parse_statements(other, SINGLE, &block)
+       end
+ 
           else
-            warn("Expected class name or '<<'. Got #{name_t.class}: #{name_t.text.inspect}")
+      warn("Expected class name or '<<'. Got #{name_t.class}: #{name_t.text.inspect}")
           end
           CLASSES[@input_file_name] ||= {}
           CLASSES[@input_file_name][cls.full_name] = { :line_no => name_t.line_no } if cls
     end
   end
+end
 # This class takes RDoc and inputs it into the models using RDocs generator support
 
 # How does it work?
@@ -251,7 +249,7 @@ module Generators
     def process_alias(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
-      p = CodeAlias.create_or_update_by_name_and_code_container_id(:code_container_id => parent.try(:id), :name => obj.name, :old_name => obj.new_name)
+      p = CodeAlias.create_or_update_by_name_and_code_container_id(:code_container_id => parent.try(:id), :name => obj.new_name, :old_name => obj.old_name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
@@ -270,7 +268,7 @@ module Generators
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeAttribute.create_or_update_by_name_and_code_container_id(:code_container_id => parent.try(:id), :name => obj.name, :read_write => obj.rw)
-      comment = Comment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
+      comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
     end
@@ -279,7 +277,7 @@ module Generators
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_container_id => parent.try(:id), :name => obj.name)
-      comment = Comment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
+      comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
     end
@@ -288,7 +286,7 @@ module Generators
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeInclude.create_or_update_by_name_and_code_container_id(:code_container_id => parent.try(:id), :name => obj.name)
-      comment = Comment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
+      comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
     end
