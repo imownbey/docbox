@@ -8,16 +8,21 @@ class DocumentationController < ApplicationController
     
     if @objects
       owner = @objects.last.try(:owner)
-      @containing_class = (owner || @objects.last)
+      @requested_object = (owner || @objects.last)
       @methods = {}
-      @methods[:all] = @containing_class.code_methods.with_comments.ordered
-      @methods[:instance] = {}
-      @methods[:instance][:all] = @methods[:all].select{ |m| m.singleton? }
-      @methods[:instance] = seperate_methods(@methods[:instance][:all].dup)
       
-      @methods[:class] = {}
-      @methods[:class][:all] = @methods[:all] - @methods[:instance][:all]
-      @methods[:class] = seperate_methods(@methods[:class][:all].dup)
+      if @requested_object.is_a?(CodeMethod)
+        render :template => 'documentation/show_method'
+      else
+        @methods[:all] = @requested_object.code_methods.with_comments.ordered
+        @methods[:instance] = {}
+        @methods[:instance][:all] = @methods[:all].select{ |m| m.singleton? }
+        @methods[:instance] = seperate_methods(@methods[:instance][:all].dup)
+      
+        @methods[:class] = {}
+        @methods[:class][:all] = @methods[:all] - @methods[:instance][:all]
+        @methods[:class] = seperate_methods(@methods[:class][:all].dup)
+      end
     else
       # 404
     end
