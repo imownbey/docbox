@@ -2,6 +2,9 @@
 # => http://blog.evanweaver.com/articles/2006/09/03/smart-plaintext-wrapping/
 # Except if it is tabbed, then you dont wrap it
 class String
+  def valid_constant?
+    !(/\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/ =~ self).nil?
+  end
 
   def wrap(width, hanging_indent = 0, magic_lists = false, skip_tabs = true)
     lines = self.split(/\n/)
