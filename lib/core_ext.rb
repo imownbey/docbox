@@ -66,15 +66,4 @@ class Object
       send method if respond_to? method
     end
   end
-<<<<<<< HEAD:lib/core_ext.rb
 end
-=======
-end
-
-<<<<<<< HEAD:lib/core_ext.rb
-<<<<<<< HEAD:lib/core_ext.rb
->>>>>>> 10a2528169e1fbd0ccfe1a2257c9820e3db3b2ed:lib/core_ext.rb
-=======
->>>>>>> mrneighborly/master:lib/core_ext.rb
-=======
->>>>>>> mrneighborly/master:lib/core_ext.rb
