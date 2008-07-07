@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   end
 
   def find_token(token, parent, last = false)
-    if last
+    if last && token.valid_constant?
       conditions = {:include => [:code_methods]}
     else
       conditions = {}

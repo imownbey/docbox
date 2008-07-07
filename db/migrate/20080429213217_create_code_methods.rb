@@ -15,6 +15,6 @@ class CreateCodeMethods < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :meths
+    drop_table :code_methods
   end
 end

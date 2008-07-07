@@ -21,4 +21,11 @@ describe DocumentationController do
     assigns[:file].should == file
     assigns[:comment].should == comment
   end
+  
+  it "should get method object" do
+    get :show, :tokens => ["SmallClass", "simple_method"]
+    
+    assigns[:objects].should == [code_containers(:some_class), code_methods(:simple_method)]  
+  end
+  
 end
