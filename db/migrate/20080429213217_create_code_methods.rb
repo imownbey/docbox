@@ -1,7 +1,7 @@
 class CreateCodeMethods < ActiveRecord::Migration
   def self.up
     create_table :code_methods do |t|
-      t.integer :code_container_id
+      t.integer :code_container_id, :code_file_id
       t.string :name
       t.string :parameters
       t.string :block_parameters

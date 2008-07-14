@@ -1,7 +1,7 @@
 class CreateCodeObjects < ActiveRecord::Migration
   def self.up
     create_table :code_objects do |t|
-      t.integer :code_container_id
+      t.integer :code_container_id, :code_file_id
       t.string :type
       t.string :name
       t.string :value

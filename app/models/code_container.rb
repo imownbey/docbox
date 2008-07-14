@@ -6,7 +6,7 @@ class CodeContainer < ActiveRecord::Base
   has_many :code_containers
   belongs_to :code_container
   has_one :code_comment, :as => :owner, :dependent => :destroy
-  
+  has_one :code_file
   named_scope :not_file, :conditions => ["type != 'CodeFile'"]
   
   is_indexed :fields => [:name, :full_name]
@@ -36,4 +36,7 @@ class CodeModule < CodeContainer
 end
 
 class CodeFile < CodeContainer
+  has_many :code_containers
+  has_many :code_methods
+  has_many :code_objects
 end
