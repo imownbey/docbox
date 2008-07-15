@@ -151,6 +151,7 @@ module Generators
       @objects = []
       @methods = []
       @in_files = []
+      
       files.each { |file| process_file(file) }
       
       files.each { |file| process_in_files(file) }
@@ -187,9 +188,10 @@ module Generators
     def process_file(file)
       @first_comment = false
 
-      d = CodeFile.create_or_update_by_full_name :name => file.file_relative_name, :full_name => file.file_absolute_name
+      d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
 
       @containers << d.id
+      # TODO: For some reason this is not being reset. WTF. But yet CodeFiles are being created.
       @current_file = d
 
       # Process all of the objects that this file contains
@@ -229,24 +231,24 @@ module Generators
         p = case type
             when :modules
             
-              CodeModule.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[obj.name]))
+              CodeModule.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[obj.name]))
             when :classes
               p obj.full_name
-              CodeClass.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[obj.name]))
+              CodeClass.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[obj.name]))
             end
         comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
         @containers << p.id
         @comments << comment.id if comment
-
+        @current_container = p
         @already_processed[obj.full_name] = true    
           
         # Process all of the objects that this class or module contains
-        obj.method_list.each { |child| process_method(child, obj) }
-        obj.aliases.each { |child| process_alias(child, obj) }
-        obj.constants.each { |child| process_constant(child, obj) }
-        obj.requires.each { |child| process_require(child, obj) }
-        obj.includes.each { |child| process_include(child, obj) }
-        obj.attributes.each { |child| process_attribute(child, obj) }   
+        obj.method_list.each { |child| process_method(child, p) }
+        obj.aliases.each { |child| process_alias(child, p) }
+        obj.constants.each { |child| process_constant(child, p) }
+        obj.requires.each { |child| process_require(child, p) }
+        obj.includes.each { |child| process_include(child, p) }
+        obj.attributes.each { |child| process_attribute(child, p) }   
       end
       
       id = @already_processed[obj.full_name]
@@ -260,7 +262,7 @@ module Generators
     def process_method(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
-      p = CodeMethod.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
+      p = CodeMethod.create(:code_file_id => @current_file.id, :code_container_id => @current_container.id, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @methods << p.id
       @comments << comment.id if comment
