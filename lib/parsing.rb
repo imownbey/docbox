@@ -187,31 +187,33 @@ module Generators
     # process a file from the code_object.rb tree
     def process_file(file)
       @first_comment = false
-
+ 
       d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
-
+ 
       @containers << d.id
       # TODO: For some reason this is not being reset. WTF. But yet CodeFiles are being created.
       @current_file = d
-
+      p @current_file
+      
+ 
       # Process all of the objects that this file contains
       file.method_list.each { |child| process_method(child, file) }
       file.aliases.each { |child| process_alias(child, file) }
       file.constants.each { |child| process_constant(child, file) }
       file.requires.each { |child| process_require(child, file) }
       file.includes.each { |child| process_include(child, file) }
-      file.attributes.each { |child| process_attribute(child, file) }   
+      file.attributes.each { |child| process_attribute(child, file) }
       
       # Recursively process contained subclasses and modules
       
       @file = file
       file.each_classmodule do |child|
-        process_type_or_module(child, file)      
+        process_type_or_module(child, file)
       end
       
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
         @comments << comment.id if comment
-      
+      @current_file = nil
     end
     
     # Process classes and modiles   
@@ -233,7 +235,6 @@ module Generators
             
               CodeModule.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[obj.name]))
             when :classes
-              p obj.full_name
               CodeClass.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[obj.name]))
             end
         comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
@@ -260,6 +261,8 @@ module Generators
     end       
     
     def process_method(obj, parent)
+      p get_source_code(obj) if obj.name =~ /to_formatted_s/
+      
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
       p = CodeMethod.create(:code_file_id => @current_file.id, :code_container_id => @current_container.id, :name => obj.name, :parameters => obj.params, :block_parameters => obj.block_params, :singleton => obj.singleton, :visibility => obj.visibility.to_s, :force_documentation => obj.force_documentation, :source_code => get_source_code(obj))
@@ -270,7 +273,7 @@ module Generators
     
     def process_alias(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      parent = CodeContainer.find_by_name(parent.name)
       p = CodeAlias.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.new_name, :old_name => obj.old_name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
@@ -279,7 +282,7 @@ module Generators
     
     def process_constant(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      parent = CodeContainer.find_by_name(parent.name)
       p = CodeConstant.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :value => obj.value)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
@@ -288,7 +291,7 @@ module Generators
     
     def process_attribute(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      parent = CodeContainer.find_by_name(parent.name)
       p = CodeAttribute.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :read_write => obj.rw)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
@@ -297,7 +300,7 @@ module Generators
     
     def process_require(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      parent = CodeContainer.find_by_name(parent.name)
       p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
@@ -306,7 +309,7 @@ module Generators
     
     def process_include(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
-      $stderr.puts "Could not find parent object for #{obj.name}" unless parent = CodeContainer.find_by_name(parent.name)
+      parent = CodeContainer.find_by_name(parent.name)
       p = CodeInclude.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
