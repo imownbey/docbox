@@ -1,17 +1,9 @@
 require 'digest/md5' # This is to find comments which are the same
 
-# This is a UGLY hack.
-# It lets me keep track of the line that classes are on
-# And makes things generally easier
-CLASSES = {}
-MODULES = {}
+# Sub in our own parse_rb and code_objects
+require 'rdoc/parse_rb'
+require 'rdoc/code_objects'
 
-class RubyLex
-  attr_reader :reader
-  class BufferedReader
-    attr_reader :content
-  end
-end
 module RDoc
   class RDoc
     def import!(argv)
@@ -36,77 +28,8 @@ module RDoc
       end
     end
   end
-  class RubyParser
-        def parse_module(container, single, tk, comment)
-          progress("m")
-          
-          @stats.num_modules += 1
-          container, name_t = get_class_or_module(container)
-    # skip_tkspace
-    
-          name = name_t.name
-          
-          mod = container.add_module(NormalModule, name)
-          mod.record_location(@top_level)
-          read_documentation_modifiers(mod, CLASS_MODIFIERS)
-          parse_statements(mod)
-          mod.comment = comment
-          MODULES[name] = @scanner.reader.content.split("\n")[name_t.line_no - 1]
-        end
-
-    def parse_class(container, single, tk, comment, &block)
-          progress("c")
-          @stats.num_classes += 1
-          container, name_t = get_class_or_module(container)
-          
-          case name_t
-          when TkCONSTANT
-       name = name_t.name
-            superclass = "Object"
-
-            if peek_tk.kind_of?(TkLT)
-              get_tk
-              skip_tkspace(true)
-              superclass = get_class_specification
-              superclass = "<unknown>" if superclass.empty?
-            end
-
-            if single == SINGLE
-             cls_type = SingleClass
-            else
-             cls_type = NormalClass
-            end
-
-            cls = container.add_class(cls_type, name, superclass)
-            read_documentation_modifiers(cls, CLASS_MODIFIERS)
-            cls.record_location(@top_level)
-      parse_statements(cls)
-            cls.comment = comment
-
-          when TkLSHFT
-           case name = get_class_specification
-             when "self", container.name
-             parse_statements(container, SINGLE, &block)
-            else
-            other = TopLevel.find_class_named(name)
-            unless other
-      # other = @top_level.add_class(NormalClass, name, nil)
-      # other.record_location(@top_level)
-      # other.comment = comment
-              other = NormalClass.new("Dummy", nil)
-            end
-            read_documentation_modifiers(other, CLASS_MODIFIERS)
-            parse_statements(other, SINGLE, &block)
-       end
-          
-          else
-      warn("Expected class name or '<<'. Got #{name_t.class}: #{name_t.text.inspect}")
-          end
-          
-          CLASSES[name] = @scanner.reader.content.split("\n")[name_t.line_no - 1] 
-    end
-  end
 end
+
 # This class takes RDoc and inputs it into the models using RDocs generator support
 
 # How does it work?
@@ -152,6 +75,8 @@ module Generators
       @methods = []
       @in_files = []
       
+      files.each { |file| add_file(file) }
+      
       files.each { |file| process_file(file) }
       
       files.each { |file| process_in_files(file) }
@@ -185,7 +110,7 @@ module Generators
     end
 
     # process a file from the code_object.rb tree
-    def process_file(file)
+    def add_file(file)
       @first_comment = false
  
       d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
@@ -193,28 +118,43 @@ module Generators
       @containers << d.id
       # TODO: For some reason this is not being reset. WTF. But yet CodeFiles are being created.
       @current_file = d
-      p @current_file
       
  
-      # Process all of the objects that this file contains
-      file.method_list.each { |child| process_method(child, file) }
-      file.aliases.each { |child| process_alias(child, file) }
-      file.constants.each { |child| process_constant(child, file) }
-      file.requires.each { |child| process_require(child, file) }
-      file.includes.each { |child| process_include(child, file) }
-      file.attributes.each { |child| process_attribute(child, file) }
-      
-      # Recursively process contained subclasses and modules
-      
-      @file = file
-      file.each_classmodule do |child|
-        process_type_or_module(child, file)
-      end
+  #   # Process all of the objects that this file contains
+  #   file.method_list.each { |child| process_method(child, file) }
+  #   file.aliases.each { |child| process_alias(child, file) }
+  #   file.constants.each { |child| process_constant(child, file) }
+  #   file.requires.each { |child| process_require(child, file) }
+  #   file.includes.each { |child| process_include(child, file) }
+  #   file.attributes.each { |child| process_attribute(child, file) }
+  #   
+  #   # Recursively process contained subclasses and modules
+  #   
+  #   @file = file
+  #   file.each_classmodule do |child|
+  #     process_type_or_module(child, file)
+  #   end
       
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
         @comments << comment.id if comment
       @current_file = nil
     end
+    
+    def process_file(file)
+     # # Process all of the objects that this file contains
+     # file.method_list.each { |child| process_method(child, file) }
+     # file.aliases.each { |child| process_alias(child, file) }
+     # file.constants.each { |child| process_constant(child, file) }
+     # file.requires.each { |child| process_require(child, file) }
+     # file.includes.each { |child| process_include(child, file) }
+     # file.attributes.each { |child| process_attribute(child, file) }
+     # 
+     # # Recursively process contained subclasses and modules
+      
+      file.each_classmodule do |child|
+        process_type_or_module(child, file)
+      end    
+    end  
     
     # Process classes and modiles   
     def process_type_or_module(obj, parent)
@@ -228,14 +168,15 @@ module Generators
       # twice. So we need to keep track of what classes/modules we have
       # already seen and make sure we don't create two INSERT statements for the same
       # object.
+      p obj.file
       if(!@already_processed.has_key?(obj.full_name)) then    
         parent = CodeContainer.find_by_name(parent.name) || CodeContainer.find_by_name(parent.file_relative_name)
         p = case type
             when :modules
             
-              CodeModule.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (MODULES[obj.name]))
+              CodeModule.create_or_update_by_full_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => obj.line)
             when :classes
-              CodeClass.create_or_update_by_full_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => (CLASSES[obj.name]))
+              CodeClass.create_or_update_by_full_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => obj.line)
             end
         comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
         @containers << p.id
@@ -244,12 +185,12 @@ module Generators
         @already_processed[obj.full_name] = true    
           
         # Process all of the objects that this class or module contains
-        obj.method_list.each { |child| process_method(child, p) }
-        obj.aliases.each { |child| process_alias(child, p) }
-        obj.constants.each { |child| process_constant(child, p) }
-        obj.requires.each { |child| process_require(child, p) }
-        obj.includes.each { |child| process_include(child, p) }
-        obj.attributes.each { |child| process_attribute(child, p) }   
+   #   obj.method_list.each { |child| process_method(child, p) }
+   #   obj.aliases.each { |child| process_alias(child, p) }
+   #   obj.constants.each { |child| process_constant(child, p) }
+   #   obj.requires.each { |child| process_require(child, p) }
+   #   obj.includes.each { |child| process_include(child, p) }
+   #   obj.attributes.each { |child| process_attribute(child, p) }   
       end
       
       id = @already_processed[obj.full_name]

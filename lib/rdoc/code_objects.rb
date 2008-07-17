@@ -11,7 +11,7 @@ module RDoc
   #
   class CodeObject
 
-    attr_accessor :parent
+    attr_accessor :parent, :file
 
     # We are the model of the code, but we know that at some point
     # we will be worked on by viewers. By implementing the Viewable
@@ -116,16 +116,20 @@ module RDoc
     attr_reader   :requires, :includes, :in_files, :visibility
 
     attr_reader   :sections
+    
+    attr_accessor :file, :line
 
     class Section
       attr_reader :title, :comment, :sequence
 
       @@sequence = "SEC00000"
 
-      def initialize(title, comment)
+      def initialize(title, comment, file = '', line = '')
         @title = title
         @@sequence.succ!
         @sequence = @@sequence.dup
+        @file ||= file
+        @line ||= line
         set_comment(comment)
       end
 
@@ -226,12 +230,12 @@ module RDoc
       @in_files.include?(file)
     end
 
-    def add_class(class_type, name, superclass)
-      add_class_or_module(@classes, class_type, name, superclass)
+    def add_class(class_type, name, superclass, file = '', line = '')
+      add_class_or_module(@classes, class_type, name, superclass, file, line)
     end
 
-    def add_module(class_type, name)
-      add_class_or_module(@modules, class_type, name, nil)
+    def add_module(class_type, name, file = '', line = '')
+      add_class_or_module(@modules, class_type, name, nil, file, line)
     end
 
     def add_method(a_method)
@@ -276,12 +280,12 @@ module RDoc
       end
     end
 
-    def add_class_or_module(collection, class_type, name, superclass=nil)
+    def add_class_or_module(collection, class_type, name, superclass=nil, file = '', line = '')
       cls = collection[name]
       if cls
         puts "Reusing class/module #{name}" if $DEBUG
       else
-        cls = class_type.new(name, superclass)
+        cls = class_type.new(name, superclass, file, line)
         puts "Adding class/module #{name} to #@name" if $DEBUG
 #        collection[name] = cls if @document_self  && !@done_documenting
         collection[name] = cls if !@done_documenting
@@ -493,7 +497,7 @@ module RDoc
     # ClassModule object for C. This code arranges to share
     # classes and modules between files.
 
-    def add_class_or_module(collection, class_type, name, superclass)
+    def add_class_or_module(collection, class_type, name, superclass, file = '', line = '')
       cls = collection[name]
       if cls
         puts "Reusing class/module #{name}" if $DEBUG
@@ -505,7 +509,7 @@ module RDoc
         end
         cls = all[name]
         if !cls
-          cls = class_type.new(name, superclass)
+          cls = class_type.new(name, superclass, file, line)
           all[name] = cls  unless @done_documenting
         end
         puts "Adding class/module #{name} to #@name" if $DEBUG
@@ -553,11 +557,13 @@ module RDoc
     attr_reader   :superclass
     attr_accessor :diagram
 
-    def initialize(name, superclass = nil)
+    def initialize(name, superclass = nil, file = '', line = '')
       @name       = name
       @diagram    = nil
       @superclass = superclass
       @comment    = ""
+      @file       = file
+      @line       = line
       super()
     end
 
@@ -633,7 +639,7 @@ module RDoc
 
     include TokenStream
 
-    def initialize(text, name)
+    def initialize(text, name, file = '')
       super()
       @text = text
       @name = name
@@ -645,6 +651,7 @@ module RDoc
       @is_alias_for  = nil
       @comment = ""
       @call_seq = nil
+      @file = file
     end
 
     def <=>(other)
