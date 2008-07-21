@@ -185,8 +185,8 @@ module Generators
           
         # Process all of the objects that this class or module contains
       obj.method_list.each { |child| process_method(child, p) unless child.nil? }
-   #   obj.aliases.each { |child| process_alias(child, p) }
-   #   obj.constants.each { |child| process_constant(child, p) }
+      obj.aliases.each { |child| process_alias(child, p) }
+      obj.constants.each { |child| process_constant(child, p) }
    #   obj.requires.each { |child| process_require(child, p) }
    #   obj.includes.each { |child| process_include(child, p) }
    #   obj.attributes.each { |child| process_attribute(child, p) }   
@@ -221,7 +221,7 @@ module Generators
           :code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), 
           :code_container_id => parent.try(:id), 
           :name => obj.name, 
-          :old_name => obj.is_alias_for.name
+          :old_name => obj.is_alias_for.name,
         })
         comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       else
@@ -229,18 +229,16 @@ module Generators
           :code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), 
           :code_container_id => parent.try(:id), 
           :name => (obj.try(:new_name) || obj.name), 
-          :old_name => (obj.try(:old_name) || obj.is_alias_for.name)
+          :old_name => (obj.try(:old_name) || obj.is_alias_for.name),
         })
-        comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       end
       @objects << p.id
-      @comments << comment.id if comment
     end
     
     def process_constant(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       parent = CodeContainer.find_by_name(parent.name)
-      p = CodeConstant.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :value => obj.value)
+      p = CodeConstant.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :code_container_id => parent.try(:id), :name => obj.name, :value => obj.value)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment

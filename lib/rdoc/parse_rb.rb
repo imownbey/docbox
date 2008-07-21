@@ -530,6 +530,8 @@ module RDoc
       res = get_tkread.tr("\n", " ").strip
       res = "" if res == ";"
       con = Constant.new(name, res, comment)
+      con.file = @top_level.file_absolute_name
+       
       read_documentation_modifiers(con, CONSTANT_MODIFIERS)
       if con.document_self
 	container.add_constant(con)
@@ -1046,6 +1048,7 @@ module RDoc
 
       al = Alias.new(get_tkread, old_name, new_name, comment)
       al.file = @top_level.file_absolute_name
+      al.line = @scanner.reader.content.split("\n")[tk.line_no - 1]
       read_documentation_modifiers(al, ATTR_MODIFIERS)
       if al.document_self
 	context.add_alias(al)

@@ -11,7 +11,7 @@ module RDoc
   #
   class CodeObject
 
-    attr_accessor :parent, :file, :type
+    attr_accessor :parent, :file, :type, :line
 
     # We are the model of the code, but we know that at some point
     # we will be worked on by viewers. By implementing the Viewable

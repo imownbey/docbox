@@ -6,7 +6,7 @@ class CreateCodeObjects < ActiveRecord::Migration
       t.string :name
       t.string :value
       t.integer :visibility
-      t.string :read_write
+      t.string :read_write, :line_code
 
       t.datetime :created_at
     end
