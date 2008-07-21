@@ -749,9 +749,10 @@ $stderr.puts p
   class Require < CodeObject
     attr_accessor :name
 
-    def initialize(name, comment)
+    def initialize(name, comment, file = '')
       super()
       @name = name.gsub(/'|"/, "") #'
+      @file = file
       self.comment = comment
     end
 

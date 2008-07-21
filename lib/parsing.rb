@@ -187,9 +187,9 @@ module Generators
       obj.method_list.each { |child| process_method(child, p) unless child.nil? }
       obj.aliases.each { |child| process_alias(child, p) }
       obj.constants.each { |child| process_constant(child, p) }
-   #   obj.requires.each { |child| process_require(child, p) }
-   #   obj.includes.each { |child| process_include(child, p) }
-   #   obj.attributes.each { |child| process_attribute(child, p) }   
+      obj.requires.each { |child| process_require(child, p) }
+      obj.includes.each { |child| process_include(child, p) }
+      obj.attributes.each { |child| process_attribute(child, p) }   
       end
       
       id = @already_processed[obj.full_name]
@@ -223,7 +223,6 @@ module Generators
           :name => obj.name, 
           :old_name => obj.is_alias_for.name,
         })
-        comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       else
         p = CodeAlias.create({
           :code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), 
@@ -247,7 +246,7 @@ module Generators
     def process_attribute(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       parent = CodeContainer.find_by_name(parent.name)
-      p = CodeAttribute.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name, :read_write => obj.rw)
+      p = CodeAttribute.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :code_container_id => parent.try(:id), :name => obj.name, :read_write => obj.rw)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
@@ -256,7 +255,7 @@ module Generators
     def process_require(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       parent = CodeContainer.find_by_name(parent.name)
-      p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name)
+      p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file), :code_container_id => parent.try(:id), :name => obj.name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment
@@ -265,7 +264,7 @@ module Generators
     def process_include(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       parent = CodeContainer.find_by_name(parent.name)
-      p = CodeInclude.create_or_update_by_name_and_code_container_id(:code_file_id => @current_file.id, :code_container_id => parent.try(:id), :name => obj.name)
+      p = CodeInclude.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :code_container_id => parent.try(:id), :name => obj.name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment

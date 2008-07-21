@@ -1087,7 +1087,7 @@ module RDoc
  #     warn "'require' used as variable"
     end
     if name
-      context.add_require(Require.new(name, comment))
+      context.add_require(Require.new(name, comment, @top_level.file_absolute_name))
     else
       unget_tk(tk)
     end
@@ -1098,7 +1098,9 @@ module RDoc
       skip_tkspace_comment
       name = get_constant_with_optional_parens
       unless name.empty?
-        context.add_include(Include.new(name, comment))
+        i = Include.new(name, comment)
+        i.file = @top_level.file_absolute_name
+        context.add_include(i)
       end
       return unless peek_tk.kind_of?(TkCOMMA)
       get_tk
@@ -1132,6 +1134,7 @@ module RDoc
           unget_tk tk
         end
 	att = Attr.new(get_tkread, name, rw, comment)
+	att.file = @top_level.file_absolute_name
 	read_documentation_modifiers(att, ATTR_MODIFIERS)
 	if att.document_self
 	  context.add_attribute(att)
@@ -1194,6 +1197,7 @@ module RDoc
       
       for name in args
 	att = Attr.new(get_tkread, name, rw, comment)
+  	att.file = @top_level.file_absolute_name
         context.add_attribute(att)
       end    
     end
