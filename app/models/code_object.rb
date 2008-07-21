@@ -16,7 +16,7 @@ class CodeAlias < CodeObject
   end
   
   def old_name= name
-    value = name
+    self.value = name
   end
 end
 

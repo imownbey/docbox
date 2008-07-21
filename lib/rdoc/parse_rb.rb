@@ -411,7 +411,8 @@ module RDoc
       	  cls_type = NormalClass
       	end
 
-        cls = container.add_class(cls_type, name, superclass, @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1])
+        cls = container.add_class(cls_type, name, superclass)
+        cls.file, cls.line =  @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
         read_documentation_modifiers(cls, CLASS_MODIFIERS)
         cls.record_location(@top_level)
 	parse_statements(cls)
@@ -444,7 +445,8 @@ module RDoc
       container, name_t  = get_class_or_module(container)
 #      skip_tkspace
       name = name_t.name
-      mod = container.add_module(NormalModule, name, @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1])
+      mod = container.add_module(NormalModule, name)
+      mod.file, mod.line = @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
       mod.record_location(@top_level)
       read_documentation_modifiers(mod, CLASS_MODIFIERS)
       parse_statements(mod)
@@ -596,12 +598,15 @@ module RDoc
 	end
 	name = name_t.name
 
-        meth =  AnyMethod.new(get_tkread, name, @top_level.file_absolute_name)
+        meth =  AnyMethod.new(get_tkread, name)
         meth.singleton = (single == SINGLE)
       end
-
+      
+      meth.comment = comment
+      meth.file = @top_level.file_absolute_name
+      
       remove_token_listener(self)
-
+        
       meth.start_collecting_tokens
       indent = TkSPACE.new(1,1)
       indent.set_text(" " * column)
@@ -650,8 +655,7 @@ module RDoc
         seq.gsub!(/^\s*\#\s*/, '')
         meth.call_seq = seq
       end
-      
-      meth.comment = comment
+
 
     end
     
@@ -1041,6 +1045,7 @@ module RDoc
       old_name = get_symbol_or_name
 
       al = Alias.new(get_tkread, old_name, new_name, comment)
+      al.file = @top_level.file_absolute_name
       read_documentation_modifiers(al, ATTR_MODIFIERS)
       if al.document_self
 	context.add_alias(al)
