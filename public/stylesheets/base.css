@@ -18,7 +18,7 @@ body, html {
   margin: 0 20px;
   padding: 0px;
 }
-h1 {
+h1, .section-head {
 	/*18px via YUI Fonts CSS foundation*/
 	font-size:138.5%;  
 }
@@ -30,11 +30,11 @@ h3 {
 	/*14px via YUI Fonts CSS foundation*/
 	font-size:108%;  
 }
-h1,h2,h3 {
+h1,h2,h3, .section-head {
 	/* top & bottom margin based on font size */
 	margin:1em 0;
 }
-h1,h2,h3,h4,h5,h6,strong {
+h1,h2,h3,h4,h5,h6,strong, .section-head {
 	/*bringing boldness back to headers and the strong element*/
 	font-weight:bold; 
 }
@@ -118,7 +118,7 @@ h1 .small {
 #menu {
   margin: -10px 0px 0px 0px;
   background: #000;
-  text-align: center;
+  text-align: left;
   border: 0px;
   border-bottom: 3px solid #666;
 }
@@ -131,7 +131,7 @@ h1 .small {
 #menu ul li {
   display: inline;
   color: #999;
-  font-size: 90%;
+  font-size: 80%;
 }
 
 #menu ul li a {
@@ -159,7 +159,7 @@ h1 .small {
   padding: 10px 20px;
 }
 
-#inner-container #documentation p {
+#inner-container #documentation {
   font-size: 85%;
   line-height: 130%;
 }
@@ -195,6 +195,16 @@ h1 .small {
   margin: 10px 0px 10px 20px;
   border: 1px solid #ccc;
   border-left: 5px solid #aaa;
+}
+
+#attributes .permission {
+  font-family: monospace;
+  font-size: 90%;
+  margin-right: 10px;
+}
+
+#attributes .highlight {
+  font-weight: bold;
 }
 
 #inner-container #notes div.note {

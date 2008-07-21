@@ -25,6 +25,10 @@ class CodeComment < ActiveRecord::Base
   
   is_indexed :fields => [:body]
   
+  def to_s
+    self.body
+  end
+  
   # For the sake of STI
   def owner_type=(sType)
     super(sType.to_s.constantize.base_class.to_s)

@@ -1,63 +1,68 @@
 pre {
-  font-size: 80%;
+  font-size: 95%;
   line-height: 130%;
 }
 
-.normal {
+tt {
+  color: #C71585;
+  font-weight: bold;
 }
-span.comment {
+
+pre .normal {
+ }
+pre span.comment {
 color:#000055;
 font-style:italic;
 }
-.keyword {
+pre .keyword {
 color:#C71585;
 font-weight:bold;
 }
-.method {
+pre .method {
 color:#007777;
 }
-.class {
+pre .class {
 color:#007744;
 }
-.module {
+pre .module {
 color:#005500;
 }
-.punct {
+pre .punct {
 color:#444477;
 font-weight:bold;
 }
-.symbol {
+pre .symbol {
 color:#009999;
 }
-.string {
+pre .string {
 background:#FFFFEE none repeat scroll 0%;
 color:#6600CC;
 }
-.char {
-color:#FF0077;
+pre .char {
+ color:#FF0077;
 }
-.ident {
-color:#000044;
+pre .ident {
+ color:#000044;
+ }
+pre .constant {
+ color:#0077FF;
 }
-.constant {
-color:#0077FF;
-}
-.regex {
-background:#FFEEFF none repeat scroll 0%;
-color:#BB6666;
-}
-.number {
-color:#FF9999;
-}
-.attribute {
-color:#77BBBB;
-}
-.global {
-color:#77FFBB;
-}
-.expr {
-color:#222277;
-}
-.escape {
-color:#227777;
-}
+pre .regex {
+ background:#FFEEFF none repeat scroll 0%;
+ color:#BB6666;
+ }
+pre .number {
+ color:#FF9999;
+ }
+pre .attribute {
+ color:#77BBBB;
+ }
+pre .global {
+ color:#77FFBB;
+ }
+pre .expr {
+ color:#222277;
+ }
+pre .escape {
+ color:#227777;
+ }

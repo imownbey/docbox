@@ -2,6 +2,8 @@ require 'mixins'
 class CodeContainer < ActiveRecord::Base
   include TokenParams
   has_many :code_objects
+  has_many :code_constants
+  has_many :code_attributes
   has_many :code_methods
   has_many :code_containers
   belongs_to :code_container

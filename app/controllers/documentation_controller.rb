@@ -23,6 +23,9 @@ class DocumentationController < ApplicationController
         @methods[:class][:all] = @methods[:all] - @methods[:instance][:all]
         @methods[:class] = seperate_methods(@methods[:class][:all].dup)
       end
+      
+      @constants = @requested_object.code_constants
+      @attributes = @requested_object.code_attributes
     else
       # 404
     end

@@ -9,41 +9,41 @@
     -%>
     <%= final %>
   </h1>
-  <p><%= @requested_object.full_name %> <%= "&lt; #{@requested_object.superclass}" if @requested_object.superclass%></p>
+  <p><%= @requested_object.full_name %></p>
 </div>
 
 <div id="documentation">
   <%= rdoc_html_parse(@requested_object.code_comment.try(:body)) %>
+
+<% unless @constants.empty? %>
+<div class="section-head">Constants</div>
+<div id="constants">
+  <ul>
+    <% @constants.each do |constant| -%>
+    <li>
+      <%= constant.name %> = <%= constant.value %>
+    </li>
+    <% end -%>
+  </ul>
 </div>
+<% end %>
 
-<div id="editing">
-  o hai
+<% unless @attributes.empty? %>
+<div class="section-head">Attributes</div>
+<div id="attributes">
+  <ul>
+    <% @attributes.each do |attribute| %>
+    <li><span class="permission"><%= attribute.read_write %></span> <span class="highlight"><%= attribute.name %></span> <%= attribute.code_comment %></li>
+    <% end %>
+  </ul>
 </div>
+<% end %>
 
-<div id="notes">
-  <h1>Notes</h1>
-  <div class="note">
-	  <p style="padding: 5px; margin: 0px;">
-      hello this is great.
-	  </p>
-	  <p style="padding: 5px; margin: 0px;">
-      hello this is great.
-	  </p>
-	  <p style="margin: 0px; padding: 3px; font-size: 8pt; color: #333; background: #aaa;">
-	    by pamp on 11/07/08 @ 3:23p.m.
-	  </p>
-  </div>
-  <div class="note">
-	  <p style="padding: 5px; margin: 0px;">
-      hello this is great.
-	  </p>
-	  <p style="padding: 5px; margin: 0px;">
-      hello this is great.
-	  </p>
-	  <p style="margin: 0px; padding: 3px; font-size: 8pt; color: #333; background: #aaa;">
-	    by pamp on 11/07/08 @ 3:23p.m.
-	  </p>
-  </div>
-  <h2>Leave a comment</h2>
-
+<% @methods[:class].each do |methods_hash| %>
+<%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Class Methods"}) unless methods_hash.first == :all %>
+<% end %>
+ 
+<% @methods[:instance].each do |methods_hash| %>
+<%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Instance Methods"}) unless methods_hash.first == :all%>
+<% end %>
 </div>
