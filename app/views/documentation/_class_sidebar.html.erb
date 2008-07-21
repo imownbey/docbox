@@ -4,11 +4,11 @@
 	  <dl class="listing">
 	    <dt>class (<%= methods[:class][:all].length %>)</dt>
 	      <% methods[:class][:all].each do |meth| %>
-	      <dd><%= link_to meth.name, "#meth-#{meth.name.to_url}" %></dd>
+	      <dd><%= link_to meth.name, "#meth-#{meth.name.to_url}", :class => 'method-link' %></dd>
 	      <% end %>
       <dt>instance (<%= methods[:instance][:all].length %>)</dt>
 	      <% methods[:instance][:all].each do |meth| %>
-	      <dd><%= link_to meth.name, "#meth-#{meth.name.to_url}" %></dd>
+	      <dd><%= link_to meth.name, "#meth-#{meth.name.to_url}", :class => 'method-link' %></dd>
 	      <% end %>
 	  </dl>
 	  <br />

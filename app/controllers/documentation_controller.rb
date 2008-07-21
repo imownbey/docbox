@@ -14,7 +14,7 @@ class DocumentationController < ApplicationController
       if @requested_object.is_a?(CodeMethod)
         render :template => 'documentation/show_method'
       else
-        @methods[:all] = @requested_object.code_methods.with_comments.ordered
+        @methods[:all] = @requested_object.code_methods.with_comments.with_container.ordered
         @methods[:instance] = {}
         @methods[:instance][:all] = @methods[:all].select{ |m| m.singleton? }
         @methods[:instance] = seperate_methods(@methods[:instance][:all].dup)

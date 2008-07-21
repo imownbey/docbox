@@ -16,6 +16,8 @@ require 'lib/core_ext'
 require 'rdoc/markup/simple_markup'
 require 'rdoc/markup/simple_markup/to_html'
 
+require 'lib/markup'
+
 Rails::Initializer.run do |config|
   config.gem 'syntax'
   config.gem 'syntaxi'

@@ -14,6 +14,12 @@ body, html {
   font-size: 12pt;
   font-family: arial,helvetica,clean,sans-serif;
 }
+
+a {
+  color: #454946;
+  text-decoration: none;
+}
+
 #container {
   margin: 0 20px;
   padding: 0px;
@@ -220,6 +226,23 @@ h1 .small {
   color: #999;
 }
 
+#methods ul li {
+  list-style: none;
+  margin-bottom: 25px;
+}
+
+#methods ul li .method-name {
+  border-top: 1px solid #666;
+  padding-top: 2px;
+  padding-bottom: 8px;
+  margin-left: -5px;
+}
+
+#methods .method .meta {
+  text-align: right;
+  font-size: 80%;
+}
+
 #sidebar {
   position: absolute;
   right: 0;
@@ -251,6 +274,15 @@ h1 .small {
   margin: 8px;
   font-size: 110%;
   margin-left: 10px;
+}
+
+#sidebar a.method-link:hover {
+  background-image: url('/images/arrow.gif');
+  background-position: center left;
+  background-repeat: no-repeat;
+  margin-left: -10px;
+  padding-left: 10px;
+  
 }
 
 #sidebar h2 {

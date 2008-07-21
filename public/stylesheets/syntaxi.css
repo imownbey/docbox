@@ -1,11 +1,11 @@
 pre {
   font-size: 95%;
   line-height: 130%;
+  font-family: monospace;
 }
 
 tt {
-  color: #C71585;
-  font-weight: bold;
+  font-family: monospace;
 }
 
 pre .normal {

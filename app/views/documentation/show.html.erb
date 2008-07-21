@@ -39,6 +39,7 @@
 </div>
 <% end %>
 
+<div id="methods">
 <% @methods[:class].each do |methods_hash| %>
 <%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Class Methods"}) unless methods_hash.first == :all %>
 <% end %>
@@ -46,4 +47,5 @@
 <% @methods[:instance].each do |methods_hash| %>
 <%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Instance Methods"}) unless methods_hash.first == :all%>
 <% end %>
+</div>
 </div>

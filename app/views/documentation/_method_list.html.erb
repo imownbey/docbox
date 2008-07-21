@@ -3,11 +3,11 @@
 <ul class="methods">
 <% collection.each do |method| %>
   <li class="method">
-    <h4 id="meth-<%= method.name.to_url%>"><%= link_to method.name, doc_path(method.path) %> <span class="params"><%= method.parameters%></span></h4>
+    <h4 class="method-name" id="meth-<%= method.name.to_url%>"><%= link_to method.name, doc_path(method.path) %> <span class="params"><%= method.parameters%></span></h4>
     <% if method.code_comment -%>
       <div class="comment">
         <%= rdoc_html_parse(method.code_comment.body) %>
-        <div class="sub">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %> <%= link_to "edit", edit_comment_path(method.code_comment.id)%>
+        <div class="meta">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at %> <%= link_to "edit", edit_comment_path(method.code_comment.id)%>
         </div>
       </div>
     <% else -%>
