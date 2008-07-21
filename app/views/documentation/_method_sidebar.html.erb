@@ -1,0 +1,11 @@
+<div class="information">
+  <dl class="listing">
+    <dt>In File</dt>
+      <dd><%= in_file.full_name %></dt>
+    <dt>Versions</dt>
+      <dd>v<%= method.code_comment.version %> by <%= method.code_comment.user.try(:name) || 'Anon' %></dd>
+      <% versions.each do |v| %>
+      <dd>v<%= v.version %> by <%= v.user.try(:name) || 'Anon' %></dd>
+      <% end %>
+  </dl>
+</div>

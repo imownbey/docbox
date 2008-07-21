@@ -9,6 +9,10 @@ class CodeContainer < ActiveRecord::Base
   belongs_to :code_container
   has_one :code_comment, :as => :owner, :dependent => :destroy
   has_one :code_file
+  
+  has_many :in_files
+  has_many :code_files, :through => :in_files
+  
   named_scope :not_file, :conditions => ["type != 'CodeFile'"]
   
   is_indexed :fields => [:name, :full_name]

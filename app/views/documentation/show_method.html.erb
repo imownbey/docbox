@@ -1,4 +1,9 @@
-<h1><%= @requested_object.name %></h1>
-<div id="comments">
-  <%= @requested_object.code_comment.body %>
+<% content_for :sidebar, render(:partial => "method_sidebar", :locals => {:in_file => @in_file, :versions => @versions, :method => @requested_object})%>
+<div id="title">
+  <h1>
+    <span class="sub"><%= @requested_object.type %></span>
+    <%= @requested_object.name %><%= @requested_object.parameters%>
+  </h1>
+  <p><%= @requested_object.code_container.full_name %></p>
 </div>
+<%= render :partial => "show_method", :locals => {:method => @requested_object} %>

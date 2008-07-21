@@ -12,6 +12,8 @@ class DocumentationController < ApplicationController
       @methods = {}
       
       if @requested_object.is_a?(CodeMethod)
+        @in_file = @requested_object.code_file
+        @versions = @requested_object.code_comment.versions
         render :template => 'documentation/show_method'
       else
         @methods[:all] = @requested_object.code_methods.with_comments.with_container.ordered
@@ -22,10 +24,13 @@ class DocumentationController < ApplicationController
         @methods[:class] = {}
         @methods[:class][:all] = @methods[:all] - @methods[:instance][:all]
         @methods[:class] = seperate_methods(@methods[:class][:all].dup)
+        
+        if (@requested_object.is_a?(CodeClass) || @requested_object.is_a?(CodeModule))
+          @constants = @requested_object.code_constants
+          @attributes = @requested_object.code_attributes
+          @in_files = @requested_object.code_files.all
+        end
       end
-      
-      @constants = @requested_object.code_constants
-      @attributes = @requested_object.code_attributes
     else
       # 404
     end

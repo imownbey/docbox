@@ -12,14 +12,13 @@
 	      <% end %>
 	  </dl>
 	  <br />
-	  <h2>Related</h2>
+	  <h2>Information</h2>
 	  <dl class="listing">
-	    <dt>mixins (3)</dt>
-	      <dd>method_thing</dd>
-	      <dd>do_stuff</dd>
-      <dt>children (1)</dt>
-	      <dd>panda</dd>
-	      <dd>do_stuff</dd>
-	      <dd>other</dd>
+	    <dt>Superclass</dt>
+	      <dd><%= object.superclass || 'None'%></dd>
+	    <dt>In Files:</dt>
+	      <% @in_files.each do |file| %>
+	      <dd><%= file.full_name %></dd>
+	      <% end %>
 	  </dl>
 	</div>

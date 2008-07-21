@@ -1,0 +1,11 @@
+<% if method.code_comment -%>
+  <div class="comment">
+    <%= rdoc_html_parse(method.code_comment.body) %>
+    <div class="meta">Last updated by <%= method.code_comment.user.name rescue "Admin"%> at <%= method.code_comment.created_at.to_s(:short) %> <%= link_to "edit", edit_comment_path(method.code_comment.id)%>
+    </div>
+  </div>
+<% else -%>
+  <div class="comment">
+    No comment yet. <%= link_to "Add One!", new_comment_path(method.path)%>
+  </div>
+<% end -%>

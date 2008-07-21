@@ -16,7 +16,7 @@ body, html {
 }
 
 a {
-  color: #454946;
+  color: #2C468F;
   text-decoration: none;
 }
 
@@ -238,7 +238,7 @@ h1 .small {
   margin-left: -5px;
 }
 
-#methods .method .meta {
+.meta {
   text-align: right;
   font-size: 80%;
 }
@@ -251,6 +251,10 @@ h1 .small {
   background: #ddd;
   width: 20%;
   overflow: hidden;
+}
+
+#sidebar a {
+  color: #454946;
 }
 
 #sidebar .information .listing {
