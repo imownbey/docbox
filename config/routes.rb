@@ -2,6 +2,8 @@ ActionController::Routing::Routes.draw do |map|
   get = {:method => :get}
   put = {:method => :put}
   post = {:method => :post}
+  
+  map.index '/', :action => 'home', :controller => 'site'
 
   map.resources :users
 

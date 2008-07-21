@@ -25,4 +25,8 @@ class CodeMethod < ActiveRecord::Base
   def protected?
     self.visibility == 'protected'
   end
+  
+  def type
+    "method"
+  end
 end

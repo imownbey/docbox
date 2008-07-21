@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title><%= @title ||= Setting[:site_name] %></title>
+    <%= stylesheet_link_tag "reset", "base", "syntaxi" %>
+  </head>
+  <body>
+    <div id="container">
+    	<div id="header">
+
+    		<h1>
+    		  <%= Setting[:site_name]%>
+    		</h1>
+
+    	</div>
+      <div id="menu">
+        <ul>
+          <li class="active"><%= link_to "Home", index_path %></li>
+          <li><%= link_to "Documentation", doc_path %></li>
+          <li><%= link_to "Comments", "#" %></li>
+        </ul>
+      </div>
+      <div id="content">
+        <div id="main">
+
+      						<div id="inner-container">
+      						  <%= yield :layout %>
+      						</div>
+
+      					</div>
+        <div id="sidebar">
+          <%= yield :sidebar %>
+        </div>
+      </div>
+      <div id="secondary">
+        <%= link_to "Top", "#main"%>
+      </div>
+      	<div id="ft">
+      		home &middot; stuff &middot; yeah &middot; about<br />
+      		Content is owned by owner as indicated in code license.  Documentation powered by Docthing.
+      	</div>
+      </div>
+  </body>
+</html>

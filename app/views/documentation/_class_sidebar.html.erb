@@ -1,0 +1,27 @@
+
+	<div class="information">
+	  <h2>Methods</h2>
+	  <dl class="listing">
+	    <dt>class (<%= methods[:class][:all].length %>)</dt>
+	      <% methods[:class][:all].each do |meth| %>
+	      <dd><%= meth.name %></dd>
+	      <% end %>
+      <dt>instance (9)</dt>
+	      <dd>method_thing</dd>
+	      <dd>other</dd>
+	      <dd>panda</dd>
+	      <dd>do_stuff</dd>
+	      <dd>other</dd>
+	  </dl>
+	  <br />
+	  <h2>Related</h2>
+	  <dl class="listing">
+	    <dt>mixins (3)</dt>
+	      <dd>method_thing</dd>
+	      <dd>do_stuff</dd>
+      <dt>children (1)</dt>
+	      <dd>panda</dd>
+	      <dd>do_stuff</dd>
+	      <dd>other</dd>
+	  </dl>
+	</div>

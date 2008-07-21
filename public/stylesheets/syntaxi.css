@@ -1,0 +1,63 @@
+pre {
+  font-size: 80%;
+  line-height: 130%;
+}
+
+.normal {
+}
+span.comment {
+color:#000055;
+font-style:italic;
+}
+.keyword {
+color:#C71585;
+font-weight:bold;
+}
+.method {
+color:#007777;
+}
+.class {
+color:#007744;
+}
+.module {
+color:#005500;
+}
+.punct {
+color:#444477;
+font-weight:bold;
+}
+.symbol {
+color:#009999;
+}
+.string {
+background:#FFFFEE none repeat scroll 0%;
+color:#6600CC;
+}
+.char {
+color:#FF0077;
+}
+.ident {
+color:#000044;
+}
+.constant {
+color:#0077FF;
+}
+.regex {
+background:#FFEEFF none repeat scroll 0%;
+color:#BB6666;
+}
+.number {
+color:#FF9999;
+}
+.attribute {
+color:#77BBBB;
+}
+.global {
+color:#77FFBB;
+}
+.expr {
+color:#222277;
+}
+.escape {
+color:#227777;
+}

@@ -102,11 +102,11 @@ class CodeComment < ActiveRecord::Base
   # Strip a comment of anything except the meat
   def strip(comment)
     comment.split("\n").inject([]) do |new_comment, line|
-      if line =~ /(=begin.*|=end)/ || line =~ /^\s*#+\s*$/
+      if line =~ /(=begin.*|=end)/
         # This is fluff
         new_comment
       else
-        new_comment << line.gsub(/\s*#\s*/, '')
+        new_comment << line.gsub(/^\s*#\s*$/, " ").gsub(/^\s*#\s/, '')
       end
     end.join("\n")
   end

@@ -1,7 +1,49 @@
-<% @methods[:class].each do |methods_hash| %>
-<%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Class Methods"}) unless methods_hash.first == :all %>
-<% end %>
+<% content_for :sidebar, render(:partial => "class_sidebar", :locals => {:object => @requested_object, :methods => @methods})%>
 
-<% @methods[:instance].each do |methods_hash| %>
-<%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Instance Methods"}) unless methods_hash.first == :all%>
-<% end %>
+<div id="title">
+  <h1>
+    <span class="sub"><%= @requested_object.type %></span>
+    <% 
+      names = @requested_object.full_name.split("::") 
+      final = names.pop
+    -%>
+    <%= final %>
+  </h1>
+  <p><%= @requested_object.full_name %> <%= "&lt; #{@requested_object.superclass}" if @requested_object.superclass%></p>
+</div>
+
+<div id="documentation">
+  <%= rdoc_html_parse(@requested_object.code_comment.try(:body)) %>
+</div>
+
+<div id="editing">
+  o hai
+</div>
+
+<div id="notes">
+  <h1>Notes</h1>
+  <div class="note">
+	  <p style="padding: 5px; margin: 0px;">
+      hello this is great.
+	  </p>
+	  <p style="padding: 5px; margin: 0px;">
+      hello this is great.
+	  </p>
+	  <p style="margin: 0px; padding: 3px; font-size: 8pt; color: #333; background: #aaa;">
+	    by pamp on 11/07/08 @ 3:23p.m.
+	  </p>
+  </div>
+  <div class="note">
+	  <p style="padding: 5px; margin: 0px;">
+      hello this is great.
+	  </p>
+	  <p style="padding: 5px; margin: 0px;">
+      hello this is great.
+	  </p>
+	  <p style="margin: 0px; padding: 3px; font-size: 8pt; color: #333; background: #aaa;">
+	    by pamp on 11/07/08 @ 3:23p.m.
+	  </p>
+  </div>
+  <h2>Leave a comment</h2>
+
+</div>

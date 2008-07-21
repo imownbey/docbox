@@ -1,3 +1,5 @@
 site_name: Docbox Sample App
 auto_push: false
 wrap_number: 80
+
+git_html_url: http://github.com/rails/rails

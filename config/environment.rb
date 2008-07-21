@@ -17,6 +17,9 @@ require 'rdoc/markup/simple_markup'
 require 'rdoc/markup/simple_markup/to_html'
 
 Rails::Initializer.run do |config|
+  config.gem 'syntax'
+  config.gem 'syntaxi'
+  
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
