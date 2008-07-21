@@ -116,10 +116,7 @@ module Generators
       d = CodeFile.create :name => file.file_relative_name, :full_name => file.file_absolute_name
  
       @containers << d.id
-      # TODO: For some reason this is not being reset. WTF. But yet CodeFiles are being created.
-      @current_file = d
-      
- 
+   
   #   # Process all of the objects that this file contains
   #   file.method_list.each { |child| process_method(child, file) }
   #   file.aliases.each { |child| process_alias(child, file) }
@@ -134,22 +131,22 @@ module Generators
   #   file.each_classmodule do |child|
   #     process_type_or_module(child, file)
   #   end
-      
-      comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
-        @comments << comment.id if comment
-      @current_file = nil
+  #   
+  #   comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
+  #     @comments << comment.id if comment
+  #   @current_file = nil
     end
     
     def process_file(file)
-     # # Process all of the objects that this file contains
-     # file.method_list.each { |child| process_method(child, file) }
-     # file.aliases.each { |child| process_alias(child, file) }
-     # file.constants.each { |child| process_constant(child, file) }
-     # file.requires.each { |child| process_require(child, file) }
-     # file.includes.each { |child| process_include(child, file) }
-     # file.attributes.each { |child| process_attribute(child, file) }
-     # 
-     # # Recursively process contained subclasses and modules
+       # Process all of the objects that this file contains
+       file.method_list.each { |child| process_method(child, file) }
+       file.aliases.each { |child| process_alias(child, file) }
+       file.constants.each { |child| process_constant(child, file) }
+       file.requires.each { |child| process_require(child, file) }
+       file.includes.each { |child| process_include(child, file) }
+       file.attributes.each { |child| process_attribute(child, file) }
+       
+       # Recursively process contained subclasses and modules
       
       file.each_classmodule do |child|
         process_type_or_module(child, file)
@@ -255,7 +252,7 @@ module Generators
     def process_require(obj, parent)
       @first_comment ||= Digest::MD5.hexdigest(obj.comment) if obj.comment
       parent = CodeContainer.find_by_name(parent.name)
-      p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file), :code_container_id => parent.try(:id), :name => obj.name)
+      p = CodeRequire.create_or_update_by_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :code_container_id => parent.try(:id), :name => obj.name)
       comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
       @objects << p.id
       @comments << comment.id if comment

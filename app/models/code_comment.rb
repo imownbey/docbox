@@ -96,15 +96,7 @@ class CodeComment < ActiveRecord::Base
       end
     end
   end
-  
-  def file
-    container = self.owner
-    while !container.is_a? CodeFile
-      container = container.code_container
-    end
-    container
-  end
-  
+
   private
   
   # Strip a comment of anything except the meat
@@ -126,7 +118,7 @@ class CodeComment < ActiveRecord::Base
   # Takes two versions, and exports the second one.
   def export v1, v2
     Dir.chdir(RAILS_ROOT + "/code")
-    @file = File.new(self.file.name, 'r+')
+    @file = File.new(self.owner.code_file.full_name, 'r+')
     if v1.nil? && owner.is_a?(CodeFile)
       # v1 is nil and owner is a file, just throw it at start at file
       file_body = inject_at_file_start v2.body
@@ -160,7 +152,7 @@ class CodeComment < ActiveRecord::Base
     git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
     git.commit_all("Documentation update for #{owner.name}")
     unless other_commits_pending?
-      git.push('origin', 'docs')
+      git.push('origin', 'docs') if Setting[:auto_push]
     end
   end
   
@@ -317,7 +309,7 @@ class CodeComment < ActiveRecord::Base
   # Makes a comment a comment. Addes # or =begin=end
   def commentify string
     string.gsub!("\r\n", "\n")
-    string = string.wrap(60, 0, true, true)
+    string = string.wrap(Setting[:wrap_number], 0, true, true)
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
