@@ -1,0 +1,2 @@
+class CodeInclude < CodeObject
+end

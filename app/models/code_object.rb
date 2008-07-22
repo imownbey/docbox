@@ -9,25 +9,3 @@ class CodeObject < ActiveRecord::Base
     code_container
   end
 end
-
-class CodeAlias < CodeObject
-  def old_name
-    value
-  end
-  
-  def old_name= name
-    self.value = name
-  end
-end
-
-class CodeConstant < CodeObject
-end
-
-class CodeAttribute < CodeObject
-end
-
-class CodeRequire < CodeObject
-end
-
-class CodeInclude < CodeObject
-end

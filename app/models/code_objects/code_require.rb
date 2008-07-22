@@ -1,0 +1,2 @@
+class CodeRequire < CodeObject
+end

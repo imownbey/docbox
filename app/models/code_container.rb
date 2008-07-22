@@ -34,25 +34,3 @@ class CodeContainer < ActiveRecord::Base
     end
   end
 end
-
-class CodeClass < CodeContainer
-  def type
-    "class"
-  end
-end
-
-class CodeModule < CodeContainer
-  def type
-    "module"
-  end
-end
-
-class CodeFile < CodeContainer
-  has_many :code_containers
-  has_many :code_methods
-  has_many :code_objects
-  
-  def type
-    "file"
-  end
-end

@@ -1,0 +1,2 @@
+class CodeAttribute < CodeObject
+end
