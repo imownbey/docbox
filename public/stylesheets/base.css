@@ -243,6 +243,14 @@ h1 .small {
   font-size: 80%;
 }
 
+.form textarea {
+  width: 75%
+}
+
+.form input[type="submit"] {
+  height: 35px;
+}
+
 #sidebar {
   position: absolute;
   right: 0;

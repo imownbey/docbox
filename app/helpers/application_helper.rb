@@ -2,14 +2,18 @@
 module ApplicationHelper
   def rdoc_html_parse(bare)
     unless bare.nil?
-      Syntaxi::line_number_method = 'none'
       p = SM::SimpleMarkup.new
       h = SM::ToHtml.new
       
       p.convert(bare, h).gsub(/(<pre>(.*?)<\/pre>)/m) do |code|
-        Syntaxi.new("[code lang=\"ruby\"]\n" + unescape_and_strip($2) + "\n[/code]").process
+        highlight(unescape_and_strip($2))
       end
     end
+  end
+  
+  def highlight(code)
+    Syntaxi::line_number_method = 'none'
+    Syntaxi.new("[code lang=\"ruby\"]\n" + code + "\n[/code]").process
   end
   
   private
