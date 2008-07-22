@@ -174,7 +174,7 @@ module Generators
             when :classes
               CodeClass.create_or_update_by_full_name_and_code_container_id(:code_file_id => CodeFile.find_by_full_name(obj.file).try(:id), :code_container_id => parent.id, :name => obj.name, :full_name => obj.full_name, :superclass => obj.superclass, :line_code => obj.line)
             end
-        comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class unless obj.comment.blank?
+        comment = CodeComment.create_or_update_by_owner_id_and_owner_type :exported_body => obj.comment, :owner_id => p.id, :owner_type => p.class, :code_file_id => CodeFile.find_by_full_name(obj.file).try(:id) unless obj.comment.blank?
         @containers << p.id
         @comments << comment.id if comment
         @current_container = p

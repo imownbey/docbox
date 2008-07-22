@@ -10,7 +10,7 @@ class String
     lines = self.split(/\n/)
 
     lines.collect! do |line|
-      if line =~ /^(.*).$/
+      if line =~ /^(.*)\.$/
         if line =~ /^\s+/ && skip_tabs
           line
         else

@@ -13,8 +13,7 @@
 </div>
 
 <div id="documentation">
-  <%= rdoc_html_parse(@requested_object.code_comment.try(:body)) %>
-
+  <%= render :partial => 'show_comment', :locals => {:object => @requested_object}%>
 <% unless @constants.empty? %>
 <div class="section-head">Constants</div>
 <div id="constants">

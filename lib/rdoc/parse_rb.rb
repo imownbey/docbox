@@ -412,11 +412,14 @@ module RDoc
       	end
 
         cls = container.add_class(cls_type, name, superclass)
-        cls.file, cls.line =  @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
+       
         read_documentation_modifiers(cls, CLASS_MODIFIERS)
         cls.record_location(@top_level)
 	parse_statements(cls)
         cls.comment = comment
+        unless comment.empty?
+           cls.file, cls.line =  @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
+        end
 
       when TkLSHFT
     	  case name = get_class_specification
@@ -446,11 +449,13 @@ module RDoc
 #      skip_tkspace
       name = name_t.name
       mod = container.add_module(NormalModule, name)
-      mod.file, mod.line = @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
       mod.record_location(@top_level)
       read_documentation_modifiers(mod, CLASS_MODIFIERS)
       parse_statements(mod)
       mod.comment = comment
+      unless comment.empty?
+        mod.file, mod.line = @top_level.file_absolute_name, @scanner.reader.content.split("\n")[tk.line_no - 1]
+      end
     end
 
     # Look for the name of a class of module (optionally with a leading :: or

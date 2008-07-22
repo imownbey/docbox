@@ -122,6 +122,7 @@ class CodeComment < ActiveRecord::Base
   # Takes two versions, and exports the second one.
   def export v1, v2
     Dir.chdir(RAILS_ROOT + "/code")
+    p self.owner.code_file.full_name
     @file = File.new(self.owner.code_file.full_name, 'r+')
     if v1.nil? && owner.is_a?(CodeFile)
       # v1 is nil and owner is a file, just throw it at start at file

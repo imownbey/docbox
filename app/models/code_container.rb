@@ -8,7 +8,7 @@ class CodeContainer < ActiveRecord::Base
   has_many :code_containers
   belongs_to :code_container
   has_one :code_comment, :as => :owner, :dependent => :destroy
-  has_one :code_file
+  belongs_to :code_file
   
   has_many :in_files
   has_many :code_files, :through => :in_files

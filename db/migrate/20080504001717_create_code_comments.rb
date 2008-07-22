@@ -2,7 +2,7 @@ class CreateCodeComments < ActiveRecord::Migration
   def self.up
     create_table :code_comments do |t|
       t.text :body, :raw_body
-      t.integer :owner_id, :user_id
+      t.integer :owner_id, :user_id, :code_file_id
       t.string :owner_type
       t.boolean :exported, :uses_begin, :default => false
       t.boolean :skip, :default => false
