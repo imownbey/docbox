@@ -27,6 +27,14 @@ module RDoc
         gen.generate(file_info)
       end
     end
+    
+    def set_main_comment(name)
+      object = CodeContainer.find_by_full_name(name)
+      if object
+        object.main_comment = true
+        object.save
+      end
+    end
   end
 end
 
@@ -44,7 +52,8 @@ end
 module Generators
   # This generator takes the output of the rdoc parser
   # and turns it into a bunch of INSERT sql statements for a database
-  class Importer  
+  class Importer
+    
     def initialize(options) #:not-new:
       @options = options
       @previous_comments = CodeComment.all.collect(&:id)
@@ -132,8 +141,8 @@ module Generators
   #     process_type_or_module(child, file)
   #   end
   #   
-  #   comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
-  #     @comments << comment.id if comment
+     comment = CodeComment.create_or_update_by_owner_id_and_owner_type_and_owner_type :exported_body => file.comment, :owner_id => d.id, :owner_type => d.class unless file.comment.blank? || Digest::MD5.hexdigest(file.comment) == @first_comment
+       @comments << comment.id if comment
   #   @current_file = nil
     end
     

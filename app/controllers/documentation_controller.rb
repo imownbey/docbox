@@ -1,6 +1,9 @@
 class DocumentationController < ApplicationController
   def index
     @classes = CodeContainer.not_file.find(:all)
+    @files = CodeFile.find(:all)
+    
+    @main_object = CodeContainer.main_comment.first
   end
   
   def show

@@ -6,4 +6,8 @@ class CodeFile < CodeContainer
   def type
     "file"
   end
+  
+  def code_file
+    self
+  end
 end

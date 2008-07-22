@@ -21,20 +21,19 @@
       </div>
       <div id="content">
         <div id="main">
-
-      						<div id="inner-container">
-      						  <%= yield :layout %>
-      						</div>
-
-      					</div>
+  				<div id="inner-container">
+  					<%= yield :layout %>
+  				</div>
+  			</div>
         <div id="sidebar">
+          <h2>Search</h2>
+            <% form_tag :controller => "search", :action => "results" do %>
+              <%= text_field_tag :q %>
+            <% end %>
           <%= yield :sidebar %>
         </div>
       </div>
-      <div id="secondary">
-        <%= link_to "Top", "#main"%>
-      </div>
-      	<div id="ft">
+      	<div id="foot">
       		home &middot; stuff &middot; yeah &middot; about<br />
       		Content is owned by owner as indicated in code license.  Documentation powered by Docthing.
       	</div>

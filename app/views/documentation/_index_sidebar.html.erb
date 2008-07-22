@@ -1,0 +1,9 @@
+
+<div class="information">
+  <h2>Classes</h2>
+  <dl class="listing classes">
+    <% classes.each do |klass| %>
+    <dd><%= link_to klass.name, doc_path(klass.path)%></dd>
+    <% end %>
+  </dl>
+</div>

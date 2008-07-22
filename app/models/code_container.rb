@@ -14,6 +14,7 @@ class CodeContainer < ActiveRecord::Base
   has_many :code_files, :through => :in_files
   
   named_scope :not_file, :conditions => ["type != 'CodeFile'"]
+  named_scope :main_comment, :conditions => {:main_comment => true}
   
   is_indexed :fields => [:name, :full_name]
   

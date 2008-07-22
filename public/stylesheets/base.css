@@ -154,7 +154,9 @@ h1 .small {
 
 #main {
   background: white;
-  width: 80%;
+  position: absolute;
+  left: 0;
+  right: 225px;
 }
 
 #content {
@@ -255,10 +257,11 @@ h1 .small {
   position: absolute;
   right: 0;
   top: 0;
-  bottom: 0;
   background: #ddd;
   width: 20%;
   overflow: hidden;
+  padding-left: 15px;
+  font-size: 70%;
 }
 
 #sidebar a {
@@ -267,11 +270,6 @@ h1 .small {
 
 #sidebar .information .listing {
   margin: 0px;
-}
-
-#sidebar .information {
-  margin-left: 15px;
-  font-size: 70%;
 }
 
 #sidebar dt {
@@ -284,8 +282,9 @@ h1 .small {
 #sidebar dd {
   color: #666;
   margin: 8px;
+  margin-top: 6px;
   font-size: 110%;
-  margin-left: 10px;
+  margin-left: 4px;
 }
 
 #sidebar a.method-link:hover {
@@ -301,7 +300,10 @@ h1 .small {
   color: #666;
   font-weight: normal;
   text-transform: uppercase;
+  font-size: 100%;
   border: 0px;
+  padding-bottom: 3px;
+  margin-bottom: 7px;
   border-bottom: 1px solid #aaa;
 }
 
@@ -311,9 +313,10 @@ h1 .small {
   padding-left: 18px;
 }
 
-#ft {
+#foot {
   color: #888;
-  text-align: center;
+  text-align: left;
   padding: 10px;
+  margin-left: 12px;
   font-size: 8pt;
 }

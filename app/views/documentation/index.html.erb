@@ -1,3 +1,5 @@
-<% @classes.each do |klass| %>
-  <%= link_to klass.name, doc_path(klass.path) %>
-<% end %>
+<% content_for :sidebar, render(:partial => "index_sidebar", :locals => {:files => @files, :classes => @classes})%>
+
+<div id="documentation">
+  <%= render :partial => 'show_comment', :locals => {:object => @main_object}%>
+</div>

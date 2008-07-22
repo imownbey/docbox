@@ -122,30 +122,34 @@ class CodeComment < ActiveRecord::Base
   # Takes two versions, and exports the second one.
   def export v1, v2
     Dir.chdir(RAILS_ROOT + "/code")
-    p self.owner.code_file.full_name
     @file = File.new(self.owner.code_file.full_name, 'r+')
-    if v1.nil? && owner.is_a?(CodeFile)
-      # v1 is nil and owner is a file, just throw it at start at file
-      file_body = inject_at_file_start v2.body
-    else
-      body = v1.try(:body)
-      pre_regexp = build_regexp(body)
-      # If the parent is a class we must make sure its in proper context
-      if owner.true_container.is_a? CodeClass
-        start, context, ending = get_context
+    if self.owner.code_file.full_name[-3..-1] == '.rb'
+      if v1.nil? && owner.is_a?(CodeFile)
+        # v1 is nil and owner is a file, just throw it at start at file
+        file_body = inject_at_file_start v2.body
       else
-        if owner.is_a? CodeFile
-          start = ''
-          context, ending = get_file_start
+        body = v1.try(:body)
+        pre_regexp = build_regexp(body)
+        # If the parent is a class we must make sure its in proper context
+        if owner.true_container.is_a? CodeClass
+          start, context, ending = get_context
         else
-          start = ''
-          ending = ''
-          context = @file.read
+          if owner.is_a? CodeFile
+            start = ''
+            context, ending = get_file_start
+          else
+            start = ''
+            ending = ''
+            context = @file.read
+          end
         end
+        replace_string = build_string(v2.body, (true if v1.nil?))
+        context = context.sub(pre_regexp, replace_string)
+        file_body = start + context + ending
       end
-      replace_string = build_string(v2.body, (true if v1.nil?))
-      context = context.sub(pre_regexp, replace_string)
-      file_body = start + context + ending
+    else
+      # This is not a .rb file. Assume its a readme and jsut throw that shit in
+      file_body = v2.body
     end
     @file.rewind
     @file.puts(file_body)
@@ -248,12 +252,11 @@ class CodeComment < ActiveRecord::Base
           context += line # Add the last line (def ...) for sanitys sake
           next
         end
-      when owner.true_container.line_code # This defines the class
+      when owner.true_container.line_code + "\n" # This defines the class
         buffer += line
         in_context = true
         next
       end
-      
       if in_context
         context += line
       elsif in_future
@@ -284,9 +287,9 @@ class CodeComment < ActiveRecord::Base
         else
           # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
           if n && !uses_begin?
-            start = "([ \\t]*)"
+            start = "([\\s\\t]*)"
           else
-            start = "[ \\t]*"
+            start = "[\\s\\t]*"
           end
           n = false
           start + line

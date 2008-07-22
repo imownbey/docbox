@@ -7,9 +7,12 @@ class CreateCodeContainers < ActiveRecord::Migration
       t.string :full_name
       t.string :superclass
       t.string :line_code
+      t.boolean :main_comment
       
       t.datetime :created_at
     end
+    
+    add_index :code_containers, :main_comment
   end
 
   def self.down
