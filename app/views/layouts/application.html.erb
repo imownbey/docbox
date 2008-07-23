@@ -2,6 +2,7 @@
   <head>
     <title><%= @title ||= Setting[:site_name] %></title>
     <%= stylesheet_link_tag "reset", "base", "syntaxi" %>
+    <%= javascript_include_tag 'jquery', 'application'%>
   </head>
   <body>
     <div id="container">
@@ -27,10 +28,13 @@
   			</div>
         <div id="sidebar">
           <h2>Search</h2>
-            <% form_tag :controller => "search", :action => "results" do %>
-              <%= text_field_tag :q %>
+            <% form_tag ({:controller => "search", :action => "results"}, :class => 'search') do %>
+              <%= text_field_tag :q, nil, :id => "search", :autocomplete => "off" %>
+              <%= link_to (image_tag 'cross.png'), "#", :class => "clear-button"%>
             <% end %>
-          <%= yield :sidebar %>
+          <div id="sidebar-content">
+            <%= yield :sidebar %>
+          </div>
         </div>
       </div>
       	<div id="foot">

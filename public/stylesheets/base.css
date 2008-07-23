@@ -228,16 +228,19 @@ h1 .small {
   color: #999;
 }
 
-#methods ul li {
+#methods ul li.method {
   list-style: none;
   margin-bottom: 25px;
 }
 
 #methods ul li .method-name {
-  border-top: 1px solid #666;
   padding-top: 2px;
   padding-bottom: 8px;
   margin-left: -5px;
+}
+
+.method {
+  border-bottom: 1px solid #666;
 }
 
 .meta {
@@ -258,7 +261,7 @@ h1 .small {
   right: 0;
   top: 0;
   background: #ddd;
-  width: 20%;
+  width: 210px;
   overflow: hidden;
   padding-left: 15px;
   font-size: 70%;
@@ -285,6 +288,22 @@ h1 .small {
   margin-top: 6px;
   font-size: 110%;
   margin-left: 4px;
+}
+
+#sidebar .search input[type="text"] {
+  background-image: url('/images/search.png');
+  background-position: 98% center;
+  background-repeat: no-repeat;
+  border: 1px solid #aaa;
+  padding: 4px;
+  width: 85%;
+}
+
+#sidebar .search .clear-button {
+  position: absolute;
+  top: 37px;
+  right: 13px;
+  display: none;
 }
 
 #sidebar a.method-link:hover {
