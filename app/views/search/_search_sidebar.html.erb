@@ -6,10 +6,10 @@
     <dd>None</dd>
     <% end %>
     <% results.each do |result| %>
-      <% if result.owner.is_a? CodeMethod %>
-      <dd><span class="sub">Meth</span> <%= link_to result.owner.name, doc_path(result.owner.path) %>
+      <% if result.is_a? CodeComment %>
+      <dd><span class="sub"><%= result.owner.type %></span> <%= link_to result.owner.full_name, doc_path(result.owner.path) %>
       <% else %>
-      <dd><span class="sub"><%= result.owner.type %></span> <%= link_to result.owner.full_name, doc_path(result.owner.path) %></dd>
+      <dd><span class="sub"><%= result.type %></span> <%= link_to (result.try(:full_name) || result.name), doc_path(result.path) %></dd>
       <% end %>
     <% end %>
   </dl>
