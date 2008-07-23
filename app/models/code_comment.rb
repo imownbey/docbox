@@ -161,7 +161,7 @@ class CodeComment < ActiveRecord::Base
     git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
     git.commit_all("Documentation update for #{owner.name}")
     unless other_commits_pending?
-      git.push('origin', 'docs') if Setting[:auto_push]
+      git.push('origin', 'docs') if Setting[:auto_push] 
     end
   end
   
@@ -275,7 +275,7 @@ class CodeComment < ActiveRecord::Base
   #   \3 = Def syntax
   def build_regexp v1 = nil
     if v1.nil? && raw_body.nil?
-      regexp = "(([ \\t]*))(#{next_line_str}[^\\n]*)"
+      regexp = "^(([ \\t]*))(#{next_line_str}[^\\n]*)$"
     else
       comment = raw_body || commentify(v1)
       comment.gsub!(/([\[\]\(\)\?\.\*\+\|\\])/, '\\\\\1') # Escapes regex special chars
@@ -287,42 +287,48 @@ class CodeComment < ActiveRecord::Base
         else
           # If it uses begin, dont capture whitespace since it does not matter, we just tab it in
           if n && !uses_begin?
-            start = "([\\s\\t]*)"
+            start = "^([ \\t]*)"
           else
-            start = "[\\s\\t]*"
+            start = "^[ \\t]*"
           end
           n = false
           start + line
         end
       }.join("\n")
-      regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)" unless self.owner.is_a? CodeFile
+      regexp += "\n(\\s*)(#{next_line_str}[^\\n]*)$" unless self.owner.is_a? CodeFile
     end
     Regexp.new(regexp)
   end
   
   # Builds the replacement string based on a comment. Adds #'s and formats for regexp
   def build_string string, no_v1 = false
+    p "ORIG: #{string}"
     if uses_begin?
       string = commentify(string)
     else
       comment = commentify(string)
+      p "COMM: #{comment}"
       string = comment.split("\n").collect {|line|
         "\\1#{line}"
       }.join("\n")
     end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
+    p string
     string
   end
   
   # Makes a comment a comment. Addes # or =begin=end
   def commentify string
-    string.gsub!("\r\n", "\n")
+    string.gsub!("\r", "")
+    p "AFT REG: #{string}"
     string = string.wrap(Setting[:wrap_number], 0, true, true)
+    p "AFT RAP: #{string}"
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
     else
       string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
+      p "AFT COM: #{string}"
     end
     string
   end

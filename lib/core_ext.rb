@@ -39,6 +39,8 @@ class String
           end
           buffer[0..-2]
         end
+      else
+        line
       end
     end
 
