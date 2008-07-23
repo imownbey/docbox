@@ -15,9 +15,8 @@
     	</div>
       <div id="menu">
         <ul>
-          <li class="active"><%= link_to "Home", index_path %></li>
-          <li><%= link_to "Documentation", doc_path %></li>
-          <li><%= link_to "Comments", "#" %></li>
+          <li class="<%= "active" if controller.controller_name == "main"%>"><%= link_to "Home", index_path %></li>
+          <li class="<%= "active" if controller.controller_name == "documentation" || controller.controller_name == "comments"%>"><%= link_to "Documentation", doc_path %></li>
         </ul>
       </div>
       <div id="content">

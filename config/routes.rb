@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
   put = {:method => :put}
   post = {:method => :post}
   
-  map.index '/', :action => 'home', :controller => 'site'
+  map.index '/', :action => 'index', :controller => 'documentation'
 
   map.resources :users
 
