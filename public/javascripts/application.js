@@ -13,6 +13,7 @@ $(document).ready(function () {
         if ($("#search").val() == '') {
           reshowSidebar()
         } else {
+          $('#sidebar-content').html("<dt>Searching...</dt><dl></dl>")
           $('.clear-button').show()
           $('#sidebar-content').load('/search/results?q=' + $("#search").val())
         }

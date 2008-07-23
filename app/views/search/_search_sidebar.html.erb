@@ -7,7 +7,7 @@
     <% end %>
     <% results.each do |result| %>
       <% if result.owner.is_a? CodeMethod %>
-      <dd><span class="sub">Method</span> <%= link_to (result.owner.name + result.owner.parameters), doc_path(result.owner.path) %>
+      <dd><span class="sub">Meth</span> <%= link_to result.owner.name, doc_path(result.owner.path) %>
       <% else %>
       <dd><span class="sub"><%= result.owner.type %></span> <%= link_to result.owner.full_name, doc_path(result.owner.path) %></dd>
       <% end %>
