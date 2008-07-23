@@ -20,7 +20,9 @@ class CommentsController < ApplicationController
   
   def new
     @commentable = get_object(params[:tokens], false).last
-    @comment = CodeComment.new
+    @comment = CodeComment.new(:owner => @commentable, :version => 1)
+    @source = @comment.owner.try(:source_code)
+    render :action => "edit", :controller => "comments"
   end
   
   def create

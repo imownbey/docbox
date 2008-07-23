@@ -1,4 +1,5 @@
-<%= content_for :sidebar, render(:partial => "documentation/method_sidebar", :locals => {:method => @comment.owner, :in_file => @comment.owner.code_file, :versions => @comment.versions}) %>
+<%= content_for :sidebar, render(:partial => "documentation/method_sidebar", :locals => {:object => @comment.owner, :in_file => @comment.owner.code_file, :versions => @comment.versions}) %>
+<h2>Comment</h2>
 <div class="form">
 <% form_for @comment, :url => {:action => 'update'} do |f| -%>
   <p><%= f.text_area :body %></p>
@@ -6,6 +7,7 @@
 <% end %>
 </div>
 <% if @source %>
+<h3>Source Code</h3>
 <div class="source">
   <%= highlight(@source) %>
 </div>
