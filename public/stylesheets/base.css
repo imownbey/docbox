@@ -98,6 +98,11 @@ p,fieldset,table,pre {
 input[type=text],input[type=password],textarea{width:12.25em;*width:11.9em;}
 
 
+p {
+  font-size:15px;
+  line-height:1.75em;
+}
+
 h1 .sub {
   color: #ccc;
 }
