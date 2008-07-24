@@ -18,6 +18,8 @@ require 'rdoc/markup/simple_markup/to_html'
 
 require 'lib/markup'
 
+require 'MD5'
+
 Rails::Initializer.run do |config|
   config.gem 'syntax'
   config.gem 'syntaxi'

@@ -35,7 +35,7 @@
   			</div>
         <div id="sidebar">
           <h2>Search</h2>
-            <% form_tag {:controller => "search", :action => "results"}, :class => 'search' do %>
+            <% form_tag({:controller => "search", :action => "results"}, :class => 'search') do %>
               <%= text_field_tag :q, nil, :id => "search", :autocomplete => "off" %>
               <%= link_to (image_tag 'cross.png'), "#", :class => "clear-button"%>
             <% end %>
