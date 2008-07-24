@@ -16,9 +16,11 @@
 	  <dl class="listing">
 	    <dt>Superclass</dt>
 	      <dd><%= object.superclass || 'None'%></dd>
+	    <% unless @in_files.nil? %>
 	    <dt>In Files:</dt>
 	      <% @in_files.each do |file| %>
 	      <dd><%= file.full_name %></dd>
 	      <% end %>
+	    <% end %>
 	  </dl>
 	</div>

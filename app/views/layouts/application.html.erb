@@ -11,8 +11,16 @@
     		<h1>
     		  <%= Setting[:site_name]%>
     		</h1>
-
+        
+        <div id="user">
+      	  <% if logged_in? %>
+      	  Welcome <%= current_user.login %> <%= link_to 'log out', logout_path, :method => :delete%>
+      	  <% else %>
+      	  Welcome Anonymous, <%= link_to 'sign up', signup_path %>
+      	  <% end %>
+      	</div>
     	</div>
+
       <div id="menu">
         <ul>
           <li class="<%= "active" if controller.controller_name == "main"%>"><%= link_to "Home", index_path %></li>
