@@ -16,7 +16,7 @@ class DocumentationController < ApplicationController
       
       if @requested_object.is_a?(CodeMethod)
         @in_file = @requested_object.code_file
-        @versions = @requested_object.code_comment.versions
+        @versions = @requested_object.code_comment.try(:versions)
         render :template => 'documentation/show_method'
       else
         @methods[:all] = @requested_object.code_methods.with_comments.with_container.ordered

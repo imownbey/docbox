@@ -7,6 +7,12 @@ namespace :docbox do
 
     rdoc = RDoc::RDoc.new
     Dir.chdir("#{RAILS_ROOT}/code/")
+      files = Rake::FileList.new
+      files.include('doc/README_FOR_APP')
+      files.include('app/**/*.rb')
+      files.include('lib/**/*.rb')
+      rdoc.import!(files)
+      rdoc.set_main_comment('doc/README_FOR_APP')
    # @files = Rake::FileList.new
    #  @files.include('railties/CHANGELOG')
    #  @files.include('railties/MIT-LICENSE')
@@ -38,8 +44,8 @@ namespace :docbox do
    #  @files.include('activesupport/CHANGELOG')
    #  @files.include('activesupport/lib/active_support/**/*.rb')
    #  @files.exclude('activesupport/lib/active_support/vendor/*')
-    rdoc.import!(%W{README main.rb})
-    rdoc.set_main_comment('README')
+  #  rdoc.import!(%W{README main.rb})
+  #  rdoc.set_main_comment('README')
   end
 
   task :export => :environment do

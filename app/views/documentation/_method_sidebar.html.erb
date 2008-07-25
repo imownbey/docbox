@@ -3,13 +3,13 @@
     <dt>In File</dt>
       <dd><%= in_file.full_name %></dt>
     <dt>Versions</dt>
-      <% if object.code_comment %>
-      <dd>v<%= object.code_comment.version %> by <%= object.code_comment.user.try(:name) || 'Anon' %></dd>
+      <% if versions %>
+        <dd>v<%= object.code_comment.version %> by <%= object.code_comment.user.try(:name) || 'Anon' %></dd>
+        <% versions.each do |v| %>
+        <dd>v<%= v.version %> by <%= v.user.try(:name) || 'Anon' %></dd>
+        <% end %>
       <% else %>
-      <dd>none</dd>
-      <% end %>
-      <% versions.each do |v| %>
-      <dd>v<%= v.version %> by <%= v.user.try(:name) || 'Anon' %></dd>
+        <dd>None</dd>
       <% end %>
   </dl>
 </div>
