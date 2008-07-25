@@ -5,9 +5,9 @@ module ApplicationHelper
       p = SM::SimpleMarkup.new
       h = SM::ToHtml.new
       
-      p.convert(bare, h).gsub(/(<pre>(.*?)<\/pre>)/m) do |code|
+      auto_link(p.convert(bare, h).gsub(/(<pre>(.*?)<\/pre>)/m) do |code|
         highlight(unescape_and_strip($2))
-      end
+      end)
     end
   end
   
