@@ -1,7 +1,7 @@
 <% if object.code_comment -%>
   <div class="comment">
     <%= rdoc_html_parse(object.code_comment.body) %>
-    <div class="meta">Last updated by <%= object.code_comment.user.login rescue "Admin" %> at <%= object.code_comment.created_at.to_s(:short) %> <%= link_to "edit", edit_comment_path(object.code_comment.id)%>
+    <div class="meta">Last updated by <%= object.code_comment.user.login rescue "Anon" %> at <%= object.code_comment.created_at.to_s(:short) %> <%= link_to "edit", edit_comment_path(object.code_comment.id)%>
     </div>
   </div>
 <% else -%>
