@@ -159,8 +159,8 @@ class CodeComment < ActiveRecord::Base
     
     git = Git.open(RAILS_ROOT + '/code')
     git.branch('docs').checkout
-    git.config('user.name', v2.user.try(:name) || 'Ian Ownbey')
-    git.config('user.email', v2.user.try(:email) || 'imownbey@gmail.com')
+    git.config('user.name', v2.user.try(:name) || 'Docbox')
+    git.config('user.email', v2.user.try(:email) || 'docbox@docbox.org')
     git.commit_all("Documentation update for #{owner.name}")
     unless other_commits_pending?
       git.push('origin', 'docs') if Setting[:auto_push] 
