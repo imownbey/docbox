@@ -122,7 +122,7 @@ class CodeComment < ActiveRecord::Base
   # Takes two versions, and exports the second one.
   def export v1, v2
     Dir.chdir(RAILS_ROOT + "/code")
-    @file = File.new(self.owner.code_file.full_name, 'r+')
+    @file = File.new(self.owner.code_file.full_name, 'r')
     if self.owner.code_file.full_name[-3..-1] == '.rb'
       if v1.nil? && owner.is_a?(CodeFile)
         # v1 is nil and owner is a file, just throw it at start at file
@@ -131,12 +131,14 @@ class CodeComment < ActiveRecord::Base
         body = v1.try(:body)
         pre_regexp = build_regexp(body)
         # If the parent is a class we must make sure its in proper context
-        if owner.true_container.is_a? CodeClass
+        if (owner.true_container.is_a?(CodeClass)) || (owner.true_container.is_a?(CodeModule))
           start, context, ending = get_context
         else
           if owner.is_a? CodeFile
             start = ''
             context, ending = get_file_start
+          elsif owner.true_container.is_a? CodeFile
+            start, context, ending = get_file_context
           else
             start = ''
             ending = ''
@@ -151,7 +153,7 @@ class CodeComment < ActiveRecord::Base
       # This is not a .rb file. Assume its a readme and jsut throw that shit in
       file_body = v2.body
     end
-    @file.rewind
+    @file = File.new(self.owner.code_file.full_name, 'w')
     @file.puts(file_body)
     @file.close
     
@@ -196,6 +198,33 @@ class CodeComment < ActiveRecord::Base
     end
     pre + body + "\n\n" + future
   end
+  
+  # Alright this is a little nutty. This contexts until it hits a next_line,
+  # it then breaks up the context by end\n - and takes the last one as context.
+  def get_file_context
+    raise unless @file
+    context, future = '', ''
+    in_context = true
+    @file.each_line do |line|
+      if in_context
+        # Add to buffer
+        if line =~ Regexp.new(next_line_str)
+          context << line ## add to context, just for fun
+          in_context = false
+          next
+        else
+          context << line # Have not hit anything yet.
+        end
+      else
+        future << line
+      end
+    end
+    
+    context_peices = context.split("end")
+    context = context_peices.pop
+    [context_peices.join("end"), context, future]
+  end
+    
   
   # Used to get context if comments parent is a file. Thus context is the start of a file (before 
   # class or method declarations)
@@ -266,6 +295,7 @@ class CodeComment < ActiveRecord::Base
         buffer += line
       end
     end # file.each_line
+    p
     [buffer, context, future]
   end
   
@@ -302,33 +332,27 @@ class CodeComment < ActiveRecord::Base
   
   # Builds the replacement string based on a comment. Adds #'s and formats for regexp
   def build_string string, no_v1 = false
-    p "ORIG: #{string}"
     if uses_begin?
       string = commentify(string)
     else
       comment = commentify(string)
-      p "COMM: #{comment}"
       string = comment.split("\n").collect {|line|
         "\\1#{line}"
       }.join("\n")
     end
     string += "\n\\2\\3" unless self.owner.is_a? CodeFile
-    p string
     string
   end
   
   # Makes a comment a comment. Addes # or =begin=end
   def commentify string
     string.gsub!("\r", "")
-    p "AFT REG: #{string}"
     string = string.wrap(Setting[:wrap_number], 0, true, true)
-    p "AFT RAP: #{string}"
     if uses_begin?
       string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
     else
       string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
-      p "AFT COM: #{string}"
     end
     string
   end
