@@ -3,7 +3,7 @@
     <dt>In File</dt>
       <dd><%= in_file.full_name %></dt>
     <dt>Versions</dt>
-      <% if versions %>
+      <% if versions && object.code_comment %>
         <dd>v<%= object.code_comment.version %> by <%= object.code_comment.user.try(:name) || 'Anon' %></dd>
         <% versions.each do |v| %>
         <dd>v<%= v.version %> by <%= v.user.try(:name) || 'Anon' %></dd>
