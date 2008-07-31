@@ -15,9 +15,7 @@ class CodeContainer < ActiveRecord::Base
   
   named_scope :not_file, :conditions => ["type != 'CodeFile'"]
   named_scope :main_comment, :conditions => {:main_comment => true}
-  
-  is_indexed :fields => [:name, :full_name]
-  
+    
   def true_container
     if code_container.is_a? CodeFile
       return code_container

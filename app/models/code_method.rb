@@ -12,6 +12,10 @@ class CodeMethod < ActiveRecord::Base
   
   is_indexed :fields => [:name, :parameters]
   
+  def full_name
+    "#{self.name} #{self.parameters}"
+  end
+  
   def true_container
     code_container
   end
@@ -28,7 +32,7 @@ class CodeMethod < ActiveRecord::Base
     self.visibility == 'protected'
   end
   
-  def type
+  def class_type
     "method"
   end
 end

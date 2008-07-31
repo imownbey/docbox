@@ -6,11 +6,7 @@
     <dd>None</dd>
     <% end %>
     <% results.each do |result| %>
-      <% if result.is_a? CodeComment %>
-      <dd><span class="sub"><%= result.owner.type %></span> <%= link_to result.owner.full_name, doc_path(result.owner.path) %>
-      <% else %>
-      <dd><span class="sub"><%= result.type %></span> <%= link_to (result.try(:full_name) || result.name), doc_path(result.path) %></dd>
-      <% end %>
+      <dd><span class="sub"><%= result.class_type %></span> <%= link_to (result.try(:full_name) || result.name), doc_path(result.path) %></dd>
     <% end %>
   </dl>
 </div>

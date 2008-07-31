@@ -22,3 +22,13 @@ module TokenParams
     end
   end
 end
+
+#module Search
+#  def self.included(base)
+#    base.class_eval do
+#      is_indexed(:fields => [:name], 
+#                 :include => [{:association_name => 'code_comment', :field => 'body', :as => :comment}],
+#                 :conditions => "type = '#{base.tableize.singularize}'")
+#    end
+#  end
+#end

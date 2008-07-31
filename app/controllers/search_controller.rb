@@ -8,7 +8,7 @@ class SearchController < ApplicationController
   def results
     redirect_to :action => :index if params[:q].blank?
     
-    @search = Ultrasphinx::Search.new(:query => params[:q])
+    @search = Ultrasphinx::Search.new(:query => "#{params[:q]}*", :weights => {:name => 10, :full_name => 10}, :sort_mode => 'relevance')
     Ultrasphinx::Search.excerpting_options[:limit] = 60
     @search.excerpt
     respond_to do |format|

@@ -23,7 +23,9 @@ class CodeComment < ActiveRecord::Base
   before_update :create_version
   after_update :add_export_to_queue
   
-  is_indexed :fields => [:body]
+  def class_type
+    "comment"
+  end
   
   def to_s
     self.body

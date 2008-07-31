@@ -8,4 +8,8 @@ class CodeObject < ActiveRecord::Base
   def true_container
     code_container
   end
+  
+  def full_name
+    self.name
+  end
 end

@@ -3,7 +3,7 @@ class CodeFile < CodeContainer
   has_many :code_methods
   has_many :code_objects
   
-  def type
+  def class_type
     "file"
   end
   
