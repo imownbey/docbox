@@ -3,6 +3,11 @@ class CommentsController < ApplicationController
   def show
   end
   
+  def diff
+    version = @comment.v(params[:v])
+    
+  end
+  
   def edit
     @source = @comment.owner.try(:source_code)
   end
