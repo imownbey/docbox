@@ -2,6 +2,7 @@ ActionController::Routing::Routes.draw do |map|
   get = {:method => :get}
   put = {:method => :put}
   post = {:method => :post}
+  delete = {:method => :delete}
   
   map.index '/', :action => 'index', :controller => 'documentation'
 
@@ -13,6 +14,16 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users
 
   map.resource :session
+  
+  map.admin '/admin', :controller => "admin", :action => 'index'
+  
+  map.with_options :controller => "admin", :path_prefix => "admin", :name_prefix => "admin_" do |admin|
+    admin.with_options :path_prefix => "user" do |user|
+      user.edit_user ':id/edit', :conditions => get, :action => "edit_user"
+      user.delete_user ':id', :conditions => delete, :action => "delete_user"
+    end
+    admin.errors 'errors', :action => "errors", :conditions => get
+  end
   
   map.with_options :controller => 'documentation', :path_prefix => 'docs', :conditions => get do |docs|
     docs.file_doc 'file/*path', :action => 'show_file'
