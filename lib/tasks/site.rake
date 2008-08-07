@@ -7,12 +7,8 @@ namespace :docbox do
 
     rdoc = RDoc::RDoc.new
     Dir.chdir("#{RAILS_ROOT}/code/")
-      files = Rake::FileList.new
-      files.include('doc/README_FOR_APP')
-      files.include('app/**/*.rb')
-      files.include('lib/**/*.rb')
-      rdoc.import!(files)
-      rdoc.set_main_comment('doc/README_FOR_APP')
+      rdoc.import!(%w{ . README})
+      rdoc.set_main_comment('README')
    # @files = Rake::FileList.new
    #  @files.include('railties/CHANGELOG')
    #  @files.include('railties/MIT-LICENSE')
