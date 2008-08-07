@@ -99,16 +99,18 @@ class CodeComment < ActiveRecord::Base
       begin
         export(pre_version, version)
       rescue
-        Error.create({:pre_version => pre_version, 
+        Error.create({
+            :pre_version => pre_version, 
             :version => version,
             :type => $!.class,
             :message => $!.message
         })
-      self.without_versioning do
-        version.exported = true
-        self.raw_body = nil
-        version.save
-      end
+      else
+        self.without_versioning do
+          version.exported = true
+          self.raw_body = nil
+          version.save
+        end
       end
     end
   end

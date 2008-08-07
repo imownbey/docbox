@@ -1,10 +1,12 @@
 class CreateErrors < ActiveRecord::Migration
   def self.up
     create_table :errors do |t|
-      t.integer :pre_version_id
-      t.integer :version_id
+      t.string :name
+      t.string :pre_version_body
+      t.string :version_body
       t.string :type
       t.string :message
+      t.boolean :fixed, :default => false
 
       t.timestamps
     end

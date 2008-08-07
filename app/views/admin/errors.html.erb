@@ -1,0 +1,21 @@
+<h2>Errors</h2>
+<p>Any errors that occur during export are listed below. Click "fix" if you have fixed an error. This is usually due to the code changing in between exports. Make sure to run <code>rake docbox:import</code> after any time you update the code.</p>
+
+<ul class="errors">
+  <% @errors.each do |error| %>
+  <li>
+    <h3><%= error.name %></h3>
+    <p><%= error.message %></p>
+    <table>
+      <tr>
+        <th>Pre Version Body</th>
+        <th>Version Body</th>
+      </tr>
+      <tr>
+        <td><%= simple_format error.pre_version_body %></td>
+        <td><%= simple_format error.version_body %></td>
+      </tr>
+    </table>
+  </li>
+  <% end %>
+</ul>
