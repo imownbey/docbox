@@ -160,10 +160,11 @@ class CodeComment < ActiveRecord::Base
     @file.close
     
     git = Git.open(RAILS_ROOT + '/code')
-    git.branch('docs').checkout
+    git.branch(Setting[:git_branch]).checkout
     git.config('user.name', v2.user.try(:login) || 'Docbox')
     git.config('user.email', v2.user.try(:email) || 'docbox@docbox.org')
-    git.commit_all("Documentation update for #{owner.name}")
+    commit = git.commit_all("Documentation update for #{owner.name}")
+    self.commit = commit.split(' ')[2][0..-2]
     unless other_commits_pending?
       git.push('origin', 'docs') if Setting[:auto_push] 
     end
@@ -297,7 +298,6 @@ class CodeComment < ActiveRecord::Base
         buffer += line
       end
     end # file.each_line
-    p
     [buffer, context, future]
   end
   
