@@ -91,14 +91,24 @@ class CodeComment < ActiveRecord::Base
     unless version.skip?
       pre_version = good_version_before(version_number) unless version == 1
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
-      if f = export(pre_version, version)
-        self.without_versioning do
-          version.exported = true
-          self.raw_body = nil
-          version.save
-        end
-      else
-        false
+      puts "Version 1:"
+      puts pre_version.body
+      puts "-"*40
+      puts "Version 2:"
+      puts version.body
+      begin
+        export(pre_version, version)
+      rescue
+        Error.create({:pre_version => pre_version, 
+            :version => version,
+            :type => $!.class,
+            :message => $!.message
+        })
+      self.without_versioning do
+        version.exported = true
+        self.raw_body = nil
+        version.save
+      end
       end
     end
   end

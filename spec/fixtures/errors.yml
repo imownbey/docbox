@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  pre_version_id: 1
+  version_id: 1
+  type: MyString
+  message: MyString
+
+two:
+  pre_version_id: 1
+  version_id: 1
+  type: MyString
+  message: MyString

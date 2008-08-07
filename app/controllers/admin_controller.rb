@@ -1,11 +1,7 @@
 class AdminController < ApplicationController
   before_filter :login_required
   
-  def authorize
   
-  def create_user_authorization
-    
-  end
   
   private
   
