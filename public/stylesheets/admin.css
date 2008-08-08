@@ -1,0 +1,38 @@
+ul li {
+  list-style: none;
+}
+
+ul li h3 {
+  margin-left: -15px;
+}
+
+ul.errors h3 a {
+  float: right;
+}
+
+ul.errors table {
+  width: 100%;
+}
+
+ul.errors table th {
+  background-color: gray;
+  border: 0;
+  border-bottom: 1px solid black;
+}
+
+ul.errors table td {
+  border: 0;
+}
+
+ul.errors table td p {
+  font-size: 80%;
+}
+
+fieldset {
+  border: 1px solid grey;
+  padding: 8px;
+}
+
+fieldset legend {
+  padding: 0 10px;
+}

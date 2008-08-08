@@ -23,6 +23,7 @@ ActionController::Routing::Routes.draw do |map|
       user.delete_user ':id', :conditions => delete, :action => "delete_user"
     end
     admin.errors 'errors', :action => "errors", :conditions => get
+    admin.error 'errors/:id', :action => "fix_error", :conditions => put
   end
   
   map.with_options :controller => 'documentation', :path_prefix => 'docs', :conditions => get do |docs|
