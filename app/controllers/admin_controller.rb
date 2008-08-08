@@ -5,6 +5,14 @@ class AdminController < ApplicationController
     @errors = Error.unfixed.all
   end
   
+  def fix_error
+    error = Error.find(params[:id])
+    error.fixed = true
+    error.save
+    flash[:notice] = "Marked error as fixed."
+    redirect_to admin_errors_path
+  end
+  
   private
   
   def authorized?
