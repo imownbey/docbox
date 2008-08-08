@@ -98,7 +98,7 @@ class CodeComment < ActiveRecord::Base
       puts "Version 2:"
       puts version.body
       begin
-        export(pre_version, version)
+        commit = export(pre_version, version)
       rescue
         Error.create({
             :pre_version => pre_version, 
@@ -110,6 +110,7 @@ class CodeComment < ActiveRecord::Base
         self.without_versioning do
           version.exported = true
           self.raw_body = nil
+          self.commit = commit
           version.save
         end
       end
@@ -177,10 +178,10 @@ class CodeComment < ActiveRecord::Base
     git.config('user.name', v2.user.try(:login) || 'Docbox')
     git.config('user.email', v2.user.try(:email) || 'docbox@docbox.org')
     commit = git.commit_all("Documentation update for #{owner.name}")
-    self.commit = commit.split(' ')[2][0..-2]
     unless other_commits_pending?
       git.push('origin', 'docs') if Setting[:auto_push] 
     end
+    commit.split[2][0..-2]
   end
   
   def other_commits_pending?
