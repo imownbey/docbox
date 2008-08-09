@@ -4,8 +4,8 @@ class CommentsController < ApplicationController
   end
   
   def diff
-    version = @comment.v(params[:v])
-     
+    @version = @comment.v(params[:v])
+    @current = @comment
   end
   
   def edit

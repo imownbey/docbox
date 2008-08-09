@@ -6,4 +6,4 @@
   </h1>
   <p><%= @requested_object.code_container.full_name %></p>
 </div>
-<%= render :partial => "show_comment", :locals => {:object => @requested_object} %>
+<%= render :partial => "show_comment", :locals => {:object => @requested_object, :comment => @comment.body} %>

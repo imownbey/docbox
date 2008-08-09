@@ -17,7 +17,15 @@ class DocumentationController < ApplicationController
       if @requested_object.is_a?(CodeMethod)
         @in_file = @requested_object.code_file
         @versions = @requested_object.code_comment.try(:versions)
-        render :template => 'documentation/show_method'
+        if params[:v]
+          @comment = @requested_object.code_comment.v(params[:v])
+        else
+          @comment = @requested_object.code_comment
+        end
+        respond_to do |format|
+          format.html  { render :template => 'documentation/show_method' }
+          format.js    { render :text => @comment.body                   }
+        end
       else
         @methods[:all] = @requested_object.code_methods.with_comments.with_container.ordered
         @methods[:instance] = {}

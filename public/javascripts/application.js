@@ -1,4 +1,24 @@
 $(document).ready(function () {
+  // Versioning
+  $('a.version').click(function() {
+    url = this.href
+    var v1 = ""
+    var v2 = ""
+    $.get(url, 
+      function(data1) {
+        $.get(location.href, 
+          function(data2) {
+            $('.comment').children('.body').html(diffString(data1, data2))
+          }
+        )
+      }
+    )
+
+  //  
+    return false
+  })
+  
+  // Sidebar Search
   $('.clear-button').click(function() {
     $('#search').val('')
     reshowSidebar()
