@@ -1,14 +1,14 @@
 require 'mixins'
 class CodeContainer < ActiveRecord::Base
   include TokenParams
+  include Documentable
+  
   has_many :code_objects
   has_many :code_constants
   has_many :code_attributes
   has_many :code_methods
   has_many :code_containers
   belongs_to :code_container
-  has_one :code_comment, :as => :owner, :dependent => :destroy
-  belongs_to :code_file
   
   has_many :in_files
   has_many :code_files, :through => :in_files

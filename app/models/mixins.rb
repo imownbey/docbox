@@ -23,6 +23,15 @@ module TokenParams
   end
 end
 
+module Documentable
+  def self.included(base)
+    base.class_eval do
+      has_one :code_comment, :as => :owner, :dependent => :destroy
+      has_one :code_file
+    end
+  end
+end
+
 #module Search
 #  def self.included(base)
 #    base.class_eval do
