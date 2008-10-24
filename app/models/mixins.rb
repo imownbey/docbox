@@ -27,7 +27,7 @@ module Documentable
   def self.included(base)
     base.class_eval do
       has_one :code_comment, :as => :owner, :dependent => :destroy
-      has_one :code_file
+      belongs_to :code_file
     end
   end
 end
