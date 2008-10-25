@@ -1,4 +1,4 @@
-<% content_for :sidebar, render(:partial => "documentation/method_sidebar", :locals => {:object => @comment.owner, :in_file => @comment.code_file || @comment.owner, :versions => @comment.versions.reverse}) %>
+<% content_for :sidebar, render(:partial => "documentation/method_sidebar", :locals => {:object => @comment.owner, :in_file => @comment.code_file || @comment.owner.try(:code_file) || @comment.owner, :versions => @comment.versions.reverse}) %>
 <h2>Edit comment for <%= @comment.owner.try(:full_name) || @comment.owner.name%></h2>
 <div class="form">
 <% form_for @comment, :url => {:action => 'update'} do |f| -%>
