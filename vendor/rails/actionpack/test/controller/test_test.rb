@@ -531,6 +531,11 @@ XML
     assert_equal content_type, file.content_type
     assert_equal file.path, file.local_path
     assert_equal expected, file.read
+
+    new_content_type = "new content_type"
+    file.content_type = new_content_type
+    assert_equal new_content_type, file.content_type
+
   end
 
   def test_test_uploaded_file_with_binary
@@ -662,6 +667,7 @@ class NamedRoutesControllerTest < ActionController::TestCase
     with_routing do |set|
       set.draw { |map| map.resources :contents }
       assert_equal 'http://test.host/contents/new', new_content_url
+      assert_equal 'http://test.host/contents/1', content_url(:id => 1)
     end
   end
 end

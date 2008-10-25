@@ -109,16 +109,17 @@ module ActionController #:nodoc:
         update_options! options
       end
 
+      # override these to return true in appropriate subclass
       def before?
-        self.class == BeforeFilter
+        false
       end
 
       def after?
-        self.class == AfterFilter
+        false
       end
 
       def around?
-        self.class == AroundFilter
+        false
       end
 
       # Make sets of strings from :only/:except options
@@ -170,6 +171,10 @@ module ActionController #:nodoc:
         :around
       end
 
+      def around?
+        true
+      end
+
       def call(controller, &block)
         if should_run_callback?(controller)
           method = filter_responds_to_before_and_after? ? around_proc : self.method
@@ -194,8 +199,8 @@ module ActionController #:nodoc:
           Proc.new do |controller, action|
             method.before(controller)
 
-            if controller.send!(:performed?)
-              controller.send!(:halt_filter_chain, method, :rendered_or_redirected)
+            if controller.__send__(:performed?)
+              controller.__send__(:halt_filter_chain, method, :rendered_or_redirected)
             else
               begin
                 action.call
@@ -212,10 +217,14 @@ module ActionController #:nodoc:
         :before
       end
 
+      def before?
+        true
+      end
+
       def call(controller, &block)
         super
-        if controller.send!(:performed?)
-          controller.send!(:halt_filter_chain, method, :rendered_or_redirected)
+        if controller.__send__(:performed?)
+          controller.__send__(:halt_filter_chain, method, :rendered_or_redirected)
         end
       end
     end
@@ -223,6 +232,10 @@ module ActionController #:nodoc:
     class AfterFilter < Filter #:nodoc:
       def type
         :after
+      end
+
+      def after?
+        true
       end
     end
 

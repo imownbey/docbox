@@ -1,4 +1,28 @@
-*Edge*
+*2.2.0 [RC1] (October 24th, 2008)*
+
+* TimeWithZone#freeze: preload instance variables so that we can actually freeze [Geoff Buesing]
+
+* Fix Brasilia timezone #1180 [Marcus Derencius, Kane]
+
+* Time#advance recognizes fractional days and weeks. Deprecate Durations of fractional months and years #970 [Tom Lea]
+
+* Add ActiveSupport::Rescuable module abstracting ActionController::Base rescue_from features. [Norbert Crombach, Pratik]
+
+* Switch from String#chars to String#mb_chars for the unicode proxy.  [Manfred Stienstra]
+
+  This helps with 1.8.7 compatibility and also improves performance for some operations by reducing indirection.
+
+* TimeWithZone #wday, #yday and #to_date avoid trip through #method_missing [Geoff Buesing]
+
+* Added Time, Date, DateTime and TimeWithZone #past?, #future? and #today? #720 [Clemens Kofler, Geoff Buesing]
+
+* Fixed Sri Jayawardenepura time zone to map to Asia/Colombo [Jamis Buck]
+
+* Added Inflector#parameterize for easy slug generation ("Donald E. Knuth".parameterize => "donald-e-knuth") #713 [Matt Darby]
+
+* Changed cache benchmarking to be reported in milliseconds [DHH]
+
+* Fix Ruby's Time marshaling bug in pre-1.9 versions of Ruby: utc instances are now correctly unmarshaled with a utc zone instead of the system local zone [#900 state:resolved] [Luca Guidi, Geoff Buesing]
 
 * Add Array#in_groups which splits or iterates over the array in specified number of groups. #579. [Adrian Mugnolo] Example:
   

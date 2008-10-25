@@ -60,12 +60,10 @@ module ActionController
       # segments are passed alongside in order to distinguish between default values
       # and requirements.
       def divide_route_options(segments, options)
-        options = options.dup
+        options = options.except(:path_prefix, :name_prefix)
 
         if options[:namespace]
           options[:controller] = "#{options.delete(:namespace).sub(/\/$/, '')}/#{options[:controller]}"
-          options.delete(:path_prefix)
-          options.delete(:name_prefix)
         end
 
         requirements = (options.delete(:requirements) || {}).dup
@@ -187,12 +185,14 @@ module ActionController
       private
         def validate_route_conditions(conditions)
           if method = conditions[:method]
-            if method == :head
-              raise ArgumentError, "HTTP method HEAD is invalid in route conditions. Rails processes HEAD requests the same as GETs, returning just the response headers"
-            end
+            [method].flatten.each do |m|
+              if m == :head
+                raise ArgumentError, "HTTP method HEAD is invalid in route conditions. Rails processes HEAD requests the same as GETs, returning just the response headers"
+              end
 
-            unless HTTP_METHODS.include?(method.to_sym)
-              raise ArgumentError, "Invalid HTTP method specified in route conditions: #{conditions.inspect}"
+              unless HTTP_METHODS.include?(m.to_sym)
+                raise ArgumentError, "Invalid HTTP method specified in route conditions: #{conditions.inspect}"
+              end
             end
           end
         end

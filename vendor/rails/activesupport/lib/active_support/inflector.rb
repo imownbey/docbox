@@ -1,4 +1,5 @@
 require 'singleton'
+require 'iconv'
 
 module ActiveSupport
   # The Inflector transforms words from singular to plural, class names to table names, modularized class names to ones without,
@@ -39,12 +40,16 @@ module ActiveSupport
       # Specifies a new pluralization rule and its replacement. The rule can either be a string or a regular expression.
       # The replacement should always be a string that may include references to the matched data from the rule.
       def plural(rule, replacement)
+        @uncountables.delete(rule) if rule.is_a?(String)
+        @uncountables.delete(replacement)
         @plurals.insert(0, [rule, replacement])
       end
 
       # Specifies a new singularization rule and its replacement. The rule can either be a string or a regular expression.
       # The replacement should always be a string that may include references to the matched data from the rule.
       def singular(rule, replacement)
+        @uncountables.delete(rule) if rule.is_a?(String)
+        @uncountables.delete(replacement)
         @singulars.insert(0, [rule, replacement])
       end
 
@@ -55,6 +60,8 @@ module ActiveSupport
       #   irregular 'octopus', 'octopi'
       #   irregular 'person', 'people'
       def irregular(singular, plural)
+        @uncountables.delete(singular)
+        @uncountables.delete(plural)
         if singular[0,1].upcase == plural[0,1].upcase
           plural(Regexp.new("(#{singular[0,1]})#{singular[1..-1]}$", "i"), '\1' + plural[1..-1])
           singular(Regexp.new("(#{plural[0,1]})#{plural[1..-1]}$", "i"), '\1' + singular[1..-1])
@@ -173,7 +180,7 @@ module ActiveSupport
       if first_letter_in_uppercase
         lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
       else
-        lower_case_and_underscored_word.first + camelize(lower_case_and_underscored_word)[1..-1]
+        lower_case_and_underscored_word.first.downcase + camelize(lower_case_and_underscored_word)[1..-1]
       end
     end
 
@@ -235,6 +242,50 @@ module ActiveSupport
       class_name_in_module.to_s.gsub(/^.*::/, '')
     end
 
+    # Replaces special characters in a string so that it may be used as part of a 'pretty' URL.
+    #
+    # ==== Examples
+    #
+    #   class Person
+    #     def to_param
+    #       "#{id}-#{name.parameterize}"
+    #     end
+    #   end
+    #
+    #   @person = Person.find(1)
+    #   # => #<Person id: 1, name: "Donald E. Knuth">
+    #
+    #   <%= link_to(@person.name, person_path %>
+    #   # => <a href="/person/1-donald-e-knuth">Donald E. Knuth</a>
+    def parameterize(string, sep = '-')
+      re_sep = Regexp.escape(sep)
+      # replace accented chars with ther ascii equivalents
+      parameterized_string = transliterate(string)
+      # Turn unwanted chars into the seperator
+      parameterized_string.gsub!(/[^a-z0-9\-_\+]+/i, sep)
+      # No more than one of the separator in a row.
+      parameterized_string.squeeze!(sep)
+      # Remove leading/trailing separator.
+      parameterized_string.gsub!(/^#{re_sep}|#{re_sep}$/i, '')
+      parameterized_string.downcase
+    end
+
+
+    # Replaces accented characters with their ascii equivalents.
+    def transliterate(string)
+      Iconv.iconv('ascii//ignore//translit', 'utf-8', string).to_s
+    end
+
+    # The iconv transliteration code doesn't function correctly
+    # on some platforms, but it's very fast where it does function.
+    if "foo" != Inflector.transliterate("föö")
+      undef_method :transliterate
+      def transliterate(string)
+        string.mb_chars.normalize(:kd). # Decompose accented characters
+          gsub(/[^\x00-\x7F]+/, '')     # Remove anything non-ASCII entirely (e.g. diacritics).
+      end
+    end
+
     # Create the name of a table like Rails does for models to table names. This method
     # uses the +pluralize+ method on the last word in the string.
     #
@@ -273,32 +324,47 @@ module ActiveSupport
       underscore(demodulize(class_name)) + (separate_class_name_and_id_with_underscore ? "_id" : "id")
     end
 
-    # Tries to find a constant with the name specified in the argument string:
-    #
-    #   "Module".constantize     # => Module
-    #   "Test::Unit".constantize # => Test::Unit
-    #
-    # The name is assumed to be the one of a top-level constant, no matter whether
-    # it starts with "::" or not. No lexical context is taken into account:
-    #
-    #   C = 'outside'
-    #   module M
-    #     C = 'inside'
-    #     C               # => 'inside'
-    #     "C".constantize # => 'outside', same as ::C
-    #   end
-    #
-    # NameError is raised when the name is not in CamelCase or the constant is
-    # unknown.
-    def constantize(camel_cased_word)
-      names = camel_cased_word.split('::')
-      names.shift if names.empty? || names.first.empty?
+    # Ruby 1.9 introduces an inherit argument for Module#const_get and
+    # #const_defined? and changes their default behavior.
+    if Module.method(:const_get).arity == 1
+      # Tries to find a constant with the name specified in the argument string:
+      #
+      #   "Module".constantize     # => Module
+      #   "Test::Unit".constantize # => Test::Unit
+      #
+      # The name is assumed to be the one of a top-level constant, no matter whether
+      # it starts with "::" or not. No lexical context is taken into account:
+      #
+      #   C = 'outside'
+      #   module M
+      #     C = 'inside'
+      #     C               # => 'inside'
+      #     "C".constantize # => 'outside', same as ::C
+      #   end
+      #
+      # NameError is raised when the name is not in CamelCase or the constant is
+      # unknown.
+      def constantize(camel_cased_word)
+        names = camel_cased_word.split('::')
+        names.shift if names.empty? || names.first.empty?
 
-      constant = Object
-      names.each do |name|
-        constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)
+        constant = Object
+        names.each do |name|
+          constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)
+        end
+        constant
       end
-      constant
+    else
+      def constantize(camel_cased_word) #:nodoc:
+        names = camel_cased_word.split('::')
+        names.shift if names.empty? || names.first.empty?
+
+        constant = Object
+        names.each do |name|
+          constant = constant.const_get(name, false) || constant.const_missing(name)
+        end
+        constant
+      end
     end
 
     # Turns a number into an ordinal string used to denote the position in an

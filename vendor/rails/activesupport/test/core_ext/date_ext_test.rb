@@ -198,10 +198,6 @@ class DateExtCalculationsTest < Test::Unit::TestCase
     assert_equal Time.local(2005,2,21,23,59,59), Date.new(2005,2,21).end_of_day
   end
 
-  def test_date_acts_like_date
-    assert Date.new.acts_like_date?
-  end
-
   def test_xmlschema
     with_env_tz 'US/Eastern' do
       assert_match(/^1980-02-28T00:00:00-05:?00$/, Date.new(1980, 2, 28).xmlschema)
@@ -211,6 +207,29 @@ class DateExtCalculationsTest < Test::Unit::TestCase
         assert_match(/^1880-02-28T00:00:00-05:?00$/, Date.new(1880, 2, 28).xmlschema)
         assert_match(/^1880-06-28T00:00:00-05:?00$/, Date.new(1880, 6, 28).xmlschema) # DateTimes aren't aware of DST rules
       end
+    end
+  end
+
+  uses_mocha 'past?, today? and future?' do
+    def test_today
+      Date.stubs(:current).returns(Date.new(2000, 1, 1))
+      assert_equal false, Date.new(1999, 12, 31).today?
+      assert_equal true, Date.new(2000,1,1).today?
+      assert_equal false, Date.new(2000,1,2).today?
+    end
+    
+    def test_past
+      Date.stubs(:current).returns(Date.new(2000, 1, 1))
+      assert_equal true, Date.new(1999, 12, 31).past?
+      assert_equal false, Date.new(2000,1,1).past?
+      assert_equal false, Date.new(2000,1,2).past?
+    end
+    
+    def test_future
+      Date.stubs(:current).returns(Date.new(2000, 1, 1))
+      assert_equal false, Date.new(1999, 12, 31).future?
+      assert_equal false, Date.new(2000,1,1).future?
+      assert_equal true, Date.new(2000,1,2).future?
     end
   end
 
@@ -244,4 +263,16 @@ class DateExtCalculationsTest < Test::Unit::TestCase
     ensure
       old_tz ? ENV['TZ'] = old_tz : ENV.delete('TZ')
     end
+end
+
+class DateExtBehaviorTest < Test::Unit::TestCase
+  def test_date_acts_like_date
+    assert Date.new.acts_like_date?
+  end
+
+  def test_freeze_doesnt_clobber_memoized_instance_methods
+    assert_nothing_raised do
+      Date.today.freeze.inspect
+    end
+  end
 end

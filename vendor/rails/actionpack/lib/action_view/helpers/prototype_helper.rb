@@ -255,6 +255,14 @@ module ActionView
         link_to_function(name, remote_function(options), html_options || options.delete(:html))
       end
 
+      # Creates a button with an onclick event which calls a remote action
+      # via XMLHttpRequest
+      # The options for specifying the target with :url
+      # and defining callbacks is the same as link_to_remote.
+      def button_to_remote(name, options = {}, html_options = {})
+        button_to_function(name, remote_function(options), html_options)
+      end
+
       # Periodically calls the specified url (<tt>options[:url]</tt>) every
       # <tt>options[:frequency]</tt> seconds (default is 10). Usually used to
       # update a specified div (<tt>options[:update]</tt>) with the results
@@ -397,7 +405,7 @@ module ActionView
       #  # Generates: <input name="create_btn" onclick="new Ajax.Request('/testing/create',
       #  #     {asynchronous:true, evalScripts:true, parameters:Form.serialize(this.form)});
       #  #     return false;" type="button" value="Create" />
-      #  <%= button_to_remote 'create_btn', 'Create', :url => { :action => 'create' } %>
+      #  <%= submit_to_remote 'create_btn', 'Create', :url => { :action => 'create' } %>
       #
       #  # Submit to the remote action update and update the DIV succeed or fail based
       #  # on the success or failure of the request
@@ -405,24 +413,18 @@ module ActionView
       #  # Generates: <input name="update_btn" onclick="new Ajax.Updater({success:'succeed',failure:'fail'},
       #  #      '/testing/update', {asynchronous:true, evalScripts:true, parameters:Form.serialize(this.form)});
       #  #      return false;" type="button" value="Update" />
-      #  <%= button_to_remote 'update_btn', 'Update', :url => { :action => 'update' },
+      #  <%= submit_to_remote 'update_btn', 'Update', :url => { :action => 'update' },
       #     :update => { :success => "succeed", :failure => "fail" }
       #
       # <tt>options</tt> argument is the same as in form_remote_tag.
-      #
-      # Note: This method used to be called submit_to_remote, but that's now just an alias for button_to_remote
-      def button_to_remote(name, value, options = {})
+      def submit_to_remote(name, value, options = {})
         options[:with] ||= 'Form.serialize(this.form)'
 
-        options[:html] ||= {}
-        options[:html][:type] = 'button'
-        options[:html][:onclick] = "#{remote_function(options)}; return false;"
-        options[:html][:name] = name
-        options[:html][:value] = value
+        html_options = options.delete(:html) || {}
+        html_options[:name] = name
 
-        tag("input", options[:html], false)
+        button_to_remote(value, options, html_options)
       end
-      alias_method :submit_to_remote, :button_to_remote
 
       # Returns '<tt>eval(request.responseText)</tt>' which is the JavaScript function
       # that +form_remote_tag+ can call in <tt>:complete</tt> to evaluate a multiple
@@ -588,9 +590,7 @@ module ActionView
 
         private
           def include_helpers_from_context
-            @context.extended_by.each do |mod|
-              extend mod unless mod.name =~ /^ActionView::Helpers/
-            end
+            extend @context.helpers if @context.respond_to?(:helpers)
             extend GeneratorMethods
           end
 
@@ -608,7 +608,7 @@ module ActionView
         # Example:
         #
         #   # Generates:
-        #   #     new Element.insert("list", { bottom: <li>Some item</li>" });
+        #   #     new Element.insert("list", { bottom: "<li>Some item</li>" });
         #   #     new Effect.Highlight("list");
         #   #     ["status-indicator", "cancel-link"].each(Element.hide);
         #   update_page do |page|
@@ -1054,7 +1054,7 @@ module ActionView
 
         js_options['asynchronous'] = options[:type] != :synchronous
         js_options['method']       = method_option_to_s(options[:method]) if options[:method]
-        js_options['insertion']    = options[:position].to_s.downcase if options[:position]
+        js_options['insertion']    = "'#{options[:position].to_s.downcase}'" if options[:position]
         js_options['evalScripts']  = options[:script].nil? || options[:script]
 
         if options[:form]

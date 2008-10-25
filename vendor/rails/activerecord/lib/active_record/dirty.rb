@@ -34,8 +34,10 @@ module ActiveRecord
   #   person.name << 'by'
   #   person.name_change    # => ['uncle bob', 'uncle bobby']
   module Dirty
+    DIRTY_SUFFIXES = ['_changed?', '_change', '_will_change!', '_was']
+
     def self.included(base)
-      base.attribute_method_suffix '_changed?', '_change', '_will_change!', '_was'
+      base.attribute_method_suffix *DIRTY_SUFFIXES
       base.alias_method_chain :write_attribute, :dirty
       base.alias_method_chain :save,            :dirty
       base.alias_method_chain :save!,           :dirty
@@ -44,6 +46,8 @@ module ActiveRecord
 
       base.superclass_delegating_accessor :partial_updates
       base.partial_updates = true
+
+      base.send(:extend, ClassMethods)
     end
 
     # Do any attributes have unsaved changes?
@@ -123,7 +127,10 @@ module ActiveRecord
         attr = attr.to_s
 
         # The attribute already has an unsaved change.
-        unless changed_attributes.include?(attr)
+        if changed_attributes.include?(attr)
+          old = changed_attributes[attr]
+          changed_attributes.delete(attr) unless field_changed?(attr, old, value)
+        else
           old = clone_attribute_value(:read_attribute, attr)
           changed_attributes[attr] = old if field_changed?(attr, old, value)
         end
@@ -134,7 +141,9 @@ module ActiveRecord
 
       def update_with_dirty
         if partial_updates?
-          update_without_dirty(changed)
+          # Serialized attributes should always be written in case they've been
+          # changed in place.
+          update_without_dirty(changed | self.class.serialized_attributes.keys)
         else
           update_without_dirty
         end
@@ -156,5 +165,19 @@ module ActiveRecord
         old != value
       end
 
+    module ClassMethods
+      def self.extended(base)
+        base.metaclass.alias_method_chain(:alias_attribute, :dirty)
+      end
+
+      def alias_attribute_with_dirty(new_name, old_name)
+        alias_attribute_without_dirty(new_name, old_name)
+        DIRTY_SUFFIXES.each do |suffix|
+          module_eval <<-STR, __FILE__, __LINE__+1
+            def #{new_name}#{suffix}; self.#{old_name}#{suffix}; end
+          STR
+        end
+      end
+    end
   end
 end

@@ -100,6 +100,11 @@ uses_mocha 'Memoizable' do
 
     def test_memoization_with_punctuation
       assert_equal true, @person.name?
+
+      assert_nothing_raised(NameError) do
+        @person.memoize_all
+        @person.unmemoize_all
+      end
     end
 
     def test_memoization_with_nil_value
@@ -110,6 +115,11 @@ uses_mocha 'Memoizable' do
       assert_equal 1, @person.age_calls
     end
 
+    def test_memorized_results_are_immutable
+      assert_equal "Josh", @person.name
+      assert_raise(ActiveSupport::FrozenObjectError) { @person.name.gsub!("Josh", "Gosh") }
+    end
+
     def test_reloadable
       counter = @calculator.counter
       assert_equal 1, @calculator.counter
@@ -117,6 +127,21 @@ uses_mocha 'Memoizable' do
       assert_equal 2, @calculator.counter
       assert_equal 3, @calculator.counter(true)
       assert_equal 3, @calculator.counter
+    end
+
+    def test_unmemoize_all
+      assert_equal 1, @calculator.counter
+
+      assert @calculator.instance_variable_get(:@_memoized_counter).any?
+      @calculator.unmemoize_all
+      assert @calculator.instance_variable_get(:@_memoized_counter).empty?
+
+      assert_equal 2, @calculator.counter
+    end
+
+    def test_memoize_all
+      @calculator.memoize_all
+      assert @calculator.instance_variable_defined?(:@_memoized_counter)
     end
 
     def test_memoization_cache_is_different_for_each_instance

@@ -19,6 +19,10 @@ class ViewRenderTest < Test::Unit::TestCase
     assert_equal "Hello world!", @view.render("test/hello_world")
   end
 
+  def test_render_file_at_top_level
+    assert_equal 'Elastica', @view.render('/shared')
+  end
+
   def test_render_file_with_full_path
     template_path = File.join(File.dirname(__FILE__), '../fixtures/test/hello_world.erb')
     assert_equal "Hello world!", @view.render(:file => template_path)
@@ -47,12 +51,42 @@ class ViewRenderTest < Test::Unit::TestCase
     assert_equal "only partial", @view.render(:partial => "test/partial_only")
   end
 
+  def test_render_partial_with_format
+    assert_equal 'partial html', @view.render(:partial => 'test/partial')
+  end
+
+  def test_render_partial_at_top_level
+    # file fixtures/_top_level_partial_only.erb (not fixtures/test)
+    assert_equal 'top level partial', @view.render(:partial => '/top_level_partial_only')
+  end
+
+  def test_render_partial_with_format_at_top_level
+    # file fixtures/_top_level_partial.html.erb (not fixtures/test, with format extension)
+    assert_equal 'top level partial html', @view.render(:partial => '/top_level_partial')
+  end
+
   def test_render_partial_with_locals
     assert_equal "5", @view.render(:partial => "test/counter", :locals => { :counter_counter => 5 })
   end
 
   def test_render_partial_with_errors
-    assert_raise(ActionView::TemplateError) { @view.render(:partial => "test/raise") }
+    @view.render(:partial => "test/raise")
+    flunk "Render did not raise TemplateError"
+  rescue ActionView::TemplateError => e
+    assert_match "undefined local variable or method `doesnt_exist'", e.message
+    assert_equal "", e.sub_template_message
+    assert_equal "1", e.line_number
+    assert_equal File.expand_path("#{FIXTURE_LOAD_PATH}/test/_raise.html.erb"), e.file_name
+  end
+
+  def test_render_sub_template_with_errors
+    @view.render(:file => "test/sub_template_raise")
+    flunk "Render did not raise TemplateError"
+  rescue ActionView::TemplateError => e
+    assert_match "undefined local variable or method `doesnt_exist'", e.message
+    assert_equal "Trace of template inclusion: #{File.expand_path("#{FIXTURE_LOAD_PATH}/test/sub_template_raise.html.erb")}", e.sub_template_message
+    assert_equal "1", e.line_number
+    assert_equal File.expand_path("#{FIXTURE_LOAD_PATH}/test/_raise.html.erb"), e.file_name
   end
 
   def test_render_partial_collection
@@ -67,6 +101,18 @@ class ViewRenderTest < Test::Unit::TestCase
   def test_render_partial_collection_without_as
     assert_equal "local_inspector,local_inspector_counter,object",
       @view.render(:partial => "test/local_inspector", :collection => [ Customer.new("mary") ])
+  end
+
+  def test_render_partial_with_empty_collection_should_return_nil
+    assert_nil @view.render(:partial => "test/customer", :collection => [])
+  end
+
+  def test_render_partial_with_nil_collection_should_return_nil
+    assert_nil @view.render(:partial => "test/customer", :collection => nil)
+  end
+
+  def test_render_partial_with_empty_array_should_return_nil
+    assert_nil @view.render(:partial => [])
   end
 
   # TODO: The reason for this test is unclear, improve documentation

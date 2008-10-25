@@ -246,7 +246,10 @@ module ActionMailer #:nodoc:
   #   +implicit_parts_order+.
   class Base
     include AdvAttrAccessor, PartContainer
-    include ActionController::UrlWriter if Object.const_defined?(:ActionController)
+    if Object.const_defined?(:ActionController)
+      include ActionController::UrlWriter
+      include ActionController::Layout
+    end
 
     private_class_method :new #:nodoc:
 
@@ -292,6 +295,9 @@ module ActionMailer #:nodoc:
 
     @@default_implicit_parts_order = [ "text/html", "text/enriched", "text/plain" ]
     cattr_accessor :default_implicit_parts_order
+
+    cattr_reader :protected_instance_variables
+    @@protected_instance_variables = %w(@body)
 
     # Specify the BCC addresses for the message
     adv_attr_accessor :bcc
@@ -362,6 +368,7 @@ module ActionMailer #:nodoc:
 
     # The mail object instance referenced by this mailer.
     attr_reader :mail
+    attr_reader :template_name, :default_template_name, :action_name
 
     class << self
       attr_writer :mailer_name
@@ -374,11 +381,16 @@ module ActionMailer #:nodoc:
       alias_method :controller_name, :mailer_name
       alias_method :controller_path, :mailer_name
 
-      def method_missing(method_symbol, *parameters)#:nodoc:
-        case method_symbol.id2name
-          when /^create_([_a-z]\w*)/  then new($1, *parameters).mail
-          when /^deliver_([_a-z]\w*)/ then new($1, *parameters).deliver!
-          when "new" then nil
+      def respond_to?(method_symbol, include_private = false) #:nodoc:
+        matches_dynamic_method?(method_symbol) || super
+      end
+
+      def method_missing(method_symbol, *parameters) #:nodoc:
+        match = matches_dynamic_method?(method_symbol)
+        case match[1]
+          when 'create'  then new(match[2], *parameters).mail
+          when 'deliver' then new(match[2], *parameters).deliver!
+          when 'new'     then nil
           else super
         end
       end
@@ -424,6 +436,12 @@ module ActionMailer #:nodoc:
       def template_root=(root)
         self.view_paths = ActionView::Base.process_view_paths(root)
       end
+
+      private
+        def matches_dynamic_method?(method_name) #:nodoc:
+          method_name = method_name.to_s
+          /(create|deliver)_([_a-z]\w*)/.match(method_name) || /^(new)$/.match(method_name)
+        end
     end
 
     # Instantiate a new mailer object. If +method_name+ is not +nil+, the mailer
@@ -451,7 +469,7 @@ module ActionMailer #:nodoc:
             template = template_root["#{mailer_name}/#{File.basename(path)}"]
 
             # Skip unless template has a multipart format
-            next unless template.multipart?
+            next unless template && template.multipart?
 
             @parts << Part.new(
               :content_type => template.content_type,
@@ -470,8 +488,9 @@ module ActionMailer #:nodoc:
         # also render a "normal" template (without the content type). If a
         # normal template exists (or if there were no implicit parts) we render
         # it.
-        template = template_root["#{mailer_name}/#{@template}"]
-        @body = render_message(@template, @body) if template
+        template_exists = @parts.empty?
+        template_exists ||= template_root["#{mailer_name}/#{@template}"]
+        @body = render_message(@template, @body) if template_exists
 
         # Finally, if there are other message parts and a textual body exists,
         # we shift it onto the front of the parts and set the body to nil (so
@@ -518,6 +537,7 @@ module ActionMailer #:nodoc:
         @content_type ||= @@default_content_type.dup
         @implicit_parts_order ||= @@default_implicit_parts_order.dup
         @template ||= method_name
+        @default_template_name = @action_name = @template
         @mailer_name ||= self.class.name.underscore
         @parts ||= []
         @headers ||= {}
@@ -534,7 +554,22 @@ module ActionMailer #:nodoc:
         if opts[:file] && (opts[:file] !~ /\// && !opts[:file].respond_to?(:render))
           opts[:file] = "#{mailer_name}/#{opts[:file]}"
         end
-        initialize_template_class(body).render(opts)
+
+        begin
+          old_template, @template = @template, initialize_template_class(body)
+          layout = respond_to?(:pick_layout, true) ? pick_layout(opts) : false
+          @template.render(opts.merge(:layout => layout))
+        ensure
+          @template = old_template
+        end
+      end
+
+      def default_template_format
+        :html
+      end
+
+      def candidate_for_layout?(options)
+        !@template.send(:_exempt_from_layout?, default_template_name)
       end
 
       def template_root

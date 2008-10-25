@@ -924,6 +924,20 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
 
     end
 
+    def test_named_route_with_name_prefix
+      rs.add_named_route :page, 'page', :controller => 'content', :action => 'show_page', :name_prefix => 'my_'
+      x = setup_for_named_route
+      assert_equal("http://named.route.test/page",
+                   x.send(:my_page_url))
+    end
+
+    def test_named_route_with_path_prefix
+      rs.add_named_route :page, 'page', :controller => 'content', :action => 'show_page', :path_prefix => 'my'
+      x = setup_for_named_route
+      assert_equal("http://named.route.test/my/page",
+                   x.send(:page_url))
+    end
+
     def test_named_route_with_nested_controller
       rs.add_named_route :users, 'admin/user', :controller => 'admin/user', :action => 'index'
       x = setup_for_named_route
@@ -1297,6 +1311,29 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
       end
     end
 
+    def test_recognize_array_of_methods
+      Object.const_set(:BooksController, Class.new(ActionController::Base))
+      rs.draw do |r|
+        r.connect '/match', :controller => 'books', :action => 'get_or_post', :conditions => { :method => [:get, :post] }
+        r.connect '/match', :controller => 'books', :action => 'not_get_or_post'
+      end
+
+      @request = ActionController::TestRequest.new
+      @request.env["REQUEST_METHOD"] = 'POST'
+      @request.request_uri = "/match"
+      assert_nothing_raised { rs.recognize(@request) }
+      assert_equal 'get_or_post', @request.path_parameters[:action]
+
+      # have to recreate or else the RouteSet uses a cached version:
+      @request = ActionController::TestRequest.new
+      @request.env["REQUEST_METHOD"] = 'PUT'
+      @request.request_uri = "/match"
+      assert_nothing_raised { rs.recognize(@request) }
+      assert_equal 'not_get_or_post', @request.path_parameters[:action]
+    ensure
+      Object.send(:remove_const, :BooksController) rescue nil
+    end
+
     def test_subpath_recognized
       Object.const_set(:SubpathBooksController, Class.new(ActionController::Base))
 
@@ -1351,6 +1388,36 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
       assert_raises(ActionController::RoutingError) do
         x.send(:foo_with_requirement_url, "I am Against the requirements")
       end
+    end
+
+    def test_routes_changed_correctly_after_clear
+      ActionController::Base.optimise_named_routes = true
+      rs = ::ActionController::Routing::RouteSet.new
+      rs.draw do |r|
+        r.connect 'ca', :controller => 'ca', :action => "aa"
+        r.connect 'cb', :controller => 'cb', :action => "ab"
+        r.connect 'cc', :controller => 'cc', :action => "ac"
+        r.connect ':controller/:action/:id'
+        r.connect ':controller/:action/:id.:format'
+      end
+
+      hash = rs.recognize_path "/cc"
+
+      assert_not_nil hash
+      assert_equal %w(cc ac), [hash[:controller], hash[:action]]
+
+      rs.draw do |r|
+        r.connect 'cb', :controller => 'cb', :action => "ab"
+        r.connect 'cc', :controller => 'cc', :action => "ac"
+        r.connect ':controller/:action/:id'
+        r.connect ':controller/:action/:id.:format'
+      end
+
+      hash = rs.recognize_path "/cc"
+
+      assert_not_nil hash
+      assert_equal %w(cc ac), [hash[:controller], hash[:action]]
+
     end
   end
 
@@ -1669,6 +1736,12 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
       controller = setup_named_route_test
       assert_equal "http://named.route.test/people/go/7/hello/joe/5?baz=bar",
         controller.send(:multi_url, 7, "hello", 5, :baz => "bar")
+    end
+
+    def test_named_route_url_method_with_ordered_parameters_and_empty_hash
+      controller = setup_named_route_test
+      assert_equal "http://named.route.test/people/go/7/hello/joe/5",
+        controller.send(:multi_url, 7, "hello", 5, {})
     end
 
     def test_named_route_url_method_with_no_positional_arguments
@@ -2086,6 +2159,13 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
       assert_equal "/foo/bar/7?x=y", set.generate(args)
       assert_equal ["/foo/bar/7", [:x]], set.generate_extras(args)
       assert_equal [:x], set.extra_keys(args)
+    end
+
+    def test_generate_with_path_prefix
+      set.draw { |map| map.connect ':controller/:action/:id', :path_prefix => 'my' }
+
+      args = { :controller => "foo", :action => "bar", :id => "7", :x => "y" }
+      assert_equal "/my/foo/bar/7?x=y", set.generate(args)
     end
 
     def test_named_routes_are_never_relative_to_modules
