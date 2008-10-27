@@ -19,7 +19,7 @@ class CodeComment < ActiveRecord::Base
   belongs_to :owner, :polymorphic => true
   belongs_to :user
   belongs_to :code_file
-  has_many :versions, :dependent => :delete_all
+  has_many :versions, :dependent => :delete_all, :class_name => 'CommentVersion'
   
   before_update :create_version
   after_update :add_export_to_queue
@@ -48,7 +48,7 @@ class CodeComment < ActiveRecord::Base
   # Before update, creating the previous version
   def create_version
     if self.body_changed? && !@dont_version
-      Version.create(
+      CommentVersion.create(
         :user_id => (self.user_id_changed? ? self.user_id_was : self.user_id), 
         :body => self.body_was, 
         :exported => self.exported?, 
@@ -99,13 +99,6 @@ class CodeComment < ActiveRecord::Base
       puts version.body
       begin
         commit = export(pre_version, version)
-      rescue
-        Error.create({
-            :pre_version => pre_version, 
-            :version => version,
-            :type => $!.class,
-            :message => $!.message
-        })
       else
         self.without_versioning do
           version.exported = true
@@ -174,7 +167,7 @@ class CodeComment < ActiveRecord::Base
     @file.close
     
     git = Git.open(RAILS_ROOT + '/code')
-    git.branch(Setting[:git_branch]).checkout
+    git.branch(Setting[:branch]).checkout
     git.config('user.name', v2.user.try(:login) || 'Docbox')
     git.config('user.email', v2.user.try(:email) || 'docbox@docbox.org')
     commit = git.commit_all("Documentation update for #{owner.name}")
