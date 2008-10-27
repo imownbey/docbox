@@ -92,9 +92,9 @@ module Generators
       files.each { |file| process_in_files(file) }
       
       (@previous_comments   - @comments).each   {|id| CodeComment.find(id).destroy   }
-      (@previous_objects    - @objects).each    {|id| CodeObject.find(id).destroy    }
-      (@previous_methods    - @methods).each    {|id| CodeMethod.find(id).destroy    }
-      (@previous_containers - @containers).each {|id| CodeContainer.find(id).destroy }
+      (@previous_objects    - @objects).each    {|id| CodeObject.find(id).remove    }
+      (@previous_methods    - @methods).each    {|id| CodeMethod.find(id).remove    }
+      (@previous_containers - @containers).each {|id| CodeContainer.find(id).remove }
       (@previous_in_files   - @in_files).each   {|id| InFile.find(id).destroy        }
     end
 

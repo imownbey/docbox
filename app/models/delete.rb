@@ -1,0 +1,2 @@
+class Delete < Change
+end

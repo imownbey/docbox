@@ -28,6 +28,13 @@ module Documentable
     base.class_eval do
       has_one :code_comment, :as => :owner, :dependent => :destroy
       belongs_to :code_file
+      
+      
+      # Creates a remove instead of deleting file
+      def remove
+        Delete.create(:owner => self)
+        self.destroy
+      end
     end
   end
 end
