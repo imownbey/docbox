@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   helper :all # include all helpers, all the time
 
+  before_filter :get_containers
+
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => '50b31e962fd5a59413682eeff21dda01'
@@ -19,6 +21,10 @@ class ApplicationController < ActionController::Base
       objects[index] = find_token token, (objects[index - 1] || nil), (preload && (params.length == index + 1))
     end
     objects
+  end
+  
+  def get_containers()
+    @containers = CodeContainer.not_file.find(:all)
   end
 
   def find_token(token, parent, last = false)

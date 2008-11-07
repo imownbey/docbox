@@ -1,9 +1,11 @@
 class DocumentationController < ApplicationController
+  
   def index
     @classes = CodeContainer.not_file.find(:all)
     @files = CodeFile.find(:all)
     
     @main_object = CodeContainer.main_comment.first
+    render :action => :show_file
   end
   
   def show
@@ -26,6 +28,9 @@ class DocumentationController < ApplicationController
           format.html  { render :template => 'documentation/show_method' }
           format.js    { render :text => @comment.body                   }
         end
+      elsif @requested_object.is_a?(CodeFile)
+        @main_object = @requested_object
+        render :template => 'documentation/show_file'
       else
         @methods[:all] = @requested_object.code_methods.with_comments.with_container.ordered
         @methods[:instance] = {}

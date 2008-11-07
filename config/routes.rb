@@ -37,7 +37,7 @@ ActionController::Routing::Routes.draw do |map|
     map.formatted_comments 'comments.:format', :conditions => get, :controller => 'comments'
     
     comments.new_comment 'new/*tokens', :conditions => get,  :action => 'new'
-    comments.connect 'new/*tokens',     :conditions => post, :action => 'create'
+    comments.connect 'new/:id',     :conditions => post, :action => 'create'
     
     comments.edit_comment ':id/edit',  :conditions => get, :action => 'edit'
     comments.connect ':id',            :conditions => put, :action => 'update'

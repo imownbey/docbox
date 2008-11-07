@@ -1,4 +1,4 @@
-<% comment ||= object.code_comment.body %>
+<% comment ||= object.code_comment.try(:body) %>
 <% if comment -%>
   <div class="comment">
     <div class="body">
@@ -13,4 +13,5 @@
   <div class="comment">
     No comment yet. <%= link_to "Add One!", new_comment_path(object.path)%>
   </div>
+  <div class="meta">&nbsp;</div>
 <% end -%>

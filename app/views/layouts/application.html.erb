@@ -7,46 +7,38 @@
   <body>
     <div id="container">
     	<div id="header">
-    		<h1>
-    		  <%= Setting[:site_name]%>
-    		</h1>
-        
-        <div id="user">
+    	  <div id="user">
       	  <% if logged_in? %>
-      	  Welcome <%= current_user.login %> <%= link_to 'log out', logout_path, :method => :delete%>
+      	  Welcome, <%= current_user.login %>. <%= link_to 'log out', logout_path, :method => :delete%>
       	  <% else %>
-      	  Welcome Anonymous, <%= link_to 'sign up', signup_path %>
+      	  Welcome, Anonymous. <%= link_to 'log in', login_path %> or <%= link_to 'sign up', signup_path %>
       	  <% end %>
       	</div>
+    		<h1>
+    		  <%= link_to Setting[:site_name], index_path%>
+    		</h1>
     	</div>
-
-      <div id="menu">
-        <ul>
-          <li class="<%= "active" if controller.controller_name == "main"%>"><%= link_to "Home", index_path %></li>
-          <li class="<%= "active" if controller.controller_name == "documentation" || controller.controller_name == "comments"%>"><%= link_to "Documentation", doc_path %></li>
-        </ul>
-      </div>
       <div id="content">
         <div id="main">
-  				<div id="inner-container">
-  					<%= yield :layout %>
-  				</div>
+  				<%= yield :layout %>
   			</div>
-        <div id="sidebar">
-          <h2>Search</h2>
+  			<div id="nav-sidebar" class="sidebar">
             <% form_tag({:controller => "search", :action => "results"}, :class => 'search') do %>
               <%= text_field_tag :q, nil, :id => "search", :autocomplete => "off" %>
               <%= link_to (image_tag 'cross.png'), "#", :class => "clear-button"%>
             <% end %>
-          <div id="sidebar-content">
-            <%= yield :sidebar %>
-          </div>
-        </div>
-      </div>
-      	<div id="foot">
-      		home &middot; stuff &middot; yeah &middot; about<br />
-      		Content is owned by owner as indicated in code license.  Documentation powered by Docthing.
-      	</div>
+            <ul>
+              <% @containers.each do |container| %>
+              <li><%= link_to container.name, doc_path(container.path) %> <%= link_to "&#x2190;", "#", :class => "toggle"%>
+                <% container.code_methods.each do |meth| %>
+                <ul class="methods">
+                  <li><%= link_to meth.name, doc_path(meth.path) %></li>
+                </ul>
+                <% end %>
+              </li>
+              <% end %>
+            </ul>
+  			</div>
       </div>
   </body>
 </html>

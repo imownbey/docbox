@@ -1,21 +1,12 @@
-<% content_for :sidebar, render(:partial => "class_sidebar", :locals => {:object => @requested_object, :methods => @methods})%>
-
-<div id="title">
-  <h1>
-    <span class="sub"><%= @requested_object.type %></span>
-    <% 
-      names = @requested_object.full_name.split("::") 
-      final = names.pop
-    -%>
-    <%= final %>
-  </h1>
-  <p><%= @requested_object.full_name %></p>
-</div>
+<h2 id="title">
+  <span class="sub"><%= @requested_object.class_type %></span>
+  <%= @requested_object.short_name %>
+</h2>
 
 <div id="documentation">
   <%= render :partial => 'show_comment', :locals => {:object => @requested_object}%>
 <% unless @constants.empty? %>
-<div class="section-head">Constants</div>
+<h3>>Constants</h3>
 <div id="constants">
   <ul>
     <% @constants.each do |constant| -%>
@@ -28,17 +19,18 @@
 <% end %>
 
 <% unless @attributes.empty? %>
-<div class="section-head">Attributes</div>
-<div id="attributes">
-  <ul>
-    <% @attributes.each do |attribute| %>
-    <li><span class="permission"><%= attribute.read_write %></span> <span class="highlight"><%= attribute.name %></span> <%= attribute.code_comment %></li>
-    <% end %>
-  </ul>
-</div>
+<h3>Attributes</h3>
+<table id="attributes">
+  <% @attributes.each do |attribute| %>
+  <tr>
+    <td><%= attribute.read_write %></td>
+    <td><%= attribute.name %></td>
+    <td><%= attribute.code_comment %></td>
+  </tr>
+  <% end %>
+</table>
 <% end %>
 
-<div id="methods">
 <% @methods[:class].each do |methods_hash| %>
 <%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Class Methods"}) unless methods_hash.first == :all %>
 <% end %>
@@ -46,5 +38,4 @@
 <% @methods[:instance].each do |methods_hash| %>
 <%= render(:partial => 'method_list', :locals => {:collection => methods_hash.last, :name => "#{methods_hash.first.to_s.titlecase} Instance Methods"}) unless methods_hash.first == :all%>
 <% end %>
-</div>
 </div>

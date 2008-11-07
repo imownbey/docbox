@@ -9,10 +9,7 @@ class CodeMethod < ActiveRecord::Base
   named_scope :ordered, :order => :name
   named_scope :with_comments, :include => [:code_comment]
   named_scope :with_container, :include => [:code_container]
-  
-  
-  is_indexed :fields => [:name, :parameters]
-  
+    
   def full_name
     "#{self.name} #{self.parameters}"
   end

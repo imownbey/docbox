@@ -1,9 +1,15 @@
 
 <div class="information">
-  <h2>Classes</h2>
-  <dl class="listing classes">
-    <% classes.each do |klass| %>
-    <dd><%= link_to klass.name, doc_path(klass.path)%></dd>
-    <% end %>
-  </dl>
+  <h2>Containers</h2>
+  <ul>
+  <% containers.each do |container| %>
+    <li class="code_container"><%= link_to container.name, doc_path(container.path) %>
+      <ul>
+      <% container.code_methods.each do |meth| %>
+        <li><%= link_to meth.name, doc_path(meth.path)%><li>
+      <% end %>
+      </ul>
+    </li>
+  <% end %>
+  </ul>
 </div>

@@ -93,7 +93,7 @@ class CodeComment < ActiveRecord::Base
       pre_version = good_version_before(version_number) unless version == 1
       raise VersionNotExported.new("Previous version not exported.") unless pre_version.nil? || pre_version.exported?
       puts "Version 1:"
-      puts pre_version.body
+      puts pre_version.try(:body)
       puts "-"*40
       puts "Version 2:"
       puts version.body
@@ -346,6 +346,8 @@ class CodeComment < ActiveRecord::Base
     else
       comment = commentify(string)
       string = comment.split("\n").collect {|line|
+        # Git breaks if just a ' # ' is there, so make it ' #' for newline
+        line = '' if line == ' '
         "\\1#{line}"
       }.join("\n")
     end
@@ -358,10 +360,22 @@ class CodeComment < ActiveRecord::Base
     string.gsub!("\r", "")
     string = string.wrap(Setting[:wrap_number], 0, true, true)
     if uses_begin?
-      string = string.split("\n").collect { |line| "  #{line}" }.join("\n")
+      string = string.split("\n").collect { |line| 
+        if line == ''
+          ''
+        else
+          "  #{line}"
+        end
+      }.join("\n")
       string = "=begin rdoc\n#{string}\n=end"
     else
-      string = string.split("\n").collect { |line| "\# #{line}"}.join("\n")
+      string = string.split("\n").collect { |line|
+        if line == ''
+          "\#"
+        else
+          "\# #{line}"
+        end
+      }.join("\n")
     end
     string
   end

@@ -10,7 +10,6 @@ RAILS_GEM_VERSION = '2.1.0' unless defined? RAILS_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
-require 'git'
 require 'lib/core_ext'
 
 require 'rdoc/markup/simple_markup'
@@ -21,6 +20,10 @@ require 'lib/markup'
 Rails::Initializer.run do |config|
   config.gem 'syntax'
   config.gem 'syntaxi'
+  config.gem 'highline'
+  
+  config.gem 'schacon-git', :source => 'http://gems.github.com', :lib => 'git'
+  
   
   config.action_controller.session = {
     :session_key => '_docbox_session',

@@ -15,6 +15,10 @@ class CodeContainer < ActiveRecord::Base
   
   named_scope :not_file, :conditions => ["type != 'CodeFile'"]
   named_scope :main_comment, :conditions => {:main_comment => true}
+  
+  def short_name
+    self.full_name.split("::").pop
+  end
     
   def true_container
     if code_container.is_a? CodeFile

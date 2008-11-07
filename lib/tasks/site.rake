@@ -1,47 +1,25 @@
+class Rake::RDocTask
+   def define
+     task :rdoc do
+       require 'rdoc/rdoc'
+       require "#{File.dirname(__FILE__)}/../parsing"
+       RDoc::RDoc.new.import!(rdoc_files.to_a)
+     end
+     self
+   end
+  
+end
+
 namespace :docbox do
   desc "Import"
   task :import => :environment do
-    
-    require 'rdoc/rdoc'
-    require "#{File.dirname(__FILE__)}/../parsing"
-
-    rdoc = RDoc::RDoc.new
-    Dir.chdir("#{RAILS_ROOT}/code/")
-      rdoc.import!(%w{ . README})
-      rdoc.set_main_comment('README')
-   # @files = Rake::FileList.new
-   #  @files.include('railties/CHANGELOG')
-   #  @files.include('railties/MIT-LICENSE')
-   #  @files.include('railties/README')
-   #  @files.include('railties/lib/{*.rb,commands/*.rb,rails/*.rb,rails_generator/*.rb}')
-   #
-   #  @files.include('activerecord/README')
-   #  @files.include('activerecord/CHANGELOG')
-   #  @files.include('activerecord/lib/active_record/**/*.rb')
-   #  @files.exclude('activerecord/lib/active_record/vendor/*')
-   #
-   #  @files.include('activeresource/README')
-   #  @files.include('activeresource/CHANGELOG')
-   #  @files.include('activeresource/lib/active_resource.rb')
-   #  @files.include('activeresource/lib/active_resource/*')
-   #
-   #  @files.include('actionpack/README')
-   #  @files.include('actionpack/CHANGELOG')
-   #  @files.include('actionpack/lib/action_controller/**/*.rb')
-   #  @files.include('actionpack/lib/action_view/**/*.rb')
-   #  @files.exclude('actionpack/lib/action_controller/vendor/*')
-   #
-   #  @files.include('actionmailer/README')
-   #  @files.include('actionmailer/CHANGELOG')
-   #  @files.include('actionmailer/lib/action_mailer/base.rb')
-   #  @files.exclude('actionmailer/lib/action_mailer/vendor/*')
-   #
-   #  @files.include('activesupport/README')
-   #  @files.include('activesupport/CHANGELOG')
-   #  @files.include('activesupport/lib/active_support/**/*.rb')
-   #  @files.exclude('activesupport/lib/active_support/vendor/*')
-  #  rdoc.import!(%W{README main.rb})
-  #  rdoc.set_main_comment('README')
+   rake = Rake::Application.new
+   chdir('code')
+   Dir.glob("#{RAILS_ROOT}/code/**/{rakefile,Rakefile,rakefile.rb,Rakefile.rb,*.rake}").each do |f|
+     Kernel.load(File.expand_path(f))
+   end
+   #rake.invoke_task('rdoc')
+   Rake::Task['rdoc'].invoke
   end
 
   task :export => :environment do

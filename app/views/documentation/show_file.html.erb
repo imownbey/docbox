@@ -1,0 +1,6 @@
+<h2 id="title">
+  <%= @main_object.name %>
+</h2>
+<div id="documentation">
+  <%= render(:partial => 'show_comment', :locals => {:object => @main_object}) if @main_object%>
+</div>

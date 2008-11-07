@@ -1,9 +1,5 @@
 require 'mixins'
-class CodeClass < CodeContainer
-  #include SearchTada
-  is_indexed(:fields => [:name],
-             :conditions => "type = 'CodeClass'")
-             
+class CodeClass < CodeContainer             
   def class_type
     "class"
   end

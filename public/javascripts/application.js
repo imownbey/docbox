@@ -1,3 +1,14 @@
+// Stolen from Evan Weaver's Allison RDoc Template
+RegExp.escape = function(text) {
+  if (!arguments.callee.sRE) {
+    var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
+    arguments.callee.sRE = new RegExp(
+      '(\\' + specials.join('|\\') + ')', 'g'
+    );
+  }
+  return text.replace(arguments.callee.sRE, '\\$1');
+}
+
 $(document).ready(function () {
   // Versioning
   $('a.version').click(function() {
@@ -21,7 +32,7 @@ $(document).ready(function () {
   // Sidebar Search
   $('.clear-button').click(function() {
     $('#search').val('')
-    reshowSidebar()
+    resetSidebar()
     return false
   })
   
@@ -30,12 +41,18 @@ $(document).ready(function () {
     if (this.value != this.lastValue) {
       if (this.timer) clearTimeout(this.timer);
       this.timer = setTimeout(function () {
-        if ($("#search").val() == '') {
-          reshowSidebar()
+        if($('#search').val() == '') {
+          resetSidebar()
         } else {
-          $('#sidebar-content').html("<dt>Searching...</dt><dl></dl>")
+          $('.toggle').hide()
           $('.clear-button').show()
-          $('#sidebar-content').load('/search/results?q=' + $("#search").val())
+          searchFor = $('#search').val()
+          $('.sidebar ul.methods').hide()
+          $('.sidebar ul.methods li').each(function() {
+            if($(this).text().match(searchFor)) {
+              $(this).parent('ul.methods').show()
+            }
+          })
         }
       }, 200);
       
@@ -43,10 +60,33 @@ $(document).ready(function () {
     }
   });
   
-  function reshowSidebar() {
+  function resetSidebar() {
     $('.clear-button').hide()
-    $('#sidebar-content').html(sidebarHTML)
+    $('#nav-sidebar').children('ul.methods').hide()
+    $('.toggle').show()
+    checkForArrows()
   }
+  
+  function checkForArrows() {
+    $('.toggle').each(function() {
+      if($(this).text() == "↓") {
+        $(this).parent().children('.methods').show()
+      } else {
+        $(this).parent().children('.methods').hide()
+      }
+    })
+  }
+  
+  $('.toggle').click(function() {
+    if($(this).text() == "↓") {
+      $(this).text("←")
+      $(this).parent().children('.methods').hide()
+    } else {
+      $(this).text('↓')
+      $(this).parent().children('.methods').show()
+    }
+    return false
+  })
 });
 
 jQuery.ajaxSetup({ 
