@@ -131,8 +131,9 @@ class CodeComment < ActiveRecord::Base
   # Takes two versions, and exports the second one.
   def export v1, v2
     Dir.chdir(RAILS_ROOT + "/code")
-    @file = File.new(self.owner.code_file.full_name, 'r')
-    if self.owner.code_file.full_name[-3..-1] == '.rb'
+    file_name = self.owner.code_file.try(:full_name) || self.owner.in_files.first.code_file.full_name
+    @file = File.new(file_name, 'r')
+    if file_name[-3..-1] == '.rb'
       if v1.nil? && owner.is_a?(CodeFile)
         # v1 is nil and owner is a file, just throw it at start at file
         file_body = inject_at_file_start v2.body
@@ -162,7 +163,7 @@ class CodeComment < ActiveRecord::Base
       # This is not a .rb file. Assume its a readme and jsut throw that shit in
       file_body = v2.body
     end
-    @file = File.new(self.owner.code_file.full_name, 'w')
+    @file = File.new(file_name, 'w')
     @file.puts(file_body)
     @file.close
     

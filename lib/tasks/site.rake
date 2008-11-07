@@ -3,7 +3,9 @@ class Rake::RDocTask
      task :rdoc do
        require 'rdoc/rdoc'
        require "#{File.dirname(__FILE__)}/../parsing"
-       RDoc::RDoc.new.import!(rdoc_files.to_a)
+       rdoc = RDoc::RDoc.new
+       rdoc.import!(rdoc_files.to_a)
+       rdoc.set_main_comment(main)
      end
      self
    end

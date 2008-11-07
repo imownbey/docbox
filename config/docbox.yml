@@ -1,6 +1,0 @@
---- 
-auto_push: true
-branch: docs
-git_url: git@github.com:iownbey/docbox-sample-app.git
-site_name: Docbox Sample App
-wrap_number: 80
