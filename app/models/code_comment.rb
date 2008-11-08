@@ -47,6 +47,7 @@ class CodeComment < ActiveRecord::Base
   
   # Before update, creating the previous version
   def create_version
+    p "CREATE VERSION USED ON #{self.id} AND #{self.exported?}"
     if self.body_changed? && !@dont_version
       CommentVersion.create(
         :user_id => (self.user_id_changed? ? self.user_id_was : self.user_id), 
@@ -57,7 +58,7 @@ class CodeComment < ActiveRecord::Base
         :skip => self.skip,
         :uses_begin => self.uses_begin
       )
-      self.exported = false
+      self.exported = !self.raw_body.nil?
       self.version += 1
     end
   end

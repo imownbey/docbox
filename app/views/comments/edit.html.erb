@@ -1,7 +1,8 @@
 <h2>Edit comment for <%= @comment.owner.try(:full_name) || @comment.owner.name%></h2>
 <div class="form">
 <% action = @comment.new_record? ? 'create' : 'update' %>
-<% form_for @comment, :url => {:action => action, :id => @comment.owner} do |f| -%>
+<% id = @comment.new_record? ? @comment.owner.id : @comment.id %>
+<% form_for @comment, :url => {:action => action, :id => id} do |f| -%>
   <p><%= f.text_area :body %></p>
   <p><%= f.submit %></p>
 <% end %>
