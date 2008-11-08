@@ -43,6 +43,7 @@ class CodeComment < ActiveRecord::Base
     self.body = strip(comment)
     self.exported = true # Only rdoc import uses exported_body, so this means its been exported
     self.uses_begin = (comment =~ REGEXP[:pound]).nil?
+    @exported = true
   end
   
   # Before update, creating the previous version
@@ -58,7 +59,7 @@ class CodeComment < ActiveRecord::Base
         :skip => self.skip,
         :uses_begin => self.uses_begin
       )
-      self.exported = !self.raw_body.nil?
+      self.exported = !@exported.nil?
       self.version += 1
     end
   end

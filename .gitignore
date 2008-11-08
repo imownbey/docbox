@@ -9,3 +9,4 @@ config/database.yml
 code/
 config/ultrasphinx/development.conf
 db/sphinx
+config/docbox.yml
